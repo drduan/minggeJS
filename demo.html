@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta charset="utf-8"/>
+<title>仿JQUERY选择器</title>
+
+ <style type="text/css">
+#some_element,#some_element2 {
+	height: 60px;
+	width: 80px;
+	background-color: #92b901;
+	position: absolute;
+	border-radius: 5px;
+	left:0;
+	font-size: 12px;
+	top: 5px;
+	line-height: 60px;
+	text-align: center;
+ }
+body input {
+	height: 50px;
+	width: 300px;
+}
+#some_element2{
+	top: 200px;
+}
+ </style>
+ 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+ <script src="mingge.js"></script>
+<script>
+
+//MingGe.setVar("$");//接入主变量名称。默认是D("div#id.class")
+ 
+
+ $(function(){  
+ $("#some_element,#some_element2").animate({rotate:"20deg","background-color":"#1ec7e6"},3500 ,"ease-out")
+  .animate({left:"500px",rotate:"0deg"},1000,"ease")
+  .animate({rotate:"-360deg",left:0,"background-color":"#92b901"},1500,"ease-out");//并发式CSS3动画
+  
+ 
+	  
+	$("input").eq(0). bind({click:function(){alert("绑定了点击事件，和JQUERY一样的，看DEMO的代码")},mouseout:function(){alert("鼠标退出事件")}});
+	
+	
+	
+	$("input").eq(1). click(function(){//再来一次动画
+	$("#some_element,#some_element2").animate({rotate:"20deg","background-color":"#1ec7e6"},3500 ,"ease-out")
+  .animate({left:"500px",rotate:"0deg"},1000,"ease")
+  .animate({rotate:"-360deg",left:0,"background-color":"#92b901"},1500,"ease-out");
+		
+		})
+ 
+	  })
+ 
+ 	
+		 
+ 
+</script>
+</head>
+<body>
+<h1>强大的minggeJS，你会JQUERY你也会用minggeJS,语法是一样的！但是minggeJS比JQUERY还要强大，文件小，选择器的效率在JQUERY和ZEPTO以上，超强的CSS3动画
+JQUERY有的功能，minggeJS都有基本上有，压缩后只有15K大</h1>
+<div id="some_element">minggeJS动画</div>
+<div id="some_element2">minggeJS动画</div> 
+
+<input name="" type="button" value="还有强大的mingge选择器，兼容IE678">
+<input name="" type="button" value="再来一次动画">
+ 
+</body>
+</html>
+			
