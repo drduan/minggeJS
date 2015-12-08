@@ -2,71 +2,115 @@
 <html lang="zh-cmn-Hans">
 <head>
 <meta charset="utf-8"/>
-<title>仿JQUERY选择器</title>
+<title>MingGeJs,国产山寨JQUERY，请支持国产</title>
 
  <style type="text/css">
 #some_element,#some_element2 {
-	height: 60px;
-	width: 80px;
-	background-color: #92b901;
-	position: absolute;
-	border-radius: 5px;
-	left:0;
-	font-size: 12px;
-	top: 5px;
-	line-height: 60px;
-	text-align: center;
- }
-body input {
-	height: 50px;
-	width: 300px;
+background:#92b901;
+border-radius:5px;
+font-size:12px;
+height:60px;
+left:0;
+line-height:60px;
+position:absolute;
+text-align:center;
+top:5px;
+width:80px;
 }
-#some_element2{
-	top: 200px;
+
+#some_element2 {
+color:red;
+top:400px;
+}
+
+body input {
+height:50px;
+width:300px;
 }
  </style>
  
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
- <script src="mingge.js"></script>
+ <script src="MingGe_Min.js"></script>
 <script>
 
-//MingGe.setVar("$");//接入主变量名称。默认是D("div#id.class")
- 
+//MingGe.setVar("D");//更换主变量名称。默认是$("div#id.class")
+$(function() {
+    !function() {
+        var fun = arguments.callee;
+        $("#some_element,#some_element2").animate({
+            rotate:"20deg",
+            "background-color":"#1ec7e6"
+        }, 1500, "ease-out").animate({
+            left:"500px",
+            rotate:"0deg"
+        }, 1e3, "ease").animate({
+            rotate:"-360deg",
+            left:0,
+            "background-color":"#92b901"
+        }, 1500, function() {
+            fun();//完成时回调
+        }, "ease-out");
+    }();
+    $("body div.main input").eq(0).bind({
+        click:function() {
+            alert('$("body div.main input")绑定了点击事件，和JQUERY一样的，看DEMO的代码');
+        }
+    });
+    $("input").eq(1).click(function() {
+        //创建节点
+        $("div").eq(1).createNode("p", {
+            html:" 把DIV添加在第一"
+        }, "内前");
+    });
+    $("input").eq(2).click(function() {
+        //创建节点
+        $("div").eq(1).createNode("p", {
+            html:"把DIV添加在DIV最后面"
+        }, "内后");
+    });
+    $("input").eq(3).click(function() {
+        //AJAX读取远程文件
+        $.ajax({
+            url:"MingGeJs介绍.txt",
+            data:"a=1&b=2",
+            //示范传参数
+            type:"get",
+            //不作介绍，和JQUERY的$.ajax接口一致
+            timeout:2e4,
+            async:true,
+            lock:true,
+            complete:false,
+            success:function(serverdata) {
+                //上传成功事件
+                alert(serverdata);
+            },
+            error:function(ErroMsg) {
+                alert(ErroMsg + "错误代码，请用http运行AJAX");
+            },
+            cache:false
+        });
+    });
+}); 
 
- $(function(){  
- $("#some_element,#some_element2").animate({rotate:"20deg","background-color":"#1ec7e6"},3500 ,"ease-out")
-  .animate({left:"500px",rotate:"0deg"},1000,"ease")
-  .animate({rotate:"-360deg",left:0,"background-color":"#92b901"},1500,"ease-out");//并发式CSS3动画
-  
- 
-	  
-	$("input").eq(0). bind({click:function(){alert("绑定了点击事件，和JQUERY一样的，看DEMO的代码")},mouseout:function(){alert("鼠标退出事件")}});
-	
-	
-	
-	$("input").eq(1). click(function(){//再来一次动画
-	$("#some_element,#some_element2").animate({rotate:"20deg","background-color":"#1ec7e6"},3500 ,"ease-out")
-  .animate({left:"500px",rotate:"0deg"},1000,"ease")
-  .animate({rotate:"-360deg",left:0,"background-color":"#92b901"},1500,"ease-out");
-		
-		})
- 
-	  })
- 
- 	
-		 
  
 </script>
 </head>
 <body>
-<h1>强大的minggeJS，你会JQUERY你也会用minggeJS,语法是一样的！但是minggeJS比JQUERY还要强大，文件小，选择器的效率在JQUERY和ZEPTO以上，超强的CSS3动画
+<div class="main">
+<br><br><br><br>
+<h1>强大的minggeJS，你会JQUERY你也会用minggeJS,语法是一样的！但是minggeJS比JQUERY还要强大，文件小，选择器的效率在JQUERY和ZEPTO之上，超强的CSS3动画
 JQUERY有的功能，minggeJS都有基本上有，压缩后只有15K大</h1>
+<div>|我是父DIV|</div>
 <div id="some_element">minggeJS动画</div>
 <div id="some_element2">minggeJS动画</div> 
 
-<input name="" type="button" value="还有强大的mingge选择器，兼容IE678">
-<input name="" type="button" value="再来一次动画">
+<input  type="button" value="还有强大的mingge选择器，兼容IE678">
  
+<input  type="button" value="创建节点第一个DIV节点"> 
+<input  type="button" value="创建节点最后一个DIV节点"> 
+
+<input  type="button" value="ajax读取远程"> 
+</div>
 </body>
 </html>
 			
