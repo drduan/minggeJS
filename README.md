@@ -1,0 +1,3 @@
+# minggeJScss3
+强大的minggeJS，你会JQUERY你也会用minggeJS,语法是一样的！但是minggeJS比JQUERY还要强大，文件小，选择器的效率
+在JQUERY和ZEPTO以上，超强的CSS3动画 JQUERY有的功能，minggeJS都有基本上有，压缩后只有15K大

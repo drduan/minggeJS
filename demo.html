@@ -35,12 +35,8 @@ width:300px;
 
 //MingGe.setVar("D");//更换主变量名称。默认是$("div#id.class")
 $(function() {
-    function an() {
-         if($("#some_element,#some_element2").is(":animate")){
-			 alert("正在动画，你还点个鸡巴啊")
-			 return;
-			 }
-		
+    !function() {
+        var fun = arguments.callee;
         $("#some_element,#some_element2").animate({
             rotate:"20deg",
             "background-color":"#1ec7e6"
@@ -52,19 +48,14 @@ $(function() {
             left:0,
             "background-color":"#92b901"
         }, 1500, function() {
-            alert("动画运行完毕")
+            fun();//完成时回调
         }, "ease-out");
-    } ;
-	an();
-	  $("input").eq(4).click(an);
-	
+    }();
     $("body div.main input").eq(0).bind({
         click:function() {
             alert('$("body div.main input")绑定了点击事件，和JQUERY一样的，看DEMO的代码');
         }
     });
-	
-	
     $("input").eq(1).click(function() {
         //创建节点
         $("div").eq(1).createNode("p", {
@@ -114,10 +105,11 @@ JQUERY有的功能，minggeJS都有基本上有，压缩后只有15K大</h1>
 <div id="some_element2">minggeJS动画</div> 
 
 <input  type="button" value="还有强大的mingge选择器，兼容IE678">
- <input  type="button" value="创建节点第一个DIV节点"> 
+ 
+<input  type="button" value="创建节点第一个DIV节点"> 
 <input  type="button" value="创建节点最后一个DIV节点"> 
- <input  type="button" value="ajax读取远程"> 
-<input  type="button" value="再来一次动画"> 
+
+<input  type="button" value="ajax读取远程"> 
 </div>
 </body>
 </html>
