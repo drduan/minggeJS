@@ -1182,7 +1182,9 @@
         },
         isEmptyObject: function(obj) {
             for (var name in obj) {
-                return false;
+                if(obj.hasOwnProperty(name)) {
+                    return false;
+                }
             }
             return true;
         },
