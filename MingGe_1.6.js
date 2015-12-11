@@ -944,7 +944,7 @@
                     system.delEvent(elem, eveName, callback);
                 }
             } else while (elem = this.ObjArray[i++]) {
-                elem[on + "eveName"] = null;
+                elem["on" + eveName] = null;
             }
             return this;
         },
