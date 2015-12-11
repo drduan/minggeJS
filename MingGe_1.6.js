@@ -740,7 +740,7 @@
         },
         insertHTML: function() {
             D.update(this);
-            return system.insertHTML.aply(this, arguments);
+            return system.insertHTML.apply(this, arguments);
         },
         stop: function() {
             system.transition || (system.transition = D.html5Attribute("transition"));
