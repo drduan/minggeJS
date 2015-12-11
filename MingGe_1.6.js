@@ -93,8 +93,7 @@
         animate: function(params, speed, callback, model) {
             model = trim(model);
             model = "string" == typeof model && /^linear$|^ease$|^ease-in$|^ease-out$|^ease-in-out$|^cubic-bezier\s?\(.+\)$/.test(model) ? model: "ease-out";
-            var timingFunction = system.transition + "TimingFunction",
-            elem, transitionArr = {},
+            var timingFunction = system.transition + "TimingFunction", transitionArr = {},
             this_ = this,
             timer, eventEnd = function() {
                 timer && (clearInterval(timer), timer = null);
@@ -692,7 +691,7 @@
         this.animateList = [];
     };
     D.fn = D.prototype = {
-        version: "你使用的版本是MingGejs1.6",
+        version: "你使用的版本是 MingGejs " + MingGEjs,
         init: function(string, parent) {
             var R;
             if (D.isFunction(string)) {
