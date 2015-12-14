@@ -1,3 +1,7 @@
+![题图](img.jpg)
+
+[点这里看minggeJS演示](http://rawgit.com/drduan/minggeJS/master/demo.html)
+
 # minggeJS
 继优秀作品shearphoto截图插件，本人又再推出国产山寨JQUERY，为什么我要开发一个山寨JQUERY？老实说我从来没用过JQUERY，正因为我反感JQUERY。
 为什么我反感，因为我完全有开发JQUERY的能力，JQUERY的底层我都了如指掌。
