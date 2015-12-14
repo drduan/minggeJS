@@ -21,27 +21,31 @@
         }
     })();
 
-    var MingGEjs = '1.6',
-    IfGetClassName = document.getElementsByClassName ? true: false,
-    IfQuery = document.querySelectorAll ? true: false,
-    MySlice = Array.prototype.slice,
-    rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
-    toString = Object.prototype.toString,
-    fcamelCase = function (all, letter) {
+    var MingGEjs = '1.6';
+    var IfGetClassName = document.getElementsByClassName ? true : false;
+    var IfQuery = document.querySelectorAll ? true : false;
+    var MySlice = Array.prototype.slice;
+    var rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/;
+    var toString = Object.prototype.toString;
+
+    function fcamelCase(all, letter) {
         return letter.toUpperCase();
-    },
-    rdashAlpha = /-([a-z])/gi,
-    ralpha = /alpha\([^)]*\)/,
-    transformReg = /^\s?(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s?$/i,
-    uaMatch = function (ua) {
+    }
+
+    var rdashAlpha = /-([a-z])/gi;
+    var ralpha = /alpha\([^)]*\)/;
+    var transformReg = /^\s?(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s?$/i;
+
+    function uaMatch(ua) {
         ua = ua.toLowerCase();
         var match = /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) || !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
         return {
             browser: match[1] || '',
             version: match[2] || '0'
         };
-    },
-    analyse = function (string) {
+    }
+
+    function analyse(string) {
         var match = rquickExpr.exec(string),
         returnArray = false;
         if (match === null) {
@@ -61,8 +65,9 @@
             }];
         }
         return returnArray;
-    },
-    system = {
+    }
+
+    var system = {
         transform: false,
         bindEvent: false,
         oStyleValue: function (elem) {
@@ -506,8 +511,9 @@
             },
             document.addEventListener('DOMContentLoaded', c, !1)) : b());
         }
-    },
-    listNodeToArray = function (listNode) {
+    };
+
+    function listNodeToArray(listNode) {
         try {
             return MySlice.call(listNode);
         } catch(e) {
@@ -517,15 +523,17 @@
             }
             return array;
         }
-    },
-    trim = function (str) {
+    }
+
+    function trim(str) {
         try {
             return str.replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, '');
         } catch(e) {
             return str;
         }
-    },
-    circulateNode = function (parent, R) {
+    }
+
+    function circulateNode(parent, R) {
         if (R[0] || R[1][3].Id && document === parent) {
             var elemName = R[1][2];
             var ObjArray = parent[R[1][0]](elemName === 'MingGeAllelem2015' ? '*': elemName);
@@ -544,12 +552,14 @@
                 this.ObjArray.push(elem);
             }
         }
-    },
-    optionColation = function (Z) {
+    }
+
+    function optionColation(Z) {
         var analyseResult = analyse(Z);
         return analyseResult ? [analyseResult[3].Tag || IfGetClassName && analyseResult[3].Class, analyseResult] : false;
-    },
-    removing = function (array) {
+    }
+
+    function removing(array) {
         var contrast, IndexOne = 0,
         ResultArray = [],
         IndexTwo,
@@ -569,8 +579,9 @@
             }
         }
         return ResultArray;
-    },
-    mergeSelector = function (strOne, strTwo, txt) {
+    }
+
+    function mergeSelector(strOne, strTwo, txt) {
         var matchOne = strOne.match(/[^\,]+/g),
         matchTwo = strTwo.match(/[^\,]+/g);
         if (matchOne && matchTwo) {
@@ -600,8 +611,9 @@
             }
             return merge.replace(/,+$/, '');
         }
-    },
-    MyQuerySelector = function (str, getObj, findTrue, newD) {
+    }
+
+    function MyQuerySelector(str, getObj, findTrue, newD) {
         try {
             var merge, MingGeId, remove = false;
             if (findTrue) {
@@ -647,8 +659,9 @@
             }
         } catch(e) {}
         return newD;
-    },
-    CanonicalStructure = function (str, getObj, findTrue) {
+    }
+
+    function CanonicalStructure(str, getObj, findTrue) {
         var newD = new D(),
         qu;
         if (typeof str === 'string') {
@@ -673,8 +686,9 @@
             return newD;
         }
         return findTrue ? newD: newD.init(str || 0, document);
-    },
-    space = function (str, getObj, findTrue) {
+    }
+
+    function space(str, getObj, findTrue) {
         var match = str.match(/[^\s]+/g);
         if (match) {
             var leng = match.length;
@@ -686,8 +700,9 @@
             }
         }
         return getObj;
-    },
-    EvenLabel = function (str, num, obj, findTrue) {
+    }
+
+    function EvenLabel(str, num, obj, findTrue) {
         var match = str.match(/[\.#]?([\w-]+)/g);
         if (match) for (var i = 0; i < match.length; i++) {
             if (num == 0) {
@@ -697,8 +712,9 @@
             }
         }
         return obj;
-    },
-    D = window.MingGe = function (args) {
+    }
+
+    var D = window.MingGe = function (args) {
         if (this === window || this.MingGe) {
             return CanonicalStructure(args);
         }
