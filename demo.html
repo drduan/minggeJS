@@ -2,7 +2,7 @@
 <html lang="zh-cmn-Hans">
 <head>
 <meta charset="utf-8"/>
-<title>MingGeJs1.6,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
+<title>MingGeJs1.7,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
 <style type="text/css">
 #some_element,#some_element2 {
 	background:#92b901;
@@ -25,10 +25,8 @@ height:50px;
 width:300px;
 }
  </style>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
- <script src="MingGe_Min_1.6.js"></script>
+ <script src="MingGe_Min_1.7.js"></script>
 <script>
-
 //MingGe.setVar("D");//更换主变量名称。默认是$("XXXX")
 $(function() {
  
@@ -87,13 +85,16 @@ $(function() {
 	 
 		
 		 
-        $.ajax({ //    $.ajax,$.post,$().load,$.get()的接口也齐全了
+        $.ajax({ //    $.ajax,$.post,$().load,$.get() $.getJSON的接口也齐全了
             url:"MingGeJs介绍.txt",
             data:{a:1,b:2}, //示范传参数
             type:"get",  //不作介绍，和JQUERY的$.ajax接口一致
-            timeout:2e4,
+            //dataType:"json", //可用JSONP
+			//jsonp:"callback",
+			//jsonpCallback:"callback",
+			timeout:2e4,
             async:true,
-            lock:true,
+            lock:true,//新加入的同线程AJAX锁定
             complete:false,
             success:function(serverdata) { //上传成功事件
                      alert(serverdata);

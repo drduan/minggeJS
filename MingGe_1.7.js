@@ -1,13 +1,13 @@
-/*  MingGEjs框架1.6
+/*  MingGEjs类库1.7
  *  
  *  你会用JQUERY，那你也会用这个框架，语法都是一样的！
  *
- *  MingGejs选择器的执行速度，是JQUERY的十倍以上,绝对排行世界尖端
+ *  MingGejs选择器的执行速度，是JQUERY的十倍以上,绝对排行世界尖端,不喜匆喷，本屌要占有JQUERY用户份额关你X事
  *
  *  作者：明哥先生 --QQ399195513 QQ群461550716 官网www.shearphoto.com
  */
 (function(window, varName, undefined) {
-    var MingGEjs = "1.6",
+    var MingGEjs = "1.7",
     IfGetClassName = document.getElementsByClassName ? true: false,
     IfQuery = document.querySelectorAll ? true: false,
     MySlice = Array.prototype.slice,
@@ -17,8 +17,13 @@
         return letter.toUpperCase();
     },
     rdashAlpha = /-([a-z])/gi,
+    showFast = {
+        fast: 200,
+        slow: 600,
+        normal: 400
+    },
     ralpha = /alpha\([^)]*\)/,
-    transformReg = /^\s?(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s?$/i,
+    transformReg = /^\s*(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s*$/i,
     uaMatch = function(ua) {
         ua = ua.toLowerCase();
         var match = /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) || !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
@@ -51,6 +56,108 @@
     system = {
         transform: false,
         bindEvent: false,
+        getFilter: function(elem) {
+            var ori;
+            if (ori = system.original("filter", system.oStyleValue(elem))) {
+                ori = /opacity\s*=\s*([0-9]+)/.exec(ori);
+                ori = ori ? parseInt(ori[1]) * .01 : 1;
+            } else ori = 1;
+            return ori;
+        },
+        getDisplay: function(tag) {
+            if (/^(div|ul|p|h1|h2|h3|h4|h5|h6|dd|dt|dl|ol|table|nav|form)$/i.test(tag)) {
+                return "block";
+            }
+            if (/^(span|ul|b|a|em|strong|a|img)$/i.test(tag)) {
+                return "inline";
+            }
+            if (/^li$/i.test(tag)) {
+                return "list-item";
+            }
+            if (/^(input|button)$/i.test(tag)) {
+                return "inline-block";
+            }
+            if (tag == "TD") {
+                return "table-cell";
+            }
+            if (tag == "TR") {
+                return "table-row";
+            }
+            var create = document.createElement(tag),
+            bodys = document.body,
+            returns;
+            create.style.visibility = "hidden";
+            bodys.appendChild(create);
+            returns = system.original("display", system.oStyleValue(create));
+            bodys.removeChild(create);
+            return returns;
+        },
+        seachIndex: function(arr, elem) {
+            return arr[0] in elem ? arr[0] : arr[1] in elem ? arr[1] : false;
+        },
+        isIndex: function(index, elem) {
+            return index in elem;
+        },
+        jsonp: function(arg) {
+            var url = arg.url,
+            jsonp = arg.jsonp,
+            jsonpCallback = arg.jsonpCallback,
+            success = arg.success,
+            timeout = arg.timeout,
+            erro = arg.error,
+            data = arg.data,
+            match, script, timer, out = function() {
+                script && script[0].removeChild(script[1]);
+                try {
+                    delete window[match];
+                } catch(e) {
+                    window[match] = null;
+                }
+            };
+            url = url.replace(/\?+$/, "callback");
+
+            if (D.isTxt(data)) {
+                url = D.urlRevise(url, D.objToUrl(data));
+            }
+            jsonp = trim(jsonp);
+            if (jsonpCallback) {
+                match = trim(jsonpCallback);
+            } else {
+                jsonp = "[&|\\?]+(?:" + (D.isTxt(jsonp) ? jsonp: "jsoncallback|callback") + ")";
+                match = new RegExp("" + jsonp + "\\s*=\\s*([^?]+?)(&|$)", "i").exec(url);
+                match = match ? trim(match[1]) : "callback";
+            }
+            timeout && (timer = setTimeout(function() {
+                D.isFunction(erro) && erro(505);
+                out();
+            },
+            timeout));
+            window[match] = function(data) {
+                timer && (clearTimeout(timer), timer = null);
+                if (D.isFunction(success)) {
+                    success(system.JsonString.StringToJson(data) || data, "success");
+                }
+                out();
+            };
+            script = D.createScript(url);
+        },
+        htmlVal: function(hv, str) {
+            try {
+                D.update(this);
+                var isIndex;
+                if (D.isTxt(str)) {
+                    D.each.call(this.ObjArray,
+                    function() {
+                        system.isIndex(hv, this) && (this[hv] = str);
+                    });
+                    return this;
+                }
+                var html = this.ObjArray[0][hv];
+                return this.ObjArray[0] ? html: null;
+            } catch(e) {
+                return null;
+            }
+        },
         oStyleValue: function(elem) {
             var oStyle = elem.currentStyle ? elem.currentStyle: window.getComputedStyle(elem, null);
             if (oStyle.getPropertyValue) {
@@ -92,9 +199,9 @@
         },
         animate: function(params, speed, callback, model) {
             model = trim(model);
-            model = "string" == typeof model && /^linear$|^ease$|^ease-in$|^ease-out$|^ease-in-out$|^cubic-bezier\s?\(.+\)$/.test(model) ? model: "ease-out";
+            model = D.isString(model) && /^(linear|ease|ease-in|ease-out|ease-in-out|cubic-bezier\s*\(.+\))$/.test(model) ? model: "ease-out";
             var timingFunction = system.transition + "TimingFunction",
-            elem, transitionArr = {},
+            transitionArr = {},
             this_ = this,
             timer, eventEnd = function() {
                 timer && (clearInterval(timer), timer = null);
@@ -121,28 +228,27 @@
         cmdFun: function(cmd) {
             cmd = D.trim(cmd);
             switch (cmd) {
-            case "外前":
+            case "\u5916\u524d":
             case "beforeBegin":
                 cmd = "beforeBegin";
                 break;
 
-            case "外后":
+            case "\u5916\u540e":
             case "afterEnd":
                 cmd = "afterEnd";
                 break;
 
-            case "内前":
+            case "\u5185\u524d":
             case "afterBegin":
                 cmd = "afterBegin";
                 break;
 
-            case "内后":
+            case "\u5185\u540e":
             case "beforeEnd":
             default:
                 cmd = "beforeEnd";
                 break;
             }
-            return cmd;
         },
         insertHTML: function(str, cmd) {
             cmd = system.cmdFun(cmd);
@@ -155,6 +261,11 @@
         createNode: function(name, attribute, cmd) {
             var newD = new D(),
             fun,
+            seachIndex,
+            div,
+            node,
+            MingGeTemp,
+            i,
             attr = {};
             if (D.isTxt(attribute)) {
                 attr.html = D.trim(attribute);
@@ -165,13 +276,14 @@
             name = D.trim(name);
             cmd = system.cmdFun(cmd);
             fun = function() {
-                var div = document.createElement("div"),
+                div = document.createElement("div"),
                 node = document.createElement(name),
-                MingGeTemp = "MingGeTemp" + Math.random().toString().match(/[^.]+D/),
+                MingGeTemp = "MingGeTemp" + Math.random().toString().match(/[^.]+$/)[0],
                 i;
+                seachIndex = seachIndex || system.seachIndex(["value", "innerHTML"], node);
                 div.appendChild(node);
                 for (i in attr) {
-                    if (i != "id" && attr[i] && D.isTxt(attr[i])) {
+                    if (i != "id" && D.isTxt(attr[i])) {
                         i == "html" || node.setAttribute(i, attr[i]);
                     }
                 }
@@ -180,7 +292,7 @@
                 node = document.getElementById(MingGeTemp);
                 attr.id ? node.id = attr.id: node.removeAttribute ? node.removeAttribute("id") : node.id = "";
                 try {
-                    attr.html && typeof node.value === "string" ? node.value = attr.html: node.innerHTML = attr.html;
+                    attr.html && seachIndex && (node[seachIndex] = attr.html);
                 } catch(e) {}
                 newD.ObjArray.push(node);
             };
@@ -220,8 +332,9 @@
             delevent[this.bindEvent] && delevent[this.bindEvent]();
         },
         timeCompute: function(saveTime, timing, callblack) {
+            var timeSubtract;
             return function() {
-                var timeSubtract = new Date().getTime() - saveTime;
+                timeSubtract = new Date().getTime() - saveTime;
                 if (timeSubtract > timing || timeSubtract < 0) {
                     callblack();
                 }
@@ -232,10 +345,25 @@
             this.transit = true;
         },
         ajaxPrototype: {
-            simplify: function(url, type, async, data, success, timeout, cache) {
+            get: function(url, data, success) {
+                return this.simplify(url, "get", true, data, success, 2e4, true);
+            },
+            post: function(url, data, success) {
+                return this.simplify(url, "post", true, data, success, 2e4, false);
+            },
+            getJSON: function(url, data, success) {
+                return this.simplify(url, "get", true, data, success, 2e4, true, /[\?&]+.+\s*=\s*\?/i.test(url) ? "jsonp": "json");
+            },
+            simplify: function(url, type, async, data, success, timeout, cache, json) {
+                if (D.isFunction(data)) {
+                    var s = success;
+                    success = data;
+                    data = s || null;
+                }
                 this.ajax({
                     url: url,
                     type: type,
+                    dataType: json,
                     timeout: timeout,
                     async: async,
                     lock: true,
@@ -257,7 +385,10 @@
                     }
                     if (200 == xmlhttp.status) {
                         var responseText = this.serverdata = trim(xmlhttp.responseText);
-                        D.isFunction(arg.success) && arg.success(responseText, "success");
+                        if (D.isFunction(arg.success)) {
+                            if (arg.dataType == "json") responseText = system.JsonString.StringToJson(responseText) || responseText;
+                            arg.success(responseText, "success");
+                        }
                     } else {
                         this.erromsg = xmlhttp.status;
                         D.isFunction(arg.error) && arg.error(xmlhttp.status);
@@ -285,6 +416,20 @@
             },
             removeUploadEve: function() {},
             ajax: function(arg) {
+                arg = D.extend({
+                    type: "get",
+                    timeout: 2e4,
+
+                    async: true
+                },
+                arg);
+                if (arg.dataType) {
+                    arg.dataType = trim(arg.dataType);
+                    if (arg.dataType == "jsonp") {
+                        system.jsonp(arg);
+                        return this;
+                    }
+                }
                 if (arg.lock && !this.transit) return false;
                 this.transit = false;
                 this.stop = this.erromsg = false;
@@ -303,7 +448,7 @@
                         xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                     };
                 } else {
-                    if (Object.prototype.toString.call(arg.data) !== "[object FormData]") {
+                    if (toString.call(arg.data) !== "[object FormData]") {
                         arg.data = "";
                         ContentType = function() {
                             xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -318,7 +463,7 @@
                         arg.type = "POST";
                     }
                 }
-                var SendArg = arg.data == "" ? [null, ""] : [arg.data, "?" + arg.data],
+                var SendArg = arg.data == "" ? null: arg.data,
                 self = this;
                 D.isFunction(arg.complete) && arg.complete();
                 arg.timeout && arg.async && (this.timeout = setTimeout(function() {
@@ -338,7 +483,7 @@
                         break;
 
                     default:
-                        xmlhttp.open("GET", arg.url + SendArg[1], arg.async);
+                        xmlhttp.open("GET", D.urlRevise(arg.url, SendArg), arg.async);
                         arg.cache === true || xmlhttp.setRequestHeader("If-Modified-Since", "0");
                         break;
                     }
@@ -353,7 +498,7 @@
                     D.isFunction(arg.error) && arg.error(505);
                     return;
                 }
-                xmlhttp.send(SendArg[0]);
+                xmlhttp.send(SendArg);
                 if (arg.async === false) {
                     self.handle(xmlhttp, arg);
                 }
@@ -363,7 +508,7 @@
             _json_: null,
             JsonToString: function(arr) {
                 try {
-                    this._json_ = new Array();
+                    this._json_ = [];
                     this._read_(arr, true);
                     var JsonJoin = this._json_.join("");
                     JsonJoin = JsonJoin.replace(/,([\}\]])/g,
@@ -373,30 +518,33 @@
                     this._json_ = null;
                     return JsonJoin;
                 } catch(e) {
-                    alert("格式不符，转换失败");
-                    return null;
+                    alert("Format does not match, conversion fails");
+                    return;
                 }
             },
-            StringToJson: function(arrtxt) {
-                if (typeof arrtxt !== "string") {
-                    alert("你传入不是JSON字符串");
-                    return null;
+            StringToJson: function(arrtxt, T) {
+                if (D.isString(arrtxt)) {
+                    return;
                 }
                 try {
-                    var array = new Function("return " + "(" + arrtxt + ")")();
-                    var type = this._type_(array);
-                    if (type !== "[object Object]" && type !== "[object Array]") {
-                        return false;
+                    if (T == null && /^[\],:{}\s]*$/.test(arrtxt.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@").replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").replace(/(?:^|:|,)(?:\s*\[)+/g, ""))) {
+                        return window.JSON && window.JSON.parse ? window.JSON.parse(arrtxt) : new Function("return (" + arrtxt + ")")();
+                    } else if (T) {
+                        var array = new Function("return (" + arrtxt + ")")();
+                        type = this._type_(array);
+                        if (type !== "[object Object]" && type !== "[object Array]") {
+                            return false;
+                        }
+                        return array;
                     }
-                    return array;
+                    return false;
                 } catch(e) {
                     return false;
                 }
             },
             _type_: function(arr) {
-                if (typeof arr.nodeType === "number") return "[object document]";
-                var Types = Object.prototype.toString.call(arr);
-                return Types;
+                if (D.isNumber(arr.nodeType)) return "[object document]";
+                return toString.call(arr);
             },
             _addjson_: function(types, txt, txt2, TrueFalse) {
                 var run = {
@@ -406,10 +554,14 @@
                 this._json_.push(run[types]);
             },
             _addstring_: function(parameter) {
-                var of = typeof parameter;
-                if (of === "string") return '"' + parameter + '"';
+                var of = typeof parameter,
+                types;
+                if (of === "string") return '"' + parameter.replace(/[\"\'\\\/]/g,
+                function(str) {
+                    return "\\" + str;
+                }) + '"';
                 if (of === "number") return parameter;
-                var types = this._type_(parameter);
+                types = this._type_(parameter);
                 if (types === "[object Object]" || types === "[object Array]") {
                     return false;
                 }
@@ -418,12 +570,13 @@
             _read_: function(arr, TrueFalse) {
                 var types = this._type_(arr);
                 if (TrueFalse && types !== "[object Object]" && types !== "[object Array]") {
-                    alert("你传入不是数组或JSON");
+                    alert("Your incoming is not an array or JSON");
                     return this._json_ = null;
                 }
                 this._addjson_(types, "{", "[", TrueFalse);
+                var pro = arr.constructor.prototype;
                 for (var a in arr) {
-                    if (typeof arr.constructor.prototype[a] === "undefined") {
+                    if (D.isUndefined(pro[a])) {
                         var ArrA = this._addstring_(arr[a]);
                         if (typeof ArrA !== "boolean") {
                             this._addjson_(types, '"' + a + '":' + ArrA + ",", ArrA + ",");
@@ -637,7 +790,7 @@
     CanonicalStructure = function(str, getObj, findTrue) {
         var newD = new D(),
         qu;
-        if (typeof str === "string") {
+        if (D.isString(str)) {
             str = trim(str);
             if (IfQuery) {
                 if ((qu = MyQuerySelector(str, getObj, findTrue, newD)) != -1) return qu;
@@ -692,7 +845,7 @@
         this.animateList = [];
     };
     D.fn = D.prototype = {
-        version: "你使用的版本是MingGejs1.6",
+        version: "\u4f60\u4f7f\u7528\u7684\u7248\u672c\u662fMingGejs" + MingGEjs,
         init: function(string, parent) {
             var R;
             if (D.isFunction(string)) {
@@ -725,10 +878,15 @@
             return system.createNode.apply(this, arguments);
         },
         load: function(url, arg) {
+            if (D.isFunction(url)) {
+                return this.bind("load", url);
+            }
             var this_ = this,
+            seachIndex;
             successFun = function(HTML) {
                 this_.each(function() {
-                    typeof this.value === "string" ? this.value = HTML: this.innerHTML = HTML;
+                    seachIndex = system.seachIndex(["value", "innerHTML"], this);
+                    seachIndex && (this[seachIndex] = HTML);
                 });
             };
             if (arg == null) {
@@ -740,7 +898,7 @@
         },
         insertHTML: function() {
             D.update(this);
-            return system.insertHTML.aply(this, arguments);
+            return system.insertHTML.apply(this, arguments);
         },
         stop: function() {
             system.transition || (system.transition = D.html5Attribute("transition"));
@@ -767,12 +925,31 @@
                 }
             });
         },
+        attr: function(name, val) {
+            D.update(this);
+            var elem = this.ObjArray[0];
+            if (elem) {
+                if (D.isUndefined(val)) {
+                    if (D.isString(name)) {
+                        return elem.getAttribute(name);
+                    }
+                    return null;
+                }
+                if (D.isString(name) && D.isTxt(val)) {
+                    D.each.call(this.ObjArray,
+                    function() {
+                        this.setAttribute(name, val);
+                    });
+                }
+            }
+            return this;
+        },
         fadeOut: function(time, callback) {
             var arr, newD = new D();
             system.transition || (system.transition = D.html5Attribute("transition"));
             this.each(function() {
                 arr = system.oStyleValue(this);
-                system.original("display", arr) == "none" || newD.ObjArray.push(this);
+                system.original("display", arr) == "none" || this.isMingGeAnimate || newD.ObjArray.push(this);
             });
             if (system.transition) {
                 newD.animate({
@@ -792,19 +969,32 @@
             }
             return this;
         },
+        hide: function() {
+            this.css("display", "none");
+        },
+        show: function() {
+            this.css("display", null);
+            D.each.call(this.ObjArray,
+            function() {
+                if (this.nodeType == 1 && system.original("display", system.oStyleValue(this)) == "none") {
+                    this.style.display = system.getDisplay(this.tagName);
+                }
+            });
+        },
         fadeIn: function(time, callback) {
             system.transition || (system.transition = D.html5Attribute("transition"));
             var arr, newD = new D();
             this.each(function() {
                 arr = system.oStyleValue(this);
                 if (system.original("display", arr) == "none") {
+                    if (this.isMingGeAnimate) return;
                     system.transition && D(this).css("opacity", 0);
                     newD.ObjArray.push(this);
                     if (this.style.display == "none") {
                         this.style.display = "";
-                        system.original("display", arr) == "none" && (this.style.display = "block");
+                        system.original("display", arr) == "none" && (this.style.display = system.getDisplay(this.tagName));
                     } else {
-                        this.style.display = "block";
+                        this.style.display = system.getDisplay(this.tagName);
                     }
                 }
             });
@@ -813,7 +1003,7 @@
                     newD.animate({
                         opacity: 1
                     },
-                    time - 5,
+                    time,
                     function() {
                         D(this).css("opacity", null);
                         D.isFunction(callback) && callback.call(this);
@@ -825,7 +1015,6 @@
             return this;
         },
         animate: function(params, speed, callback, model) {
-            D.update(this);
             system.transition || (system.transition = D.html5Attribute("transition"));
             if (!system.transition) {
                 this.css(params);
@@ -836,11 +1025,11 @@
             newCallback;
             if (typeSpeed !== "number") {
                 if (typeSpeed === "string") {
-                    typeSpeed = parseFloat(speed);
-                    isNaN(typeSpeed) && (speed = 200);
+                    showFast[speed] && (speed = showFast[speed]);
+                    isNaN(parseFloat(speed)) && (speed = 500);
                 } else if (typeSpeed === "function") {
                     callback = speed;
-                    speed = 200;
+                    speed = 500;
                 }
             }
             if (!D.isFunction(callback)) {
@@ -897,9 +1086,11 @@
             return this;
         },
         empty: function() {
+            var seachIndex;
             return this.each(function(i) {
                 if (this.nodeType == 1) {
-                    this.innerHTML = this.value = "";
+                    seachIndex = system.seachIndex(["value", "innerHTML"], this);
+                    seachIndex && (this[seachIndex] = "");
                 }
             });
         },
@@ -909,15 +1100,6 @@
             });
             this.ObjArray = [];
             return this;
-        },
-        click: function(callback) {
-            return this.bind("click", callback);
-        },
-        mouseover: function(callback) {
-            return this.bind("mouseover", callback);
-        },
-        mouseout: function(callback) {
-            return this.bind("mouseout", callback);
         },
         bind: function(eveName, callback) {
             D.update(this);
@@ -969,6 +1151,7 @@
                 }
                 return this.bind(eveObj);
             }
+            return this;
         },
         SelectorStr: false,
         SelectorTxt: false,
@@ -982,9 +1165,10 @@
         parent: function(re) {
             D.update(this);
             var obj, i = 0,
-            newD = new D();
+            newD = new D(),
+            par;
             while (obj = this.ObjArray[i++]) {
-                obj.parentNode.tagName == "BODY" || newD.ObjArray.push(obj.parentNode);
+                par = obj.parentNode(par && par.tagName == "BODY") || newD.ObjArray.push(par);
             }
             newD.ObjArray = removing(newD.ObjArray);
             newD.SelectorTxt = document.body;
@@ -992,11 +1176,12 @@
             return re ? newD.filter(re) : newD;
         },
         addClass: function(str) {
-            if (typeof str == "string") {
+            if (D.isString(str)) {
+                str = trim(str);
+                var className;
                 return this.each(function() {
                     if (this.nodeType === 1) {
-                        str = trim(str);
-                        var className = this.className;
+                        className = this.className;
                         if (className) {
                             this.className = className + " " + str;
                         } else {
@@ -1007,13 +1192,14 @@
             }
         },
         removeClass: function(str) {
-            if (typeof str == "string") {
+            str = trim(str);
+            var className, reg;
+            if (D.isString(str)) {
                 return this.each(function() {
                     if (this.nodeType === 1) {
-                        str = trim(str);
-                        var className = this.className;
+                        className = this.className;
                         if (className) {
-                            var reg = RegExp("(^|\\s)" + str + "($|\\s)", "ig");
+                            reg = RegExp("(^|\\s)" + str + "($|\\s)", "ig");
                             if (reg.test(className)) {
                                 this.className = className = trim(className.replace(reg, " "));
                                 className == "" && (this.removeAttribute ? this.removeAttribute("class") : this.className = "");
@@ -1021,7 +1207,16 @@
                         }
                     }
                 });
+            } else if (D.isUndefined(str)) {
+                return this.each(function() {
+                    if (this.nodeType === 1) {
+                        if (this.className) {
+                            this.removeAttribute ? this.removeAttribute("class") : this.className = "";
+                        }
+                    }
+                });
             }
+            return this;
         },
         children: function(elem) {
             return elem ? this.find(elem) : IfQuery ? this.find("*") : this.find("MingGeAllelem2015");
@@ -1070,27 +1265,41 @@
             }
             return this;
         },
+        val: function(str) {
+            return system.htmlVal.call(this, "value", str);
+        },
         html: function(str) {
-            D.update(this);
-            try {
-                if (D.isTxt(str)) {
-                    this.ObjArray[0].innerHTML = str;
-                    return this;
-                }
-                return this.ObjArray[0] ? this.ObjArray[0].innerHTML: null;
-            } catch(e) {
-                return this;
-            }
+            return system.htmlVal.call(this, "innerHTML", str);
+        },
+        text: function(str) {
+            return system.htmlVal.call(this, system.isIndex("textContent", document.body) ? "textContent": "innerText", str);
         },
         css: function(args, val) {
             var i = 0,
-            elem, type = typeof args,
-            key, arrayKey = {},
-            sty;
+            elem, key, arrayKey = {},
+            sty, type = typeof args;
             system.opacity || (system.opacity = D.html5Attribute("opacity") || "filter");
             system.transform || (system.transform = D.html5Attribute("transform"));
             if (type === "string") {
-                args = D.styleName(args);
+                args = D.styleName(trim(args));
+                if (D.isUndefined(val)) {
+                    D.update(this);
+                    if (! ((elem = this.ObjArray[0]) && elem.ownerDocument)) {
+                        return null;
+                    }
+                    if (transformReg.test(args)) {
+                        var transform = elem.style[system.transform];
+                        if (transform) {
+                            i = new RegExp("" + args + "\\s?\\((.*)\\)", "i").exec(transform);
+                            return i && i[1];
+                        }
+                        return null;
+                    }
+                    if (system.opacity == "filter") {
+                        return system.getFilter(elem);
+                    }
+                    return system.original(args, system.oStyleValue(elem));
+                }
                 while (elem = this.ObjArray[i++]) {
                     try {
                         sty = elem.style;
@@ -1111,18 +1320,6 @@
             }
             return this;
         },
-        val: function(str) {
-            try {
-                D.update(this);
-                if (D.isTxt(str)) {
-                    this.ObjArray[0].value = str;
-                    return this;
-                }
-                return this.ObjArray[0] ? this.ObjArray[0].value: null;
-            } catch(e) {
-                return null;
-            }
-        },
         get: function(index) {
             D.update(this);
             return index == null ? this.ObjArray: (index = index < 0 ? this.ObjArray.length + index: index, this.ObjArray[index]);
@@ -1131,27 +1328,62 @@
     D.fn.extend = D.extend = function() {
         var length = arguments.length,
         key;
-        if (length === 1 && typeof arguments[0] === "object") {
+        if (length === 1 && toString.call(arguments[0]) === "[object Object]") {
             for (key in arguments[0]) {
                 this[key] || (this[key] = arguments[0][key]);
             }
             return true;
         }
         if (length > 1) {
+            var arg0 = arguments[0],
+            arg1 = arguments[1];
+            if (D.isObject(arg1) && D.isObject(arg0)) {
+                D.each(arg1,
+                function(i, str) {
+                    arg0[i] = str;
+                });
+                return arg0;
+            }
             return arguments[1] || arguments[0];
         }
         return false;
     };
-    system.ajax.prototype = system.ajaxPrototype;
+    system.ajax.prototype = system.ajaxPrototype; !
+    function(args) {
+        var elem, i = 0;
+        while (elem = args[i++]) {
+            D.fn[elem] = function(elem) {
+                return function(callback) {
+                    return this.bind(elem, callback);
+                };
+            } (elem);
+        }
+    } (["blur", "focus", "focusin", "focusout", "resize", "scroll", "unload", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "error", "touchstart", "touchmove", "touchend"]);
     D.extend({
-        parseJSON: function(string) {
-            return system.JsonString.StringToJson(string);
+        parseJSON: function(string, T) {
+            return system.JsonString.StringToJson(string, T);
         },
         toJSON: function(JSON) {
             return system.JsonString.JsonToString(JSON);
         },
         trim: function(str) {
             return trim(str);
+        },
+        each: function(obj, fun) {
+            var elem, i = 0;
+            if (D.isFunction(obj)) {
+                while (elem = this[i++]) {
+                    obj.call(elem);
+                }
+            } else if ((D.isObject(obj) || D.isArray(obj)) && D.isFunction(fun)) {
+                var a = [],
+                b = {};
+                for (i in obj) {
+                    b[i] || a[i] || fun(i, obj[i]);
+                }
+                return true;
+            }
+            return false;
         },
         setVar: function(name) {
             try {
@@ -1182,26 +1414,30 @@
         },
         isEmptyObject: function(obj) {
             for (var name in obj) {
-                return false;
+                if (obj.hasOwnProperty(name)) {
+                    return false;
+                }
             }
             return true;
         },
         createScript: function(srcTxt) {
-            if (typeof srcTxt === "string") {
-                var head = document.getElementsByTagName("head").item(0),
-                script;
-                if (head) {
-                    script = document.createElement("script");
-                    head.appendChild(script);
-                    script.src = srcTxt;
-                }
+            var head = document.getElementsByTagName("head").item(0),
+            script;
+            if (head) {
+                script = document.createElement("script");
+                head.appendChild(script);
+                srcTxt && (script.src = srcTxt);
+                return [head, script];
             }
         },
         post: function(url, data, success) {
-            return new system.ajax().simplify(url, "post", true, data, success, 2e4, false);
+            return new system.ajax().post(url, data, success);
         },
         get: function(url, data, success) {
-            return new system.ajax().simplify(url, "get", true, data, success, 2e4, true);
+            return new system.ajax().get(url, data, success);
+        },
+        getJSON: function(url, data, success) {
+            return new system.ajax().getJSON(url, data, success);
         },
         ajax: function(options) {
             var returns = new system.ajax();
@@ -1217,23 +1453,34 @@
                 return name;
             }
         },
-        query: document.querySelectorAll,
         userAgent: uaMatch(navigator.userAgent),
         isIe: function() {
             return this.userAgent.browser === "msie" ? this.userAgent.version.charAt(0) : false;
         },
         isTxt: function(str) {
-            return typeof str == "string" || !isNaN(str);
+            var ty = typeof str;
+            return ty == "string" || ty == "number";
+        },
+        isNumber: function(number) {
+            return typeof str == "number";
+        },
+        isUndefined: function(str) {
+            return typeof str == "undefined";
+        },
+        isString: function(str) {
+            return typeof str == "string";
         },
         objToUrl: function(obj) {
             if (D.isObject(obj)) {
-                var str = "",
-                val;
-                for (var key in obj) {
-                    val = obj[key];
-                    D.isTxt(val) && (str += key + "=" + val + "&");
-                }
+                var str = "";
+                D.each(obj,
+                function(key, val) {
+                    D.isTxt(val) && (str += key + "=" + encodeURIComponent(val) + "&");
+                });
                 return str.replace(/&+$/, "");
+            }
+            if (D.isString(obj)) {
+                return encodeURIComponent(obj);
             }
             return obj;
         },
@@ -1249,15 +1496,23 @@
             }
             return - 1;
         },
+        urlRevise: function(url, args) {
+            if (args != "" && D.isTxt(args)) {
+                if (/\?/.test(url)) {
+                    url += "&" + args;
+                } else url += "?" + args;
+            }
+            return url;
+        },
         isHtml5: function() {
-            return document.createElement("canvas").getContext("2d") ? true: false;
+            return document.createElement("canvas").getContext ? true: false;
         },
         html5Attribute: function(attribute) {
             try {
                 var attributeLow = attribute ? attribute.toLowerCase() : "transform";
                 attribute = attributeLow.replace(/^\w/, attribute.charAt(0).toUpperCase());
                 var bodyStyle = document.body.style,
-                arr = new Array(attributeLow, "Ms" + attribute, "Moz" + attribute, "Webkit" + attribute, "O" + attribute),
+                arr = [attributeLow, "Ms" + attribute, "Moz" + attribute, "Webkit" + attribute, "O" + attribute],
                 save = false;
                 for (var i = 0; i < arr.length; i++) {
                     if (arr[i] in bodyStyle) {
@@ -1270,6 +1525,18 @@
                 return false;
             }
         }
+    });
+    D.each(["width", "height", "top", "left"],
+    function(i, item) {
+        D.fn[item] = function(item, newItem) {
+            return function(str) {
+                if (str == null) {
+                    return this.ObjArray[0]["offset" + newItem];
+                }
+                /^[0-9]+$/.test(str) && (str += "px");
+                return this.css(item, str);
+            };
+        } (item, item.replace(/^\w/, item.charAt(0).toUpperCase()));
     });
     window[varName] = D;
 })(window, "$");
