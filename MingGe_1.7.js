@@ -7,52 +7,55 @@
  *  作者：明哥先生 --QQ399195513 QQ群461550716 官网www.shearphoto.com
  */
 (function(window, varName, undefined) {
+    (function(){
+        if(window.console){
+            console.log('%c骚年，本站采用最顶尖的MingGEjs类库，还不快快加入！连接直达 --> http://www.shearphoto.com/','color:red;');
+        }
+    })();
     var MingGEjs = "1.7",
-    IfGetClassName = document.getElementsByClassName ? true: false,
-    IfQuery = document.querySelectorAll ? true: false,
-    MySlice = Array.prototype.slice,
-    rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
-    toString = Object.prototype.toString,
-    fcamelCase = function(all, letter) {
-        return letter.toUpperCase();
-    },
-    rdashAlpha = /-([a-z])/gi,
-    showFast = {
-        fast: 200,
-        slow: 600,
-        normal: 400
-    },
-    ralpha = /alpha\([^)]*\)/,
-    transformReg = /^\s*(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s*$/i,
-    uaMatch = function(ua) {
-        ua = ua.toLowerCase();
-        var match = /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) || !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
-        return {
-            browser: match[1] || "",
-            version: match[2] || "0"
-        };
-    },
-    analyse = function(string) {
-        var match = rquickExpr.exec(string),
-        returnArray = false;
-        if (match === null) {
-            return false;
-        }
-        if (match[1]) {
-            returnArray = ["getElementById", "id", match[1], {
-                Id: true
-            }];
-        } else if (match[2]) {
-            returnArray = ["getElementsByTagName", "tagName", match[2], {
-                Tag: true
-            }];
-        } else {
-            returnArray = ["getElementsByClassName", "className", match[3], {
-                Class: true
-            }];
-        }
-        return returnArray;
-    },
+        IfGetClassName = document.getElementsByClassName ? true: false,
+        IfQuery = document.querySelectorAll ? true: false,
+        MySlice = Array.prototype.slice,
+        rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
+        toString = Object.prototype.toString,
+        fcamelCase = function(all, letter) {
+            return letter.toUpperCase();
+        },
+        rdashAlpha = /-([a-z])/gi,
+        showFast = {
+            fast: 200,
+            slow: 600,
+            normal: 400
+        },
+        ralpha = /alpha\([^)]*\)/,
+        transformReg = /^\s*(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s*$/i,
+        uaMatch = function(ua) {
+            ua = ua.toLowerCase();
+            var match = /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) || !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
+            return {
+                browser: match[1] || "",
+                version: match[2] || "0"
+            };
+        },
+        analyse = function(string) {
+            var match = rquickExpr.exec(string),
+                returnArray = false;
+            if (match === null)  return false;
+            if (match[1]) {
+                returnArray = ["getElementById", "id", match[1], {
+                    Id: true
+                }];
+            } else if (match[2]) {
+                returnArray = ["getElementsByTagName", "tagName", match[2], {
+                    Tag: true
+                }];
+            } else {
+                returnArray = ["getElementsByClassName", "className", match[3], {
+                    Class: true
+                }];
+            }
+            return returnArray;
+        },
     system = {
         transform: false,
         bindEvent: false,
@@ -84,12 +87,12 @@
                 return "table-row";
             }
             var create = document.createElement(tag),
-            bodys = document.body,
-            returns;
-            create.style.visibility = "hidden";
-            bodys.appendChild(create);
-            returns = system.original("display", system.oStyleValue(create));
-            bodys.removeChild(create);
+                bodys = document.body,
+                returns;
+                create.style.visibility = "hidden";
+                bodys.appendChild(create);
+                returns = system.original("display", system.oStyleValue(create));
+                bodys.removeChild(create);
             return returns;
         },
         seachIndex: function(arr, elem) {
