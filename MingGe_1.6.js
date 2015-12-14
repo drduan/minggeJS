@@ -8,6 +8,19 @@
  */
 (function (window, varNames, undefined) {
     var varName = varNames[0];
+
+    // 我做了一个艰难的决定，我觉得如果MingGEjs的用户还在使用JQUERY是一种很SB的行为
+    // 所以我有责任提醒用户：前端的世界只需要一个MingGEjs
+    (function () {
+        for (var i = 0; i < varNames.length; i++) {
+            var n = varNames[i];
+            if (window[n] && !window[n].isMingGe) {
+                alert('为了避免因为jQuery自身的Bug而影响您的页面正常运行，请去掉jQuery！\n请记住：前端的世界只需要一个MingGEjs，其他都是浮云！支持国产，从我做起！');
+                break;
+            }
+        }
+    })();
+
     var MingGEjs = '1.6',
     IfGetClassName = document.getElementsByClassName ? true: false,
     IfQuery = document.querySelectorAll ? true: false,
@@ -1272,7 +1285,10 @@
             }
         }
     });
-    for (var i = 0; i < varNames.length; i++) {
-        window[varNames[i]] = D;
-    }
+    (function () {
+        for (var i = 0; i < varNames.length; i++) {
+            window[varNames[i]] = D;
+        }
+    })();
+    D.isMingGe = true;
 })(window, ['明哥', 'MingGe', 'MINGGE', '$']);
