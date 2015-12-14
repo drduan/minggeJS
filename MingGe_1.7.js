@@ -116,6 +116,7 @@
             };
             url = url.replace(/\?+$/, "callback");
 
+
             if (D.isTxt(data)) {
                 url = D.urlRevise(url, D.objToUrl(data));
             }
@@ -1031,7 +1032,8 @@
                 } else if (typeSpeed === "function") {
                     callback = speed;
                     speed = 500;
-                }
+                } else speed = 500;
+
             }
             if (!D.isFunction(callback)) {
                 var m = model;
