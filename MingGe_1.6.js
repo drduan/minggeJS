@@ -1250,7 +1250,7 @@
             return - 1;
         },
         isHtml5: function() {
-            return document.createElement("canvas").getContext("2d") ? true: false;
+            return !!document.createElement('canvas').getContext;
         },
         html5Attribute: function(attribute) {
             try {
