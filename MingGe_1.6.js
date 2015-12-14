@@ -1,25 +1,25 @@
 /*  MingGEjs框架1.6
- *  
+ *
  *  你会用JQUERY，那你也会用这个框架，语法都是一样的！
  *
  *  MingGejs选择器的执行速度，是JQUERY的十倍以上,绝对排行世界尖端
  *
  *  作者：明哥先生 --QQ399195513 QQ群461550716 官网www.shearphoto.com
  */
-(function(window, varName, undefined) {
+(function (window, varName, undefined) {
     var MingGEjs = "1.6",
     IfGetClassName = document.getElementsByClassName ? true: false,
     IfQuery = document.querySelectorAll ? true: false,
     MySlice = Array.prototype.slice,
     rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
     toString = Object.prototype.toString,
-    fcamelCase = function(all, letter) {
+    fcamelCase = function (all, letter) {
         return letter.toUpperCase();
     },
     rdashAlpha = /-([a-z])/gi,
     ralpha = /alpha\([^)]*\)/,
     transformReg = /^\s?(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s?$/i,
-    uaMatch = function(ua) {
+    uaMatch = function (ua) {
         ua = ua.toLowerCase();
         var match = /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) || !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
         return {
@@ -27,7 +27,7 @@
             version: match[2] || "0"
         };
     },
-    analyse = function(string) {
+    analyse = function (string) {
         var match = rquickExpr.exec(string),
         returnArray = false;
         if (match === null) {
@@ -51,17 +51,17 @@
     system = {
         transform: false,
         bindEvent: false,
-        oStyleValue: function(elem) {
+        oStyleValue: function (elem) {
             var oStyle = elem.currentStyle ? elem.currentStyle: window.getComputedStyle(elem, null);
             if (oStyle.getPropertyValue) {
                 return [oStyle, "getPropertyValue"];
             }
             return [oStyle, "getAttribute"];
         },
-        original: function(styleName, oStyleValue) {
+        original: function (styleName, oStyleValue) {
             return oStyleValue[0][oStyleValue[1]](D.styleName(styleName));
         },
-        find: function(Z) {
+        find: function (Z) {
             var elem, i = 0,
             newD = new D(),
             R;
@@ -73,7 +73,7 @@
             }
             return newD;
         },
-        filter: function(string) {
+        filter: function (string) {
             var elem, i = 0,
             newD = new D();
             newD.SelectorTxt = this.SelectorTxt;
@@ -90,13 +90,13 @@
             }
             return newD;
         },
-        animate: function(params, speed, callback, model) {
+        animate: function (params, speed, callback, model) {
             model = trim(model);
             model = "string" == typeof model && /^linear$|^ease$|^ease-in$|^ease-out$|^ease-in-out$|^cubic-bezier\s?\(.+\)$/.test(model) ? model: "ease-out";
             var timingFunction = system.transition + "TimingFunction",
             elem, transitionArr = {},
             this_ = this,
-            timer, eventEnd = function() {
+            timer, eventEnd = function () {
                 timer && (clearInterval(timer), timer = null);
                 var a, b = 0,
                 style;
@@ -111,14 +111,14 @@
             transitionArr[system.transition] = speed + "ms";
             transitionArr[timingFunction] = model;
             this.css(transitionArr);
-            setTimeout(function() {
+            setTimeout(function () {
                 this_.css(params);
             },
             5);
             timer = setInterval(system.timeCompute(new Date().getTime(), speed - 1, eventEnd), 5);
             return this;
         },
-        cmdFun: function(cmd) {
+        cmdFun: function (cmd) {
             cmd = D.trim(cmd);
             switch (cmd) {
             case "外前":
@@ -144,15 +144,15 @@
             }
             return cmd;
         },
-        insertHTML: function(str, cmd) {
+        insertHTML: function (str, cmd) {
             cmd = system.cmdFun(cmd);
             str = trim(str);
-            D.isTxt(str) && this.each(function() {
+            D.isTxt(str) && this.each(function () {
                 this.insertAdjacentHTML(cmd, str);
             });
             return this;
         },
-        createNode: function(name, attribute, cmd) {
+        createNode: function (name, attribute, cmd) {
             var newD = new D(),
             fun,
             attr = {};
@@ -164,7 +164,7 @@
             }
             name = D.trim(name);
             cmd = system.cmdFun(cmd);
-            fun = function() {
+            fun = function () {
                 var div = document.createElement("div"),
                 node = document.createElement(name),
                 MingGeTemp = "MingGeTemp" + Math.random().toString().match(/[^.]+D/),
@@ -189,50 +189,50 @@
             newD.SelectorStr = "000";
             return newD;
         },
-        addEvent: function(obj, evetype, fun) {
+        addEvent: function (obj, evetype, fun) {
             var addevent = {
-                add: function() {
+                add: function () {
                     D.isFunction(fun) && obj.addEventListener(evetype, fun, false);
                 },
-                att: function() {
+                att: function () {
                     D.isFunction(fun) && obj.attachEvent("on" + evetype, fun);
                 },
-                no: function() {
+                no: function () {
                     D.isFunction(fun) && (obj["on" + evetype] = fun);
                 }
             };
             this.bindEvent = this.bindEvent || obj.addEventListener && "add" || obj.attachEvent && "att" || "no";
             addevent[this.bindEvent] && addevent[this.bindEvent]();
         },
-        delEvent: function(obj, evetype, fun) {
+        delEvent: function (obj, evetype, fun) {
             var delevent = {
-                add: function() {
+                add: function () {
                     D.isFunction(fun) && obj.removeEventListener(evetype, fun, false);
                 },
-                att: function() {
+                att: function () {
                     D.isFunction(fun) && obj.detachEvent("on" + evetype, fun);
                 },
-                no: function() {
+                no: function () {
                     D.isFunction(fun) && (obj["on" + evetype] = null);
                 }
             };
             this.bindEvent = this.bindEvent || obj.addEventListener && "add" || obj.attachEvent && "att" || "no";
             delevent[this.bindEvent] && delevent[this.bindEvent]();
         },
-        timeCompute: function(saveTime, timing, callblack) {
-            return function() {
+        timeCompute: function (saveTime, timing, callblack) {
+            return function () {
                 var timeSubtract = new Date().getTime() - saveTime;
                 if (timeSubtract > timing || timeSubtract < 0) {
                     callblack();
                 }
             };
         },
-        ajax: function() {
+        ajax: function () {
             this.serverdata = this.erromsg = this.timeout = this.stop = this.xmlhttp = false;
             this.transit = true;
         },
         ajaxPrototype: {
-            simplify: function(url, type, async, data, success, timeout, cache) {
+            simplify: function (url, type, async, data, success, timeout, cache) {
                 this.ajax({
                     url: url,
                     type: type,
@@ -246,7 +246,7 @@
                 });
                 return this;
             },
-            handle: function(xmlhttp, arg) {
+            handle: function (xmlhttp, arg) {
                 if (4 == xmlhttp.readyState) {
                     if (this.stop === true) return;
                     this.transit = true;
@@ -276,15 +276,15 @@
                     }
                 }
             },
-            out: function(arg) {
+            out: function (arg) {
                 this.transit = true;
                 this.erromsg = 504;
                 this.stop = true;
                 this.removeUploadEve();
                 D.isFunction(arg.error) && arg.error(504);
             },
-            removeUploadEve: function() {},
-            ajax: function(arg) {
+            removeUploadEve: function () {},
+            ajax: function (arg) {
                 if (arg.lock && !this.transit) return false;
                 this.transit = false;
                 this.stop = this.erromsg = false;
@@ -295,23 +295,23 @@
                     xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
                 }
                 arg.type = arg.type.toUpperCase();
-                var ContentType = function() {};
+                var ContentType = function () {};
                 arg.data = D.objToUrl(arg.data);
                 if (D.isTxt(arg.data)) {
                     arg.data = arg.data && trim(arg.data);
-                    ContentType = function() {
+                    ContentType = function () {
                         xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                     };
                 } else {
                     if (Object.prototype.toString.call(arg.data) !== "[object FormData]") {
                         arg.data = "";
-                        ContentType = function() {
+                        ContentType = function () {
                             xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                         };
                     } else {
                         if (D.isFunction(arg.progress)) {
                             xmlhttp.upload.addEventListener("progress", arg.progress, false);
-                            this.removeUploadEve = function() {
+                            this.removeUploadEve = function () {
                                 xmlhttp.upload.removeEventListener("progress", arg.progress, false);
                             };
                         }
@@ -321,12 +321,12 @@
                 var SendArg = arg.data == "" ? [null, ""] : [arg.data, "?" + arg.data],
                 self = this;
                 D.isFunction(arg.complete) && arg.complete();
-                arg.timeout && arg.async && (this.timeout = setTimeout(function() {
+                arg.timeout && arg.async && (this.timeout = setTimeout(function () {
                     self.out(arg);
                 },
                 arg.timeout));
                 if (arg.async === true) {
-                    xmlhttp.onreadystatechange = function() {
+                    xmlhttp.onreadystatechange = function () {
                         self.handle(xmlhttp, arg);
                     };
                 }
@@ -361,13 +361,13 @@
         },
         JsonString: {
             _json_: null,
-            JsonToString: function(arr) {
+            JsonToString: function (arr) {
                 try {
                     this._json_ = new Array();
                     this._read_(arr, true);
                     var JsonJoin = this._json_.join("");
                     JsonJoin = JsonJoin.replace(/,([\}\]])/g,
-                    function(a, b) {
+                    function (a, b) {
                         return b;
                     });
                     this._json_ = null;
@@ -377,7 +377,7 @@
                     return null;
                 }
             },
-            StringToJson: function(arrtxt) {
+            StringToJson: function (arrtxt) {
                 if (typeof arrtxt !== "string") {
                     alert("你传入不是JSON字符串");
                     return null;
@@ -393,19 +393,19 @@
                     return false;
                 }
             },
-            _type_: function(arr) {
+            _type_: function (arr) {
                 if (typeof arr.nodeType === "number") return "[object document]";
                 var Types = Object.prototype.toString.call(arr);
                 return Types;
             },
-            _addjson_: function(types, txt, txt2, TrueFalse) {
+            _addjson_: function (types, txt, txt2, TrueFalse) {
                 var run = {
                     "[object Object]": txt,
                     "[object Array]": txt2
                 };
                 this._json_.push(run[types]);
             },
-            _addstring_: function(parameter) {
+            _addstring_: function (parameter) {
                 var of = typeof parameter;
                 if (of === "string") return '"' + parameter + '"';
                 if (of === "number") return parameter;
@@ -415,7 +415,7 @@
                 }
                 return '""';
             },
-            _read_: function(arr, TrueFalse) {
+            _read_: function (arr, TrueFalse) {
                 var types = this._type_(arr);
                 if (TrueFalse && types !== "[object Object]" && types !== "[object Array]") {
                     alert("你传入不是数组或JSON");
@@ -439,7 +439,7 @@
         },
         opacity: false,
         transition: false,
-        style: function(objstyle, name, val) {
+        style: function (objstyle, name, val) {
             var arr, regexps, transform;
             val = D.isTxt(val) ? trim(val) : "";
             if (transformReg.test(name)) {
@@ -463,11 +463,11 @@
             }
             return [name, val];
         },
-        ready: function(a) {
+        ready: function (a) {
             system.bindEvent = system.bindEvent || document.addEventListener && "add" || document.attachEvent && "att" || "no";
             function b() {
                 try {
-                    var c = function() {
+                    var c = function () {
                         "complete" === document.readyState && (system.addEvent(document, "readystatechange", c), a());
                     },
                     d = window.frameElement;
@@ -486,14 +486,14 @@
                 a();
             }
             var c;
-            D.isFunction(a) && (system.bindEvent == "add" ? (c = function() {
+            D.isFunction(a) && (system.bindEvent == "add" ? (c = function () {
                 document.removeEventListener("DOMContentLoaded", c, !1),
                 a();
             },
             document.addEventListener("DOMContentLoaded", c, !1)) : b());
         }
     },
-    listNodeToArray = function(listNode) {
+    listNodeToArray = function (listNode) {
         try {
             return MySlice.call(listNode);
         } catch(e) {
@@ -504,14 +504,14 @@
             return array;
         }
     },
-    trim = function(str) {
+    trim = function (str) {
         try {
             return str.replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, "");
         } catch(e) {
             return str;
         }
     },
-    circulateNode = function(parent, R) {
+    circulateNode = function (parent, R) {
         if (R[0] || R[1][3].Id && document === parent) {
             var elemName = R[1][2];
             var ObjArray = parent[R[1][0]](elemName === "MingGeAllelem2015" ? "*": elemName);
@@ -531,11 +531,11 @@
             }
         }
     },
-    optionColation = function(Z) {
+    optionColation = function (Z) {
         var analyseResult = analyse(Z);
         return analyseResult ? [analyseResult[3].Tag || IfGetClassName && analyseResult[3].Class, analyseResult] : false;
     },
-    removing = function(array) {
+    removing = function (array) {
         var contrast, IndexOne = 0,
         ResultArray = [],
         IndexTwo,
@@ -556,7 +556,7 @@
         }
         return ResultArray;
     },
-    mergeSelector = function(strOne, strTwo, txt) {
+    mergeSelector = function (strOne, strTwo, txt) {
         var matchOne = strOne.match(/[^\,]+/g),
         matchTwo = strTwo.match(/[^\,]+/g);
         if (matchOne && matchTwo) {
@@ -587,7 +587,7 @@
             return merge.replace(/,+$/, "");
         }
     },
-    MyQuerySelector = function(str, getObj, findTrue, newD) {
+    MyQuerySelector = function (str, getObj, findTrue, newD) {
         try {
             var merge, MingGeId, remove = false;
             if (findTrue) {
@@ -634,7 +634,7 @@
         } catch(e) {}
         return newD;
     },
-    CanonicalStructure = function(str, getObj, findTrue) {
+    CanonicalStructure = function (str, getObj, findTrue) {
         var newD = new D(),
         qu;
         if (typeof str === "string") {
@@ -660,7 +660,7 @@
         }
         return findTrue ? newD: newD.init(str || 0, document);
     },
-    space = function(str, getObj, findTrue) {
+    space = function (str, getObj, findTrue) {
         var match = str.match(/[^\s]+/g);
         if (match) {
             var leng = match.length;
@@ -673,7 +673,7 @@
         }
         return getObj;
     },
-    EvenLabel = function(str, num, obj, findTrue) {
+    EvenLabel = function (str, num, obj, findTrue) {
         var match = str.match(/[\.#]?([\w-]+)/g);
         if (match) for (var i = 0; i < match.length; i++) {
             if (num == 0) {
@@ -684,7 +684,7 @@
         }
         return obj;
     },
-    D = window.MingGe = function(args) {
+    D = window.MingGe = function (args) {
         if (this === window || this.MingGe) {
             return CanonicalStructure(args);
         }
@@ -693,7 +693,7 @@
     };
     D.fn = D.prototype = {
         version: "你使用的版本是MingGejs1.6",
-        init: function(string, parent) {
+        init: function (string, parent) {
             var R;
             if (D.isFunction(string)) {
                 system.ready(string);
@@ -707,7 +707,7 @@
             }
             return this;
         },
-        is: function(str) {
+        is: function (str) {
             D.update(this);
             str = trim(str);
             switch (str) {
@@ -716,18 +716,18 @@
                 break;
             }
         },
-        append: function(name) {
+        append: function (name) {
             return system.createNode.call(this, name, {},
             "beforeEnd");
         },
-        createNode: function() {
+        createNode: function () {
             D.update(this);
             return system.createNode.apply(this, arguments);
         },
-        load: function(url, arg) {
+        load: function (url, arg) {
             var this_ = this,
-            successFun = function(HTML) {
-                this_.each(function() {
+            successFun = function (HTML) {
+                this_.each(function () {
                     typeof this.value === "string" ? this.value = HTML: this.innerHTML = HTML;
                 });
             };
@@ -738,15 +738,15 @@
             }
             return this;
         },
-        insertHTML: function() {
+        insertHTML: function () {
             D.update(this);
             return system.insertHTML.aply(this, arguments);
         },
-        stop: function() {
+        stop: function () {
             system.transition || (system.transition = D.html5Attribute("transition"));
             if (!system.transition) return this;
             var style;
-            return this.each(function() {
+            return this.each(function () {
                 if (this.isMingGeAnimate) {
                     delete this.isMingGeAnimate;
                     this.mingGeAnimateList && delete this.mingGeAnimateList;
@@ -756,9 +756,9 @@
                 }
             });
         },
-        fadeToggle: function(time, callback) {
+        fadeToggle: function (time, callback) {
             var arr;
-            this.each(function() {
+            this.each(function () {
                 arr = system.oStyleValue(this);
                 if (system.original("display", arr) == "none") {
                     D(this).fadeIn(time, callback);
@@ -767,10 +767,10 @@
                 }
             });
         },
-        fadeOut: function(time, callback) {
+        fadeOut: function (time, callback) {
             var arr, newD = new D();
             system.transition || (system.transition = D.html5Attribute("transition"));
-            this.each(function() {
+            this.each(function () {
                 arr = system.oStyleValue(this);
                 system.original("display", arr) == "none" || newD.ObjArray.push(this);
             });
@@ -779,7 +779,7 @@
                     opacity: 0
                 },
                 time,
-                function() {
+                function () {
                     D(this).css({
                         display: "none",
                         opacity: null
@@ -792,10 +792,10 @@
             }
             return this;
         },
-        fadeIn: function(time, callback) {
+        fadeIn: function (time, callback) {
             system.transition || (system.transition = D.html5Attribute("transition"));
             var arr, newD = new D();
-            this.each(function() {
+            this.each(function () {
                 arr = system.oStyleValue(this);
                 if (system.original("display", arr) == "none") {
                     system.transition && D(this).css("opacity", 0);
@@ -809,12 +809,12 @@
                 }
             });
             if (system.transition) {
-                setTimeout(function() {
+                setTimeout(function () {
                     newD.animate({
                         opacity: 1
                     },
                     time - 5,
-                    function() {
+                    function () {
                         D(this).css("opacity", null);
                         D.isFunction(callback) && callback.call(this);
                     },
@@ -824,7 +824,7 @@
             }
             return this;
         },
-        animate: function(params, speed, callback, model) {
+        animate: function (params, speed, callback, model) {
             D.update(this);
             system.transition || (system.transition = D.html5Attribute("transition"));
             if (!system.transition) {
@@ -846,9 +846,9 @@
             if (!D.isFunction(callback)) {
                 var m = model;
                 model = callback;
-                callback = D.isFunction(m) ? m: function() {};
+                callback = D.isFunction(m) ? m: function () {};
             }
-            newCallback = function() {
+            newCallback = function () {
                 var list = this.mingGeAnimateList;
                 if (D.isArray(list) && list.length > 0) {
                     var newD = new D(),
@@ -879,7 +879,7 @@
             lock && system.animate.apply(newD, arg);
             return this;
         },
-        on: function(eveName, callback) {
+        on: function (eveName, callback) {
             D.update(this);
             var elem, i = 0,
             type = typeof eveName;
@@ -896,30 +896,30 @@
             }
             return this;
         },
-        empty: function() {
-            return this.each(function(i) {
+        empty: function () {
+            return this.each(function (i) {
                 if (this.nodeType == 1) {
                     this.innerHTML = this.value = "";
                 }
             });
         },
-        remove: function() {
-            this.each(function() {
+        remove: function () {
+            this.each(function () {
                 this.parentNode.removeChild(this);
             });
             this.ObjArray = [];
             return this;
         },
-        click: function(callback) {
+        click: function (callback) {
             return this.bind("click", callback);
         },
-        mouseover: function(callback) {
+        mouseover: function (callback) {
             return this.bind("mouseover", callback);
         },
-        mouseout: function(callback) {
+        mouseout: function (callback) {
             return this.bind("mouseout", callback);
         },
-        bind: function(eveName, callback) {
+        bind: function (eveName, callback) {
             D.update(this);
             var elem, i = 0,
             type = typeof eveName;
@@ -936,7 +936,7 @@
             }
             return this;
         },
-        unbind: function(eveName, callback) {
+        unbind: function (eveName, callback) {
             var elem, i = 0;
             D.update(this);
             if (callback) {
@@ -948,10 +948,10 @@
             }
             return this;
         },
-        one: function(eveName, callback) {
+        one: function (eveName, callback) {
             var type = typeof eveName;
             if (type === "string" && D.isFunction(callback)) {
-                var newOne = function() {
+                var newOne = function () {
                     system.delEvent(this, eveName, newOne);
                     callback.call(this);
                 };
@@ -960,8 +960,8 @@
             if (type === "object") {
                 var eveObj = {};
                 for (var key in eveName) {
-                    eveObj[key] = function(keys) {
-                        return function() {
+                    eveObj[key] = function (keys) {
+                        return function () {
                             system.delEvent(this, keys, eveObj[keys]);
                             eveName[keys].call(this);
                         };
@@ -973,13 +973,13 @@
         SelectorStr: false,
         SelectorTxt: false,
         ObjArray: [],
-        ready: function(callback) {
+        ready: function (callback) {
             system.ready(callback);
         },
-        removing: function(array) {
+        removing: function (array) {
             return removing(array);
         },
-        parent: function(re) {
+        parent: function (re) {
             D.update(this);
             var obj, i = 0,
             newD = new D();
@@ -991,9 +991,9 @@
             newD.SelectorStr = "000";
             return re ? newD.filter(re) : newD;
         },
-        addClass: function(str) {
+        addClass: function (str) {
             if (typeof str == "string") {
-                return this.each(function() {
+                return this.each(function () {
                     if (this.nodeType === 1) {
                         str = trim(str);
                         var className = this.className;
@@ -1006,9 +1006,9 @@
                 });
             }
         },
-        removeClass: function(str) {
+        removeClass: function (str) {
             if (typeof str == "string") {
-                return this.each(function() {
+                return this.each(function () {
                     if (this.nodeType === 1) {
                         str = trim(str);
                         var className = this.className;
@@ -1023,22 +1023,22 @@
                 });
             }
         },
-        children: function(elem) {
+        children: function (elem) {
             return elem ? this.find(elem) : IfQuery ? this.find("*") : this.find("MingGeAllelem2015");
         },
-        find: function(str) {
+        find: function (str) {
             return CanonicalStructure(str, this, {
                 find: true
             });
         },
-        filter: function(str) {
+        filter: function (str) {
             var fil = CanonicalStructure(str, this, {
                 filter: true
             });
             this.SelectorTxt.ownerDocument && !this.SelectorStr && fil.ObjArray[0] && (fil.SelectorTxt = fil.ObjArray[0], fil.SelectorStr = false);
             return fil;
         },
-        index: function(obj) {
+        index: function (obj) {
             try {
                 D.update(this);
                 if (obj) {
@@ -1049,17 +1049,17 @@
                 return - 1;
             }
         },
-        eq: function(index) {
+        eq: function (index) {
             var M = new D();
             D.update(this);
             M = index == null ? this: (index = index < 0 ? this.ObjArray.length + index: index, this.ObjArray[index] && (M.ObjArray = [M.SelectorTxt = this.ObjArray[index]]), M);
             return M;
         },
-        size: function() {
+        size: function () {
             D.update(this);
             return this.ObjArray.length;
         },
-        each: function(callback) {
+        each: function (callback) {
             D.update(this);
             if (D.isFunction(callback)) {
                 var length = this.ObjArray.length,
@@ -1070,7 +1070,7 @@
             }
             return this;
         },
-        html: function(str) {
+        html: function (str) {
             D.update(this);
             try {
                 if (D.isTxt(str)) {
@@ -1082,7 +1082,7 @@
                 return this;
             }
         },
-        css: function(args, val) {
+        css: function (args, val) {
             var i = 0,
             elem, type = typeof args,
             key, arrayKey = {},
@@ -1111,7 +1111,7 @@
             }
             return this;
         },
-        val: function(str) {
+        val: function (str) {
             try {
                 D.update(this);
                 if (D.isTxt(str)) {
@@ -1123,12 +1123,12 @@
                 return null;
             }
         },
-        get: function(index) {
+        get: function (index) {
             D.update(this);
             return index == null ? this.ObjArray: (index = index < 0 ? this.ObjArray.length + index: index, this.ObjArray[index]);
         }
     };
-    D.fn.extend = D.extend = function() {
+    D.fn.extend = D.extend = function () {
         var length = arguments.length,
         key;
         if (length === 1 && typeof arguments[0] === "object") {
@@ -1144,16 +1144,16 @@
     };
     system.ajax.prototype = system.ajaxPrototype;
     D.extend({
-        parseJSON: function(string) {
+        parseJSON: function (string) {
             return system.JsonString.StringToJson(string);
         },
-        toJSON: function(JSON) {
+        toJSON: function (JSON) {
             return system.JsonString.JsonToString(JSON);
         },
-        trim: function(str) {
+        trim: function (str) {
             return trim(str);
         },
-        setVar: function(name) {
+        setVar: function (name) {
             try {
                 delete window[varName];
             } catch(e) {
@@ -1161,10 +1161,10 @@
             }
             window[name] = D;
         },
-        isObject: function(obj) {
+        isObject: function (obj) {
             return toString.call(obj) === "[object Object]";
         },
-        update: function(getObj) {
+        update: function (getObj) {
             var elem, i = 0,
             array = [];
             while (elem = getObj.ObjArray[i++]) {
@@ -1174,19 +1174,19 @@
             }
             getObj.ObjArray = array;
         },
-        isArray: function(obj) {
+        isArray: function (obj) {
             return toString.call(obj) === "[object Array]";
         },
-        isFunction: function(obj) {
+        isFunction: function (obj) {
             return toString.call(obj) === "[object Function]";
         },
-        isEmptyObject: function(obj) {
+        isEmptyObject: function (obj) {
             for (var name in obj) {
                 return false;
             }
             return true;
         },
-        createScript: function(srcTxt) {
+        createScript: function (srcTxt) {
             if (typeof srcTxt === "string") {
                 var head = document.getElementsByTagName("head").item(0),
                 script;
@@ -1197,20 +1197,20 @@
                 }
             }
         },
-        post: function(url, data, success) {
+        post: function (url, data, success) {
             return new system.ajax().simplify(url, "post", true, data, success, 2e4, false);
         },
-        get: function(url, data, success) {
+        get: function (url, data, success) {
             return new system.ajax().simplify(url, "get", true, data, success, 2e4, true);
         },
-        ajax: function(options) {
+        ajax: function (options) {
             var returns = new system.ajax();
             if (D.isObject(options)) {
                 returns.ajax(options);
             }
             return returns;
         },
-        styleName: function(name) {
+        styleName: function (name) {
             try {
                 return name.replace(rdashAlpha, fcamelCase);
             } catch(e) {
@@ -1219,13 +1219,13 @@
         },
         query: document.querySelectorAll,
         userAgent: uaMatch(navigator.userAgent),
-        isIe: function() {
+        isIe: function () {
             return this.userAgent.browser === "msie" ? this.userAgent.version.charAt(0) : false;
         },
-        isTxt: function(str) {
+        isTxt: function (str) {
             return typeof str == "string" || !isNaN(str);
         },
-        objToUrl: function(obj) {
+        objToUrl: function (obj) {
             if (D.isObject(obj)) {
                 var str = "",
                 val;
@@ -1237,7 +1237,7 @@
             }
             return obj;
         },
-        inArray: function(elem, array) {
+        inArray: function (elem, array) {
             if (array.indexOf) {
                 return array.indexOf(elem);
             }
@@ -1249,10 +1249,10 @@
             }
             return - 1;
         },
-        isHtml5: function() {
+        isHtml5: function () {
             return document.createElement("canvas").getContext("2d") ? true: false;
         },
-        html5Attribute: function(attribute) {
+        html5Attribute: function (attribute) {
             try {
                 var attributeLow = attribute ? attribute.toLowerCase() : "transform";
                 attribute = attributeLow.replace(/^\w/, attribute.charAt(0).toUpperCase());
