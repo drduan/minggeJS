@@ -1,2 +1,7 @@
-
+.DS_Store
+.idea/
+*.lock
+*.log
+node_modules
+build
 mingge_MIN.js
