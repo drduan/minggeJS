@@ -249,6 +249,7 @@
                 cmd = "beforeEnd";
                 break;
             }
+            return cmd;
         },
         insertHTML: function(str, cmd) {
             cmd = system.cmdFun(cmd);
@@ -278,7 +279,7 @@
             fun = function() {
                 div = document.createElement("div"),
                 node = document.createElement(name),
-                MingGeTemp = "MingGeTemp" + Math.random().toString().match(/[^.]+$/)[0],
+                MingGeTemp = "MingGeTemp" + Math.random().toString().match(/[^\.]+$/)[0],
                 i;
                 seachIndex = seachIndex || system.seachIndex(["value", "innerHTML"], node);
                 div.appendChild(node);
@@ -419,7 +420,6 @@
                 arg = D.extend({
                     type: "get",
                     timeout: 2e4,
-
                     async: true
                 },
                 arg);
@@ -710,6 +710,7 @@
         return ResultArray;
     },
     mergeSelector = function(strOne, strTwo, txt) {
+
         var matchOne = strOne.match(/[^\,]+/g),
         matchTwo = strTwo.match(/[^\,]+/g);
         if (matchOne && matchTwo) {
@@ -1167,8 +1168,7 @@
             var obj, i = 0,
             newD = new D(),
             par;
-            while (obj = this.ObjArray[i++]) {
-                par = obj.parentNode(par && par.tagName == "BODY") || newD.ObjArray.push(par);
+            while (obj = this.ObjArray[i++]) { (par = obj.parentNode) && (par.tagName == "BODY" || newD.ObjArray.push(par));
             }
             newD.ObjArray = removing(newD.ObjArray);
             newD.SelectorTxt = document.body;
@@ -1190,6 +1190,7 @@
                     }
                 });
             }
+            return this;
         },
         removeClass: function(str) {
             str = trim(str);
