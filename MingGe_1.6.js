@@ -6,7 +6,8 @@
  *
  *  作者：明哥先生 --QQ399195513 QQ群461550716 官网www.shearphoto.com
  */
-(function (window, varName, undefined) {
+(function (window, varNames, undefined) {
+    var varName = varNames[0];
     var MingGEjs = '1.6',
     IfGetClassName = document.getElementsByClassName ? true: false,
     IfQuery = document.querySelectorAll ? true: false,
@@ -1271,5 +1272,7 @@
             }
         }
     });
-    window[varName] = D;
-})(window, '$');
+    for (var i = 0; i < varNames.length; i++) {
+        window[varNames[i]] = D;
+    }
+})(window, ['明哥', 'MingGe', 'MINGGE', '$']);
