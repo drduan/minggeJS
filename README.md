@@ -6,6 +6,8 @@
 #### QQ群461550716
 #### 官网www.shearphoto.com
 
+# [在线演示(没错，点这里就可以马上看到minggeJS的实际效果)](http://rawgit.com/drduan/minggeJS/master/demo.html)
+
 ### 为什么我反感，因为我完全有开发JQUERY的能力，JQUERY的底层我都了如指掌。
 
 我开发插件一直都是用原生JS，大家可以看下我前面的作品shearphoto就是用原生JS写的。  虽说我反感JQUERY，但是JQUERY却在前端界占有大量的用户份额，之后我有个想法，不如重新开发一个属于自己思想，自己架构的JQUERY。
