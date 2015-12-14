@@ -373,13 +373,13 @@
                     this._json_ = null;
                     return JsonJoin;
                 } catch(e) {
-                    alert("格式不符，转换失败");
+                    alert("大胆，格式竟然不符，必须给你转换失败。-- MingGe");
                     return null;
                 }
             },
             StringToJson: function(arrtxt) {
                 if (typeof arrtxt !== "string") {
-                    alert("你传入不是JSON字符串");
+                    alert("大胆，竟然没有传入JSON字符串。-- MingGe");
                     return null;
                 }
                 try {
@@ -418,7 +418,7 @@
             _read_: function(arr, TrueFalse) {
                 var types = this._type_(arr);
                 if (TrueFalse && types !== "[object Object]" && types !== "[object Array]") {
-                    alert("你传入不是数组或JSON");
+                    alert("大胆，竟然没有传入数组或JSON。-- MingGe");
                     return this._json_ = null;
                 }
                 this._addjson_(types, "{", "[", TrueFalse);
