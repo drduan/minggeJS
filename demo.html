@@ -4,34 +4,33 @@
 <meta charset="utf-8"/>
 <title>MingGeJs1.7,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
 <style type="text/css">
-#some_element,#some_element2 {
-	background:#92b901;
-	border-radius:5px;
-	font-size:12px;
-	height:60px;
-	left:0;
-	line-height:60px;
-	position:absolute;
-	text-align:center;
-	top:5px;
-	width:80px;
-}
-#some_element2 {
-color:red;
-top:400px;
-}
-body input {
-height:50px;
-width:300px;
-}
- </style>
- <script src="MingGe_Min_1.7.js"></script>
+    #some_element,#some_element2 {
+    	background:#92b901;
+    	border-radius:5px;
+    	font-size:12px;
+    	height:60px;
+    	left:0;
+    	line-height:60px;
+    	position:absolute;
+    	text-align:center;
+    	top:5px;
+    	width:80px;
+    }
+    #some_element2 {
+        color:red;
+        top:400px;
+    }
+    body input {
+        height:50px;
+        width:300px;
+    }
+</style>
+<script src="MingGe_Min_1.7.js"></script>
 <script>
 //MingGe.setVar("D");//更换主变量名称。默认是$("XXXX")
 $(function() {
  
     function an(some) { 
- 
        some.animate({   //linear|ease$|ease-in|ease-out|ease-in-out|cubic-bezier 可选择的动画模式       
             rotate:"20deg",
             "background-color":"#1ec7e6"
@@ -43,23 +42,23 @@ $(function() {
             left:0,
 			 "background-color":"#92b901"
         }, 1500, "ease-out", function() {
-			  alert(this+"对象，串联动画全部完成"); 
+			  alert(this.id+"对象，串联动画全部完成"); 
         });
     } ;
 	
 	an($("#some_element,#some_element2"));
 	
-	 $("input").eq(6).click(function(){//再来一次动画
-		     an($("#some_element,#some_element2"));
-          });
+	$("input").eq(6).click(function(){//再来一次动画
+	    an($("#some_element,#some_element2"));
+    });
 	
-	      $("input").eq(4).click(function(){//淡入
-		  $("#some_element").fadeIn(1000,function(){alert("淡入成功");});
-          });
+	$("input").eq(4).click(function(){//淡入
+	    $("#some_element").fadeIn(1000,function(){alert("淡入成功");});
+    });
 	
-	    $("input").eq(5).click(function(){//淡出
-		    $("#some_element").fadeOut(1000,function(){alert("淡出成功");});
-         });
+    $("input").eq(5).click(function(){//淡出
+	    $("#some_element").fadeOut(1000,function(){alert("淡出成功");});
+    });
 		  
     $("body div.main input").eq(0).bind({//事件绑定  one bind click  on 等事件都齐全了
         click:function() {
@@ -69,7 +68,6 @@ $(function() {
 	
 	
     $("input").eq(1).click(function() {//创建节点
-        
         $("div").eq(1).createNode("p", {
             html:" 把DIV添加在第一"
         }, "内前");
@@ -82,9 +80,6 @@ $(function() {
     });
     $("input").eq(3).click(function() {
         //AJAX读取远程文件
-	 
-		
-		 
         $.ajax({ //    $.ajax,$.post,$().load,$.get() $.getJSON的接口也齐全了
             url:"MingGeJs介绍.txt",
             data:{a:1,b:2}, //示范传参数
@@ -104,8 +99,6 @@ $(function() {
             },
             cache:false
         });
-		
-		 
     });
 }); 
 
