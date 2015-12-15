@@ -1,0 +1,20 @@
+<html>
+	<body>
+		<script type="text/javascript" src="../lib/morn.define.js"></script>
+		<script type="text/javascript">
+
+			define('third', ['first', 'second'], function() {
+				console.log(3);
+			});
+
+			define('first', [], function() {
+				console.log(1);
+			});
+
+			define('second', ['first'], function() {
+				console.log(2);
+			});
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,35 @@
+.wrap {
+    height:200px;
+    overflow-y:hidden;
+    width: 500px;
+    position: relative;
+}
+
+.inner {
+    position:relative;
+    margin-right: 15px;
+}
+
+
+.scroll-bar {
+    position: absolute;
+    width: 10px;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.track {
+    background: #eee;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+}
+
+.thumb {
+    height:40px;
+    width:10px;
+    background: #aaa;
+    position: absolute;
+    top: 0;
+}

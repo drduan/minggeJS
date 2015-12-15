@@ -1,0 +1,61 @@
+.morn-resizable {
+	left: 0px;
+	z-index: 999;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.morn-resizable-resizing {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.morn-resizable-border-n {
+	position: absolute;
+	z-index: 1000;
+	width: 100%;
+	height: 3px;
+	background: #aaa;
+	top:0px;
+	left:0px;
+	cursor: n-resize;
+}
+
+.morn-resizable-border-s {
+	position: absolute;
+	z-index: 1000;
+	width: 100%;
+	height: 3px;
+	background: #aaa;
+	bottom:0px;
+	left:0px;
+	cursor: s-resize;
+}
+
+.morn-resizable-border-w {
+	position: absolute;
+	z-index: 1000;
+	height: 100%;
+	width: 3px;
+	background: #aaa;
+	left: 0px;
+	top:0px;
+	cursor: w-resize;
+}
+
+.morn-resizable-border-e {
+	position: absolute;
+	z-index: 1000;
+	height: 100%;
+	width: 3px;
+	background: #aaa;
+	right:0px;
+	top:0px;
+	cursor: e-resize;
+}

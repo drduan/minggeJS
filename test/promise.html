@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>QUnit Example</title>
+  <link rel="stylesheet" href="qunit/qunit-1.14.0.css">
+</head>
+<body>
+	<pre><div>
+		<b>promise:</b>
+			<b>then(success, failed)</b>
+			<b>resolve(value): invoke the function chains. and pass value to the all functions</b>
+			<b>reject(error): invoke the error handling functions. add pass the error to the function;</b>
+
+		test function:
+			<!-- delay -->
+				function delay1(ms){
+					var p = morn.promise();
+					setTimeout(function(){p.resolve(1);},ms);
+					return p;
+				}
+
+				function delay2(ms){
+					var p = morn.promise();
+					setTimeout(function(){p.resolve(1);},ms);
+					return p;
+				}
+
+			<!-- success -->
+				function success1(result){
+					console.log('success1: ' + result);
+				}
+
+				function success2(result){
+					console.log('success2: ' + result);
+				}
+
+			<!-- failed  (handling error) -->
+				function failed(error){
+					console.log('error: ', error);
+				}
+
+			<!-- error  (will throw the error) -->
+				function err(){
+					throw new Error("Custmized error");
+				}
+
+
+		run: <b>delay1(1000).then(success1).then(function(){return delay2(2000);}).then(success2)</b>
+		result: 
+			success1: 1 //delay 1s and output
+			success2: 2 //delay 2s and output
+
+		run: <b>delay1(1000).then(success1,failed).then(err,failed)</b>
+		result:
+			success1: 1 
+			error:  Error {stack: (...), message: "Custmized error"}
+
+
+	</div></pre>
+  <script src="../dist/morn.js"></script>
+  <script type="text/javascript">
+
+	function delay1(ms){
+		var p = morn.promise();setTimeout(function(){p.resolve(1);},ms);
+		return p;
+	}
+
+	function delay2(ms){
+		var p = morn.promise();setTimeout(function(){p.resolve(2);},ms);
+		return p;
+	}
+
+	function success1(result){
+		console.log('success1: ' + result);
+	}
+
+	function success2(result){
+		console.log('success2: ' + result);
+	}
+
+	function failed(error){
+		console.log('error: ', error);
+	}
+
+	function err(){
+		throw new Error("Custmized error");
+	}
+
+	delay1(1000).then(success1).then(function(){return delay2(2000);}).then(success2).then(success2);
+	delay1(1000).then(success1,failed).then(err,failed);
+	delay1(1000).then(success1,failed).catch(success1);
+  </script>
+</body>
+</html>
