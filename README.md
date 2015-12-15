@@ -1,4 +1,7 @@
 # minggeJS
+
+English version is [here](README_en.md).
+
 继优秀作品shearphoto截图插件，本人又再推出国产山寨JQUERY，为什么我要开发一个山寨JQUERY？老实说我从来没用过JQUERY，正因为我反感JQUERY。
 为什么我反感，因为我完全有开发JQUERY的能力，JQUERY的底层我都了如指掌。
 我开发插件一直都是用原生JS，大家可以看下我前面的作品shearphoto就是用原生JS写的。  虽说我反感JQUERY，但是JQUERY却在前端界占有大量的用户份额，之后我有个想法，不如重新开发一个属于自己思想，自己架构的JQUERY。有了想法就要实现我山寨JQUERY之路
@@ -41,8 +44,8 @@ minggeJS具有以下优点
 
 3：语法，函数用法，函数名称，都与JQUERY一致，只要会JQUERY，你就会更用minggeJS,易学易用，马上上手。部份函数用法稍有不同，例如mingge新建节点是用$(XX).createNode(),比JQUERY方便很多！
   minggeJS不单单是山寨JQUERY，更多的是融入了自己的思想，想法！
-  
+
 4：文件体积20K左右，后期升级可能会维持在40K左右，我自己的想法就是希望不超过40K。
 
+
 5： minggeJS后期的发展，更多是想往手机端发展，即使战不胜JQUERY，能战胜zepto也是赏心悦目的事。再者就是动画方面，打算采用两种模式供用户选择，1种是CSS3，第2种CSS2定时器方式，定时器方式，估计以插件方式发布！
- 
