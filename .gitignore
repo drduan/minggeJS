@@ -1,2 +1,5 @@
 
-mingge_MIN.js
+/.tmp
+/node_modules
+/bower_components
+
