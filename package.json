@@ -1,0 +1,33 @@
+{
+  "name": "mingge-js",
+  "version": "1.0.0",
+  "description": "中国人的jQuery",
+  "main": "MingGe_1.6.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0rangeT1ger/minggeJS.git"
+  },
+  "keywords": [
+    "jQuery",
+    "mingge"
+  ],
+  "author": "mingGe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/0rangeT1ger/minggeJS/issues"
+  },
+  "homepage": "https://github.com/0rangeT1ger/minggeJS#readme",
+  "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.1",
+    "gulp-livereload": "^3.8.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.5.1",
+    "gulp-watch": "^4.3.5",
+    "gulp-webpack": "^1.5.0"
+  }
+}
