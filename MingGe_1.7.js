@@ -83,13 +83,15 @@
             if (tag == "TR") {
                 return "table-row";
             }
-            var create = document.createElement(tag),
-            bodys = document.body,
+            var frame = document.createElement('iframe');
+            document.body.appendChild(frame);
+            var newDoc = frame.contentWindow.document;
+            var create = newDoc.createElement(tag),
+            bodys = newDoc.body,
             returns;
-            create.style.visibility = "hidden";
             bodys.appendChild(create);
             returns = system.original("display", system.oStyleValue(create));
-            bodys.removeChild(create);
+            document.body.removeChild(frame);
             return returns;
         },
         seachIndex: function(arr, elem) {
