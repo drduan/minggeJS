@@ -1,0 +1,13 @@
+ul.tasks-list li span {
+  margin-left: 10px;
+}
+ul.tasks-list li a {
+  margin-left: 20px;
+}
+ul.tasks-list li.is-done {
+  text-decoration:line-through;
+}
+a {
+  text-decoration: underline;
+  cursor: pointer;
+}

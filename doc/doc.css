@@ -1,0 +1,72 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:300italic,700italic,300,700);
+
+body {
+  font: 14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #111;
+  font-weight: 300;
+  background: #f0f0ee;
+  overflow-x: hidden;
+}
+
+h1.casua {
+  font-size: 40px;
+}
+
+a {
+  color: #983;
+  font-weight: 700;
+  text-decoration: none;
+  outline: none;
+}
+
+a small {
+  font-size: 11px;
+  color: #777;
+  margin-top: -0.6em;
+  display: block;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+#side-index {
+  width: 200px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 15px 0 30px 30px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: #f6f6ee;
+}
+
+#main-content {
+  margin: 40px 50px 50px 260px;
+}
+
+#side-index .unit {
+  padding-bottom: 30px;
+}
+
+#side-index ul.sections {
+  list-style-type: none;
+  padding: 4px 0 0 10px;
+  margin: 0;
+}
+
+#side-index ul.sections li a {
+  font-weight: 300;
+  color: #000;
+}
+
+#side-index .unit a.name {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+#main-content .unit {
+  padding-top: 30px;
+}
