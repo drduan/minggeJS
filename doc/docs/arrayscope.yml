@@ -1,0 +1,84 @@
+id: 'arrayscope'
+title: 'casua.ArrayScope'
+content: >
+  ArrayScope is a special scope wrapped Array. It also have get() set() remove() and watch(), which exist and can be used like in Scope.
+
+  ArrayScope also provides following methods:
+sections:
+  -
+    id: 'length'
+    title: 'length'
+    content: >
+      `scope.length()` get the length of array
+
+       - Returns *[ Integer ]*
+  -
+    id: 'each'
+    title: 'each'
+    content: >
+      `scope.each(fn)` iterates over array
+
+       - `fn` *[ Function ]* Each invocation of iterator is called it with two arguments: `(element, index)`, and context `this` is the ArrayScope itself.
+       - `handler` *[ Function ]*
+       - Returns `scope` itself
+  -
+    id: 'indexOf'
+    title: 'indexOf'
+    content: >
+      `scope.indexOf(element)`
+
+       - `element` *[ Any / casua.Scope ]*
+       - Returns *[ Integer ]* position of element in array, if element not exist, returns -1
+  -
+    id: 'pop'
+    title: 'pop'
+    content: >
+      `scope.pop()` removes last element of array, returns that element
+
+       - Returns *[ Any / casua.Scope ]*
+  -
+    id: 'push'
+    title: 'push'
+    content: >
+      `scope.push(element1, element2, ..., elementX)`
+
+       - `element` *[ Any / casua.Scope ]* adds new items to the end of an array, returns new length.
+       - Returns *[ Integer ]*
+  -
+    id: 'reverse'
+    title: 'reverse'
+    content: >
+      `scope.reverse()` reverses the order of the elements in array
+
+       - Returns `scope` itself
+  -
+    id: 'shift'
+    title: 'shift'
+    content: >
+      `scope.shift()` removes first element of array, returns that element
+
+       - Returns *[ Any / casua.Scope ]*
+  -
+    id: 'sort'
+    title: 'sort'
+    content: >
+      `scope.sort(fn)`
+
+       - `fn` *[ Function ]* called with arguments: `(a, b)`, and `a` and `b` will be sorted ascending or descending, based on numbers `fn` return.
+       - Returns *[ Any / casua.Scope ]*
+  -
+    id: 'unshift'
+    title: 'unshift'
+    content: >
+      `scope.unshift(element1, element2, ..., elementX)`
+
+       - `element` *[ Any / casua.Scope ]* adds new items to the beginning of an array, returns new length.
+       - Returns *[ Integer ]*
+  -
+    id: 'filter'
+    title: 'filter'
+    content: >
+      `scope.filter(fn)` looks through each element in array, keep only elements that pass a truth test (`fn` return).
+
+       - `fn` *[ Function ]* called it with two arguments: `(element, index)`, and context `this` is the ArrayScope itself.
+       - Returns `scope` itself

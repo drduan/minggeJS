@@ -1,0 +1,141 @@
+id: 'node'
+title: 'casua.Node'
+content: >
+  casua.Node is a wrapping to basic HTML DOM element, provides some jQuery-like methods, and compatible with jQuery.
+sections: 
+  -
+    id: 'constructor'
+    title: 'constructor / initialize'
+    content: >
+      `new casua.Node(element)`
+
+       - `element` *[ String / casua.Node / Dom Element ]* 
+       - Returns a *[ casua.Node ]* wrapping to `element`
+
+      examples :
+
+      ```coffeescript
+
+      new casua.Node('.a-div')
+      # => <div class="a-div"></div>
+
+      new casua.Node('p.p-1#p-id.p-2')
+      # => <p id="p-id" class="p-1 p-2"></p>'
+
+      new casua.Node('a href="/?a=b" target="_blank" disabled')
+      # => <a disabled="disabled" target="_blank" href="/?a=b"></a>
+
+      new casua.Node('<div></div>')
+      # => <div></div>
+
+      new casua.Node(document.createElement('div'))
+      # => <div></div>
+
+      ```
+  -
+    id: 'append'
+    title: 'append'
+    content: >
+      `node.append(content)` append content to the end of node
+
+       - `content` *[ String / casua.Node / Dom Element ]*
+       - Returns `node` itself
+  -
+    id: 'attr'
+    title: 'attr'
+    content: >
+      `node.attr(name)` get attribute value
+
+       - `name` *[ String ]* attribute name
+       - Returns attribute value
+
+      `node.attr(name, value)` set attribute value
+
+       - `name` *[ String ]* attribute name
+       - `value` *[ Any ]* attribute value
+       - Returns `node` itself
+  -
+    id: 'empty'
+    title: 'empty'
+    content: >
+      `node.empty()`
+      Remove all child nodes
+
+       - Returns `node` itself
+  -
+    id: 'find'
+    title: 'find'
+    content: >
+      `node.find(query)`
+
+       - `query` *[ String ]* CSS3 Selector's querying if broswer supports, looking-up by tag name if not
+       - Returns `casua.Node` found node(s)
+  -
+    id: 'html'
+    title: 'html'
+    content: >
+      `node.html()` get the HTML content
+
+       - Returns the HTML
+
+      `node.html(html)` set the HTML content
+
+       - `html` *[ String ]* the HTML to set
+       - Returns `node` itself
+  -
+    id: 'on'
+    title: 'on'
+    content: >
+      `node.on(type, handler)` attach an event handler 
+
+       - `type` *[ String ]* event type, such as "click", "dblclick", "focus"
+       - `handler` *[ Function ]*
+       - Returns `node` itself
+  -
+    id: 'parent'
+    title: 'parent'
+    content: >
+      `node.parent()`
+
+       - Returns the parent of node if exists
+  -
+    id: 'replaceWith'
+    title: 'replaceWith'
+    content: >
+      `node.replaceWith(content)` replace this node with the content
+
+       - `content` *[ String / casua.Node / Dom Element ]*
+       - Returns `node` itself
+  -
+    id: 'text'
+    title: 'text'
+    content: >
+      `node.text()` get the text content
+
+       - Returns the text
+       
+      `node.text(text)` set the text content
+
+       - `text` *[ String ]* the text to set
+       - Returns `node` itself
+  -
+    id: 'trigger'
+    title: 'trigger'
+    content: >
+      `node.trigger(type, event_data)` execute all handlers with given event type
+
+       - `type` *[ String ]* event type, such as "click", "dblclick", "focus"
+       - `event_data` *[ Object ]* additonal parameters to pass along to the event handler, such as `{'custom':'value'}`
+       - Returns `node` itself
+  -
+    id: 'val'
+    title: 'val'
+    content: >
+      `node.val()` get the value
+
+       - Returns attribute value
+
+      `node.val(value)` set the value
+
+       - `value` *[ Any ]* the value to set
+       - Returns `node` itself
