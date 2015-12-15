@@ -2,7 +2,7 @@
 <html lang="zh-cmn-Hans">
 <head>
 <meta charset="utf-8"/>
-<title>MingGeJs1.7,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
+<title>MingGeJs1.7.1,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
 <style type="text/css">
 #some_element,#some_element2 {
 	background:#92b901;
@@ -29,10 +29,8 @@ width:300px;
 <script>
 //MingGe.setVar("D");//更换主变量名称。默认是$("XXXX")
 $(function() {
- 
-    function an(some) { 
- 
-       some.animate({   //linear|ease$|ease-in|ease-out|ease-in-out|cubic-bezier 可选择的动画模式       
+   function an(some) { 
+  some.animate({   //linear|ease$|ease-in|ease-out|ease-in-out|cubic-bezier 可选择的动画模式       
             rotate:"20deg",
             "background-color":"#1ec7e6"
         }, 1500, "ease-in").animate({
@@ -43,7 +41,7 @@ $(function() {
             left:0,
 			 "background-color":"#92b901"
         }, 1500, "ease-out", function() {
-			  alert(this+"对象，串联动画全部完成"); 
+			  alert("id:"+this.id+"对象，串联动画全部完成"); 
         });
     } ;
 	
@@ -54,11 +52,11 @@ $(function() {
           });
 	
 	      $("input").eq(4).click(function(){//淡入
-		  $("#some_element").fadeIn(1000,function(){alert("淡入成功");});
+		  $("#some_element,#some_element2").fadeIn(1000,function(){alert("id:"+this.id+"淡入成功");});
           });
 	
 	    $("input").eq(5).click(function(){//淡出
-		    $("#some_element").fadeOut(1000,function(){alert("淡出成功");});
+		    $("#some_element,#some_element2").fadeOut(1000,function(){alert("id:"+this.id+"淡出成功");});
          });
 		  
     $("body div.main input").eq(0).bind({//事件绑定  one bind click  on 等事件都齐全了
@@ -120,17 +118,16 @@ JQUERY有的功能，minggeJS都有基本上有，压缩后只有20K大</h1>
 <div>|我是父DIV|</div>
 <div id="some_element">minggeJS动画</div>
 <div id="some_element2">minggeJS动画</div> 
-
 <input  type="button" value="还有强大的mingge选择器，兼容IE678">
- <input  type="button" value="创建节点第一个DIV节点"> 
+<input  type="button" value="创建节点第一个DIV节点"> 
 <input  type="button" value="创建节点最后一个DIV节点"> 
- <input  type="button" value="ajax读取远程"> 
-  <input  type="button" value="淡入"> 
-    <input  type="button" value="淡出"> 
-      <input  type="button" value="再来一次动画"> 
-      <br><br><br><br>
-      minggeJS的接口就何止这些，请自己按着你所认识的JQUERY的函数。来测试下其他函数
- </div>
+<input  type="button" value="ajax读取远程"> 
+<input  type="button" value="淡入"> 
+<input  type="button" value="淡出"> 
+<input  type="button" value="再来一次动画"> 
+<br><br><br><br>
+minggeJS的接口就何止这些，请自己按着你所认识的JQUERY的函数。来测试下其他函数
+</div>
 </body>
 </html>
 			

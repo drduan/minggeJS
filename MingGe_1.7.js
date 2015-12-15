@@ -1,4 +1,4 @@
-/*  MingGEjs类库1.7
+/*  MingGEjs类库1.7.1
  *  
  *  你会用JQUERY，那你也会用这个框架，语法都是一样的！
  *
@@ -7,7 +7,7 @@
  *  作者：明哥先生 --QQ399195513 QQ群461550716 官网www.shearphoto.com
  */
 (function(window, varName, undefined) {
-    var MingGEjs = "1.7",
+    var MingGEjs = "1.7.1",
     IfGetClassName = document.getElementsByClassName ? true: false,
     IfQuery = document.querySelectorAll ? true: false,
     MySlice = Array.prototype.slice,
@@ -115,8 +115,6 @@
                 }
             };
             url = url.replace(/\?+$/, "callback");
-
-
             if (D.isTxt(data)) {
                 url = D.urlRevise(url, D.objToUrl(data));
             }
@@ -144,17 +142,16 @@
         },
         htmlVal: function(hv, str) {
             try {
-                D.update(this);
                 var isIndex;
                 if (D.isTxt(str)) {
-                    D.each.call(this.ObjArray,
+                    D.each.call(this.nodeList,
                     function() {
                         system.isIndex(hv, this) && (this[hv] = str);
                     });
                     return this;
                 }
-                var html = this.ObjArray[0][hv];
-                return this.ObjArray[0] ? html: null;
+                var html = this.nodeList[0][hv];
+                return this.nodeList[0] ? html: null;
             } catch(e) {
                 return null;
             }
@@ -174,10 +171,10 @@
             newD = new D(),
             R;
             if (R = optionColation(Z)) {
-                while (elem = this.ObjArray[i++]) {
+                while (elem = this.nodeList[i++]) {
                     circulateNode.call(newD, elem, R);
                 }
-                newD.ObjArray = removing(newD.ObjArray);
+                newD.nodeList = removing(newD.nodeList);
             }
             return newD;
         },
@@ -190,11 +187,11 @@
                 return newD;
             }
             var Reg = new RegExp("(^|\\s)" + analyseResult[2] + "(\\s|$)", analyseResult[3].Tag && "i");
-            while (elem = this.ObjArray[i++]) {
+            while (elem = this.nodeList[i++]) {
                 if (Reg.test(elem[analyseResult[1]])) {
-                    newD.ObjArray.push(elem);
+                    newD.nodeList.push(elem);
                 }
-                newD.ObjArray = removing(newD.ObjArray);
+                newD.nodeList = removing(newD.nodeList);
             }
             return newD;
         },
@@ -208,7 +205,7 @@
                 timer && (clearInterval(timer), timer = null);
                 var a, b = 0,
                 style;
-                while (a = this_.ObjArray[b++]) {
+                while (a = this_.nodeList[b++]) {
                     if (a.isMingGeAnimate) {
                         style = a.style;
                         style[system.transition] = style[timingFunction] = null;
@@ -296,7 +293,7 @@
                 try {
                     attr.html && seachIndex && (node[seachIndex] = attr.html);
                 } catch(e) {}
-                newD.ObjArray.push(node);
+                newD.nodeList.push(node);
             };
             this.each(fun);
             newD.SelectorTxt = document.body;
@@ -524,7 +521,7 @@
                 }
             },
             StringToJson: function(arrtxt, T) {
-                if (D.isString(arrtxt)) {
+                if (!D.isString(arrtxt)) {
                     return;
                 }
                 try {
@@ -604,6 +601,7 @@
                 return arr;
             }
             if (name == "opacity") {
+
                 var filter, opacity, num;
                 if (system.opacity == "opacity") {
                     num = parseFloat(val, 10);
@@ -668,10 +666,10 @@
     circulateNode = function(parent, R) {
         if (R[0] || R[1][3].Id && document === parent) {
             var elemName = R[1][2];
-            var ObjArray = parent[R[1][0]](elemName === "MingGeAllelem2015" ? "*": elemName);
-            if (ObjArray) {
-                ObjArray = R[1][3].Id ? [ObjArray] : listNodeToArray(ObjArray);
-                this.ObjArray = this.ObjArray.concat(ObjArray);
+            var nodeList = parent[R[1][0]](elemName === "MingGeAllelem2015" ? "*": elemName);
+            if (nodeList) {
+                nodeList = R[1][3].Id ? [nodeList] : listNodeToArray(nodeList);
+                this.nodeList = this.nodeList.concat(nodeList);
             }
             return;
         }
@@ -681,7 +679,7 @@
         Reg = new RegExp("(^|\\s)" + R[1][2] + "(\\s|$)");
         while (elem = ListNode[i++]) {
             if (Reg.test(elem[R[1][1]])) {
-                this.ObjArray.push(elem);
+                this.nodeList.push(elem);
             }
         }
     },
@@ -711,7 +709,6 @@
         return ResultArray;
     },
     mergeSelector = function(strOne, strTwo, txt) {
-
         var matchOne = strOne.match(/[^\,]+/g),
         matchTwo = strTwo.match(/[^\,]+/g);
         if (matchOne && matchTwo) {
@@ -755,7 +752,7 @@
                             if (getObj.SelectorStr && getObj.SelectorStr !== "000") {
                                 MingGeId = "#" + (getObj.SelectorTxt.id || (remove = true, getObj.SelectorTxt.id = "tempMingGeId2015"));
                                 merge = mergeSelector(MingGeId, newD.SelectorStr = mergeSelector(getObj.SelectorStr, str, ""), " ");
-                                newD.ObjArray = listNodeToArray(getObj.SelectorTxt.querySelectorAll(merge));
+                                newD.nodeList = listNodeToArray(getObj.SelectorTxt.querySelectorAll(merge));
                                 newD.SelectorTxt = getObj.SelectorTxt;
                                 remove && getObj.SelectorTxt.removeAttribute("id");
                                 return newD;
@@ -770,7 +767,7 @@
                         if (getObj.SelectorTxt.ownerDocument) {
                             MingGeId = "#" + (getObj.SelectorTxt.id || (remove = true, getObj.SelectorTxt.id = "tempMingGeId2015"));
                             merge = getObj.SelectorStr ? mergeSelector(MingGeId, newD.SelectorStr = mergeSelector(getObj.SelectorStr, str, " "), " ") : mergeSelector(MingGeId, newD.SelectorStr = str, " ");
-                            newD.ObjArray = listNodeToArray(getObj.SelectorTxt.querySelectorAll(merge));
+                            newD.nodeList = listNodeToArray(getObj.SelectorTxt.querySelectorAll(merge));
                             newD.SelectorTxt = getObj.SelectorTxt;
                             remove && getObj.SelectorTxt.removeAttribute("id");
                             return newD;
@@ -778,12 +775,12 @@
                         merge = mergeSelector(getObj.SelectorTxt, str, " ");
                     }
                 }
-                newD.ObjArray = listNodeToArray(document.querySelectorAll(merge));
+                newD.nodeList = listNodeToArray(document.querySelectorAll(merge));
                 newD.SelectorTxt = merge;
             } else {
                 var match = /^#([\w-_]+)$/.exec(str),
                 getid;
-                newD.ObjArray = match ? (getid = document.getElementById(match[1])) ? [getid] : [] : listNodeToArray(document.querySelectorAll(str));
+                newD.nodeList = match ? (getid = document.getElementById(match[1])) ? [getid] : [] : listNodeToArray(document.querySelectorAll(str));
                 newD.SelectorTxt = str;
             }
         } catch(e) {}
@@ -794,21 +791,18 @@
         qu;
         if (D.isString(str)) {
             str = trim(str);
-            if (IfQuery) {
-                if ((qu = MyQuerySelector(str, getObj, findTrue, newD)) != -1) return qu;
-            }
-            getObj && D.update(getObj);
+            if (IfQuery && (qu = MyQuerySelector(str, getObj, findTrue, newD)) != -1) return qu;
             var match = str.match(/[^\,]+/g),
-            ObjArray = [];
+            nodeList = [];
             if (match) {
                 var length = match.length;
                 if (length === 1) {
                     return space(match[0], getObj, findTrue);
                 }
                 for (var i = 0; i < length; i++) {
-                    ObjArray = ObjArray.concat(space(match[i], getObj, findTrue).ObjArray);
+                    nodeList = nodeList.concat(space(match[i], getObj, findTrue).nodeList);
                 }
-                return newD.ObjArray = removing(ObjArray),
+                return newD.nodeList = removing(nodeList),
                 newD;
             }
             return newD;
@@ -843,7 +837,7 @@
         if (this === window || this.MingGe) {
             return CanonicalStructure(args);
         }
-        this.ObjArray = [];
+        this.nodeList = [];
         this.animateList = [];
     };
     D.fn = D.prototype = {
@@ -856,18 +850,17 @@
             }
             if (string === window || string === document || string.ownerDocument) {
                 this.SelectorTxt = string;
-                this.ObjArray = [string];
+                this.nodeList = [string];
             } else if (R = optionColation(string)) {
                 circulateNode.call(this, parent, R);
             }
             return this;
         },
         is: function(str) {
-            D.update(this);
             str = trim(str);
             switch (str) {
             case ":animate":
-                return this.ObjArray[0].isMingGeAnimate ? true: false;
+                return this.nodeList[0].isMingGeAnimate ? true: false;
                 break;
             }
         },
@@ -876,7 +869,6 @@
             "beforeEnd");
         },
         createNode: function() {
-            D.update(this);
             return system.createNode.apply(this, arguments);
         },
         load: function(url, arg) {
@@ -899,7 +891,6 @@
             return this;
         },
         insertHTML: function() {
-            D.update(this);
             return system.insertHTML.apply(this, arguments);
         },
         stop: function() {
@@ -928,8 +919,7 @@
             });
         },
         attr: function(name, val) {
-            D.update(this);
-            var elem = this.ObjArray[0];
+            var elem = this.nodeList[0];
             if (elem) {
                 if (D.isUndefined(val)) {
                     if (D.isString(name)) {
@@ -938,7 +928,7 @@
                     return null;
                 }
                 if (D.isString(name) && D.isTxt(val)) {
-                    D.each.call(this.ObjArray,
+                    D.each.call(this.nodeList,
                     function() {
                         this.setAttribute(name, val);
                     });
@@ -951,7 +941,7 @@
             system.transition || (system.transition = D.html5Attribute("transition"));
             this.each(function() {
                 arr = system.oStyleValue(this);
-                system.original("display", arr) == "none" || this.isMingGeAnimate || newD.ObjArray.push(this);
+                system.original("display", arr) == "none" || this.isMingGeAnimate || newD.nodeList.push(this);
             });
             if (system.transition) {
                 newD.animate({
@@ -976,7 +966,7 @@
         },
         show: function() {
             this.css("display", null);
-            D.each.call(this.ObjArray,
+            D.each.call(this.nodeList,
             function() {
                 if (this.nodeType == 1 && system.original("display", system.oStyleValue(this)) == "none") {
                     this.style.display = system.getDisplay(this.tagName);
@@ -991,7 +981,7 @@
                 if (system.original("display", arr) == "none") {
                     if (this.isMingGeAnimate) return;
                     system.transition && D(this).css("opacity", 0);
-                    newD.ObjArray.push(this);
+                    newD.nodeList.push(this);
                     if (this.style.display == "none") {
                         this.style.display = "";
                         system.original("display", arr) == "none" && (this.style.display = system.getDisplay(this.tagName));
@@ -1033,7 +1023,6 @@
                     callback = speed;
                     speed = 500;
                 } else speed = 500;
-
             }
             if (!D.isFunction(callback)) {
                 var m = model;
@@ -1045,7 +1034,7 @@
                 if (D.isArray(list) && list.length > 0) {
                     var newD = new D(),
                     arg;
-                    newD.ObjArray = [this];
+                    newD.nodeList = [this];
                     arg = list[0];
                     list.splice(0, 1);
                     system.animate.apply(newD, arg);
@@ -1059,12 +1048,12 @@
             newD = new D(),
             arg = [params, speed, newCallback, model],
             lock;
-            while (elem = this.ObjArray[b++]) {
+            while (elem = this.nodeList[b++]) {
                 if (elem.isMingGeAnimate) {
                     elem.mingGeAnimateList ? elem.mingGeAnimateList.push(arg) : elem.mingGeAnimateList = [arg];
                 } else {
                     elem.isMingGeAnimate = 1;
-                    newD.ObjArray.push(elem);
+                    newD.nodeList.push(elem);
                     lock || (lock = true);
                 }
             }
@@ -1072,15 +1061,14 @@
             return this;
         },
         on: function(eveName, callback) {
-            D.update(this);
             var elem, i = 0,
             type = typeof eveName;
             if (type === "string" && D.isFunction(callback)) {
-                while (elem = this.ObjArray[i++]) {
+                while (elem = this.nodeList[i++]) {
                     elem["on" + eveName] = callback;
                 }
             } else if (type === "object") {
-                while (elem = this.ObjArray[i++]) {
+                while (elem = this.nodeList[i++]) {
                     for (var key in eveName) {
                         elem["on" + key] = eveName[key];
                     }
@@ -1101,19 +1089,18 @@
             this.each(function() {
                 this.parentNode.removeChild(this);
             });
-            this.ObjArray = [];
+            this.nodeList = [];
             return this;
         },
         bind: function(eveName, callback) {
-            D.update(this);
             var elem, i = 0,
             type = typeof eveName;
             if (type === "string" && D.isFunction(callback)) {
-                while (elem = this.ObjArray[i++]) {
+                while (elem = this.nodeList[i++]) {
                     system.addEvent(elem, eveName, callback);
                 }
             } else if (type === "object") {
-                while (elem = this.ObjArray[i++]) {
+                while (elem = this.nodeList[i++]) {
                     for (var key in eveName) {
                         system.addEvent(elem, key, eveName[key]);
                     }
@@ -1123,12 +1110,11 @@
         },
         unbind: function(eveName, callback) {
             var elem, i = 0;
-            D.update(this);
             if (callback) {
-                while (elem = this.ObjArray[i++]) {
+                while (elem = this.nodeList[i++]) {
                     system.delEvent(elem, eveName, callback);
                 }
-            } else while (elem = this.ObjArray[i++]) {
+            } else while (elem = this.nodeList[i++]) {
                 elem[on + "eveName"] = null;
             }
             return this;
@@ -1158,7 +1144,7 @@
         },
         SelectorStr: false,
         SelectorTxt: false,
-        ObjArray: [],
+        nodeList: [],
         ready: function(callback) {
             system.ready(callback);
         },
@@ -1166,13 +1152,12 @@
             return removing(array);
         },
         parent: function(re) {
-            D.update(this);
             var obj, i = 0,
             newD = new D(),
             par;
-            while (obj = this.ObjArray[i++]) { (par = obj.parentNode) && (par.tagName == "BODY" || newD.ObjArray.push(par));
+            while (obj = this.nodeList[i++]) { (par = obj.parentNode) && (par.tagName == "BODY" || newD.nodeList.push(par));
             }
-            newD.ObjArray = removing(newD.ObjArray);
+            newD.nodeList = removing(newD.nodeList);
             newD.SelectorTxt = document.body;
             newD.SelectorStr = "000";
             return re ? newD.filter(re) : newD;
@@ -1233,37 +1218,33 @@
             var fil = CanonicalStructure(str, this, {
                 filter: true
             });
-            this.SelectorTxt.ownerDocument && !this.SelectorStr && fil.ObjArray[0] && (fil.SelectorTxt = fil.ObjArray[0], fil.SelectorStr = false);
+            this.SelectorTxt.ownerDocument && !this.SelectorStr && fil.nodeList[0] && (fil.SelectorTxt = fil.nodeList[0], fil.SelectorStr = false);
             return fil;
         },
         index: function(obj) {
             try {
-                D.update(this);
                 if (obj) {
-                    return D.inArray(obj.ObjArray[0], this.ObjArray);
+                    return D.inArray(obj.nodeList[0], this.nodeList);
                 }
-                return D.inArray(this.ObjArray[0], this.ObjArray[0].parentNode.getElementsByTagName("*"));
+                return D.inArray(this.nodeList[0], this.nodeList[0].parentNode.getElementsByTagName("*"));
             } catch(e) {
                 return - 1;
             }
         },
         eq: function(index) {
             var M = new D();
-            D.update(this);
-            M = index == null ? this: (index = index < 0 ? this.ObjArray.length + index: index, this.ObjArray[index] && (M.ObjArray = [M.SelectorTxt = this.ObjArray[index]]), M);
+            M = index == null ? this: (index = index < 0 ? this.nodeList.length + index: index, this.nodeList[index] && (M.nodeList = [M.SelectorTxt = this.nodeList[index]]), M);
             return M;
         },
         size: function() {
-            D.update(this);
-            return this.ObjArray.length;
+            return this.nodeList.length;
         },
         each: function(callback) {
-            D.update(this);
             if (D.isFunction(callback)) {
-                var length = this.ObjArray.length,
+                var length = this.nodeList.length,
                 i = 0;
                 for (; i < length; i++) {
-                    callback.call(this.ObjArray[i], i, length);
+                    callback.call(this.nodeList[i], i, length);
                 }
             }
             return this;
@@ -1286,8 +1267,7 @@
             if (type === "string") {
                 args = D.styleName(trim(args));
                 if (D.isUndefined(val)) {
-                    D.update(this);
-                    if (! ((elem = this.ObjArray[0]) && elem.ownerDocument)) {
+                    if (! ((elem = this.nodeList[0]) && elem.ownerDocument)) {
                         return null;
                     }
                     if (transformReg.test(args)) {
@@ -1303,7 +1283,7 @@
                     }
                     return system.original(args, system.oStyleValue(elem));
                 }
-                while (elem = this.ObjArray[i++]) {
+                while (elem = this.nodeList[i++]) {
                     try {
                         sty = elem.style;
                         arrayKey = system.style(sty, args, val);
@@ -1311,7 +1291,7 @@
                     } catch(e) {}
                 }
             } else if (type === "object") {
-                while (elem = this.ObjArray[i++]) {
+                while (elem = this.nodeList[i++]) {
                     sty = elem.style;
                     for (key in args) {
                         try {
@@ -1324,8 +1304,7 @@
             return this;
         },
         get: function(index) {
-            D.update(this);
-            return index == null ? this.ObjArray: (index = index < 0 ? this.ObjArray.length + index: index, this.ObjArray[index]);
+            return index == null ? this.nodeList: (index = index < 0 ? this.nodeList.length + index: index, this.nodeList[index]);
         }
     };
     D.fn.extend = D.extend = function() {
@@ -1379,10 +1358,8 @@
                     obj.call(elem);
                 }
             } else if ((D.isObject(obj) || D.isArray(obj)) && D.isFunction(fun)) {
-                var a = [],
-                b = {};
                 for (i in obj) {
-                    b[i] || a[i] || fun(i, obj[i]);
+                    obj.hasOwnProperty(i) && fun(i, obj[i]);
                 }
                 return true;
             }
@@ -1402,12 +1379,12 @@
         update: function(getObj) {
             var elem, i = 0,
             array = [];
-            while (elem = getObj.ObjArray[i++]) {
+            while (elem = getObj.nodeList[i++]) {
                 if (elem.ownerDocument) {
                     elem.parentNode && array.push(elem);
                 } else array.push(elem);
             }
-            getObj.ObjArray = array;
+            getObj.nodeList = array;
         },
         isArray: function(obj) {
             return toString.call(obj) === "[object Array]";
@@ -1429,7 +1406,7 @@
             if (head) {
                 script = document.createElement("script");
                 head.appendChild(script);
-                srcTxt && (script.src = srcTxt);
+                D.isString(srcTxt) && (script.src = srcTxt);
                 return [head, script];
             }
         },
@@ -1534,7 +1511,7 @@
         D.fn[item] = function(item, newItem) {
             return function(str) {
                 if (str == null) {
-                    return this.ObjArray[0]["offset" + newItem];
+                    return this.nodeList[0]["offset" + newItem];
                 }
                 /^[0-9]+$/.test(str) && (str += "px");
                 return this.css(item, str);
