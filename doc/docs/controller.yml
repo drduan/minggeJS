@@ -1,0 +1,117 @@
+id: 'controller'
+title: 'Controller'
+content: >
+  The controller in casua, are behind the DOM elements, used to response the user interaction and update the result to the view.
+  Todo that, a controller should have some methods, which can binded as event handler of DOM element, or as computed value to html, attrbutes or condition of DOM element.
+sections:
+  -
+    id: 'define'
+    title: 'To define a controller'
+    content: >
+      ```javascript
+
+      exampleController = casua.defineController( function (scope) {
+        /* Constructor 
+         * This constructor function will be called when everytime the controller be instantiated.
+         * Over here, You can initialize data to scope, such as loading data from backend api.
+         */
+        scope.set('amount', 10);
+        return {
+          /* Returns Methods
+           * Everytime controller is invoked, should return a object, 
+           * which contained some methods like following, to bind with view.
+           */
+          computedAmount: function () {
+            // Return a computed value
+            return scope.get('amount') + 100;
+          },
+          onClickClearAmount: function (event) {
+            // Binded as a onclick event handler, argument event passed in is a DOM Event.
+            scope.set('amount', 0);
+          }
+        };
+      } );
+
+      ```
+
+      In fact, casua is designed to be used together with coffeescript, the code above in coffeescript will be more simple and clear, like:
+
+      ```coffeescript
+
+      exampleController = casua.defineController (scope) ->
+        scope.set('amount', 10)
+
+        computedAmount: -> scope.get('amount') + 100 
+        onClickClearAmount: (e) -> scope.set('amount', 0)
+
+      ```
+  -
+    id: 'new'
+    title: 'New Controller'
+    content: >
+
+      After you defined prototype of controller, you can use `new` opreator to get a instance of the controller.
+
+
+      `instance = new exampleController(init_data, parent_controller)`
+
+       - `init_data` *[ Object / casua.Scope ]* all passed in `init_data` will be converted to casua.Scope, and can be accessed by `scope` in controller
+       - `parent_controller` Optional, parent of current controller
+  -
+    id: 'render'
+    title: 'render() / renderAt()'
+    content: >
+      Once you get a instance of controller, contained the scope of data, you can render the view with the template to DOM element.
+
+      `instance.renderAt(container, template)`
+
+      The `container` here, can be a casua.Node, DOM element, or even a jQuery object.
+
+      `node = instance.render(template)`
+
+      Return a div node, which as container of the view, for you can insert it to anywhere later.
+  -
+    id: 'content'
+    title: 'Context in method'
+    content: >
+      Within method is invoked, is a context, you can use `this` or `@` (in coffeescript) to access.
+
+      ```coffeescript
+
+      controllerPrototype = casua.defineController (scope) ->
+
+        accessContextExample: -> 
+          @ or this # the context
+          this.anotherMethod() # call another method in controller
+          this.$parent # refers to parent controller is exist
+          this.$parent.someMethod() # call the method in parent controller
+          this.$node() # get the current node that this `accessContextExample` is binded to
+          this.$node('$root') # get the named node `$root`, which default is root node of controller
+          this.$node('.name') # <=> this.$node().find('.name')
+
+          this.$parent.$node() # can NOT do that, access parent nodes
+
+        anotherMethod: ->
+          console.log 'called'
+
+      ```
+  -
+    id: 'example'
+    title: 'Example'
+    content: >
+      ```coffeescript
+
+      exampleController = casua.defineController (scope) ->
+        scope.set 'was_or_not', 'was not'
+        onClick: -> scope.set 'was_or_not', 'was'
+
+      app_node = new casua.Node document.getElementById('app')
+
+      template =
+        'div':
+          '@on click': 'onClick()'
+          '@text': 'this {{@was_or_not}} clicked'
+
+      new exampleController().renderAt app_node, template
+      
+      ```

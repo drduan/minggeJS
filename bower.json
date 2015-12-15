@@ -1,0 +1,25 @@
+{
+  "name": "casua",
+  "description": "A casual and neat Structured Template and MVVM engine.",
+  "version": "0.0.2",
+  "author": {
+    "name": "aligo Kang",
+    "email": "aligo_x@163.com"
+  },
+  "main": "build/casua.js",
+  "ignore": [
+    ".tmp",
+    "node_modules",
+    "bower_components",
+    "examples",
+    "test",
+    "doc",
+    "gh-pages"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "jquery": ">= 2.0.0",
+    "qunit": "~1.12.0",
+    "js-yaml": ">=3.0.0"
+  }
+}

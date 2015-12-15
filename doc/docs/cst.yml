@@ -1,0 +1,155 @@
+id: 'cst'
+title: 'CST (Template)'
+content: >
+  The CST (Casua Structured Template) in casua, inspired by haml and jade, is a clear and beautiful markup, to simply describe the structure of html, and the data bindings to html element. 
+
+  The CST can be created as a javascript object, nested the tree like structure of html, but it only looks good, clear and well-indented in coffeescript. Maybe later casua should provide a parser, for converting plain-text template (more clear, no quotes and colons) or even html to this kind of CST object. But for now, let's use coffee. A CST in coffee looks like this:
+
+  ```coffeescript
+
+  '#div-id.div-class':
+    'a href="http://www.xxx.com/"': 'link text'
+    'h1':
+      '@on click': 'clickTitle()'
+      '@text': '@title'
+      '@attr class': '@titleClass()'
+    'ul':
+      '@child lists':
+        '@controller': ItemController
+        'li class="item"':
+          '@html': 'htmlContent()'
+
+  ```
+sections:
+  -
+    id: 'controller'
+    title: '@controller'
+    content: >
+      `'@controller': controller_prototype`
+
+       - `controller_prototype`: a prototype of controller returned by `defineController`, to be noticed it should not to be wrapped in quotes.
+
+      Defines current node and its childs bind to given controller, replace the current.
+
+      ```coffeescript
+
+      '.new-controller'
+        '@controller': newController
+        '@text': 'methodInNewController()'
+
+      ```
+  -
+    id: 'if-unless'
+    title: '@if / @unless'
+    content: >
+      `'@if': 'expression'`
+
+      `'@unless': 'expression'`
+
+       - `expression`: A javascript boolen expression, you can use `@key` get the value in current scope, or `method()` to call controller method.
+
+      Defines whether the current node is rendered to html structure, according to the results of the expression.
+      Notice: this is data-binding definition, if scope value or method return in expression has been changed, the node would be re-rendered immediately according to new result.
+
+      ```coffeescript
+
+      '.div1':
+        '@if': '@isDiv1Shown'
+      '.div2':
+        '@unless': 'isDiv2Hidden()'
+      '.div3':
+        '@if': '@isDiv3Shown && !isDiv3Hidden()'
+
+      ```
+  -
+    id: 'text-html'
+    title: '@text / @html'
+    content: >
+      `'@text': 'expression'`
+
+      `'@html': 'expression'`
+
+       - `expression`: A CST data binding expression.
+
+      The `@text` or `@html` binding, defines the content of node, if the result of expression has been changed, the node content would be updated immediately.
+      `@html` binding will put actually string of the scope value into the node, you can use it to render html. And `@text` will not, string will be escaped.
+
+      CST data binding expression supports:
+      ```coffeescript
+
+      '.div1':
+        '@html': 'this is <b>content</b>' # plain text or html
+      '.div2':
+        '@text': '@key' # binding to single value of scope
+      '.div3':
+        '@html': 'formatedHtml()' # to return of controller method
+      '.div4':
+        '@text': '{{@name}} is a {{kindName()}}' # mixing text, scope and controller
+
+      ```
+
+      Also `@text` can be shoft defined likes this:
+      
+      ```coffeeescript
+
+      '.div': 'text content in div {{@hello}}'
+
+      ```
+  -
+    id: 'val'
+    title: '@val'
+    content: >
+      `'@val': '@key'`
+
+      `'@val': 'method()'`
+
+      The '@val' binding, defines the value of input elements. When the value of scope or the return of method has been changed. the input value would be updated, and when user changed value of input, the binded scope value would be updated, or the binded method would be called with new value as first parameter.
+
+      ```coffeescript
+
+      '.last-name': '@last'
+      'input.name type="text"'
+        '@value': '@name'
+      'input.full_name type="text"'
+        '@value': 'fullName()'
+
+      # and the controller
+      nameController = casua.defineController (scope) ->
+        scope.set('name', 'John')
+        scope.set('last', 'Doe')
+
+        fullName: (new_name) ->
+          if new_name
+            name = new_name.split(' ')
+            scope.set('name', name[0])
+            scope.set('last', name[1])
+          else
+            scope.get('name') + ' ' + scope.get('last')
+
+      ```
+  -
+    id: 'attr'
+    title: '@attr'
+    content: >
+      `'@attr html_attribute_name': '@key'`
+
+      `'@attr html_attribute_name': 'method()'`
+
+      The '@attr' binding, defines the attribute value of given attribute name.
+
+
+      ```coffeescript
+
+      '.div1':
+        '@attr class': '@div1_classes'
+      '.div2':
+        '@attr style': 'customStyle()'
+      'input type="checkbox"':
+        '@attr checked': '@is_checked'
+
+      ```
+  -
+    id: 'class'
+    title: '@class'
+    content: >
+      Shortcut of `'@attr class'`
