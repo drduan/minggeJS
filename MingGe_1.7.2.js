@@ -1,4 +1,4 @@
-/*  MingGEjs类库1.7.1
+/*  MingGEjs类库1.7.2
  *  
  *  你会用JQUERY，那你也会用这个框架，语法都是一样的！
  *
@@ -7,7 +7,7 @@
  *  作者：明哥先生 --QQ399195513 QQ群461550716 官网www.shearphoto.com
  */
 (function(window, varName, undefined) {
-    var MingGEjs = "1.7.1",
+    var MingGEjs = "1.7.2",
     IfGetClassName = document.getElementsByClassName ? true: false,
     IfQuery = document.querySelectorAll ? true: false,
     MySlice = Array.prototype.slice,
@@ -52,6 +52,16 @@
             }];
         }
         return returnArray;
+    },
+    filterSpecial = function(str) {
+        var Reg;
+        D.each(["r", "t", "n", "f", "v"],
+        function(key, val) {
+            val = "\\" + val;
+            Reg = new RegExp(val, "g");
+            str = str.replace(Reg, val);
+        });
+        return str.replace(/[\x01-\x12]/g, "");
     },
     system = {
         transform: false,
@@ -106,7 +116,24 @@
             timeout = arg.timeout,
             erro = arg.error,
             data = arg.data,
-            match, script, timer, out = function() {
+            match, script, timer, matchFun = function() {
+                if (window[match]) {
+                    tally > 30 && matchTimer ? (clearInterval(matchTimer), matchTimer = null) : tally++;
+                    return;
+                }
+                matchTimer && (clearInterval(matchTimer), matchTimer = null);
+                window[match] = function(data) {
+                    timer && (clearTimeout(timer), timer = null);
+                    if (D.isFunction(success)) {
+                        success(system.JsonString.StringToJson(data) || data, "success");
+                    }
+                    out();
+                };
+                script = D.createScript(url);
+            },
+            matchTimer,
+            tally = 0,
+            out = function() {
                 script && script[0].removeChild(script[1]);
                 try {
                     delete window[match];
@@ -127,18 +154,12 @@
                 match = match ? trim(match[1]) : "callback";
             }
             timeout && (timer = setTimeout(function() {
+                matchTimer && (clearInterval(matchTimer), matchTimer = null);
                 D.isFunction(erro) && erro(505);
                 out();
             },
             timeout));
-            window[match] = function(data) {
-                timer && (clearTimeout(timer), timer = null);
-                if (D.isFunction(success)) {
-                    success(system.JsonString.StringToJson(data) || data, "success");
-                }
-                out();
-            };
-            script = D.createScript(url);
+            matchTimer = setInterval(matchFun, 200);
         },
         htmlVal: function(hv, str) {
             try {
@@ -150,8 +171,7 @@
                     });
                     return this;
                 }
-                var html = this.nodeList[0][hv];
-                return this.nodeList[0] ? html: null;
+                return this.nodeList[0] ? this.nodeList[0][hv] : null;
             } catch(e) {
                 return null;
             }
@@ -508,13 +528,12 @@
                 try {
                     this._json_ = [];
                     this._read_(arr, true);
-                    var JsonJoin = this._json_.join("");
-                    JsonJoin = JsonJoin.replace(/,([\}\]])/g,
+                    var JsonJoin = this._json_.join("").replace(/,([\}\]])/g,
                     function(a, b) {
                         return b;
                     });
                     this._json_ = null;
-                    return JsonJoin;
+                    return filterSpecial(JsonJoin);
                 } catch(e) {
                     alert("Format does not match, conversion fails");
                     return;
@@ -601,7 +620,6 @@
                 return arr;
             }
             if (name == "opacity") {
-
                 var filter, opacity, num;
                 if (system.opacity == "opacity") {
                     num = parseFloat(val, 10);
@@ -860,7 +878,7 @@
             str = trim(str);
             switch (str) {
             case ":animate":
-                return this.nodeList[0].isMingGeAnimate ? true: false;
+                return this.nodeList[0] ? this.nodeList[0].isMingGeAnimate ? true: false: false;
                 break;
             }
         },
@@ -909,7 +927,7 @@
         },
         fadeToggle: function(time, callback) {
             var arr;
-            this.each(function() {
+            return this.each(function() {
                 arr = system.oStyleValue(this);
                 if (system.original("display", arr) == "none") {
                     D(this).fadeIn(time, callback);
@@ -919,10 +937,24 @@
             });
         },
         attr: function(name, val) {
-            var elem = this.nodeList[0];
+            var elem = this.nodeList[0],
+            this_;
             if (elem) {
+                if (D.isObject(name)) {
+                    D.each.call(this.nodeList,
+                    function() {
+                        this_ = this;
+                        this_.setAttribute && D.each(name,
+                        function(k, v) {
+                            if (D.isString(k) && D.isTxt(v)) {
+                                this_.setAttribute(k, v);
+                            }
+                        });
+                    });
+                    return this;
+                }
                 if (D.isUndefined(val)) {
-                    if (D.isString(name)) {
+                    if (elem.getAttribute && D.isString(name)) {
                         return elem.getAttribute(name);
                     }
                     return null;
@@ -930,7 +962,7 @@
                 if (D.isString(name) && D.isTxt(val)) {
                     D.each.call(this.nodeList,
                     function() {
-                        this.setAttribute(name, val);
+                        this.setAttribute && this.setAttribute(name, val);
                     });
                 }
             }
@@ -962,7 +994,7 @@
             return this;
         },
         hide: function() {
-            this.css("display", "none");
+            return this.css("display", "none");
         },
         show: function() {
             this.css("display", null);
@@ -972,6 +1004,7 @@
                     this.style.display = system.getDisplay(this.tagName);
                 }
             });
+            return this;
         },
         fadeIn: function(time, callback) {
             system.transition || (system.transition = D.html5Attribute("transition"));
@@ -1086,10 +1119,15 @@
             });
         },
         remove: function() {
+            var arr = [];
             this.each(function() {
-                this.parentNode.removeChild(this);
+                try {
+                    this.parentNode.removeChild(this);
+                } catch(e) {
+                    arr.push(this);
+                }
             });
-            this.nodeList = [];
+            this.nodeList = arr;
             return this;
         },
         bind: function(eveName, callback) {
@@ -1115,7 +1153,7 @@
                     system.delEvent(elem, eveName, callback);
                 }
             } else while (elem = this.nodeList[i++]) {
-                elem[on + "eveName"] = null;
+                elem["on" + eveName] = null;
             }
             return this;
         },
@@ -1147,6 +1185,7 @@
         nodeList: [],
         ready: function(callback) {
             system.ready(callback);
+            return this;
         },
         removing: function(array) {
             return removing(array);
@@ -1166,7 +1205,7 @@
             if (D.isString(str)) {
                 str = trim(str);
                 var className;
-                return this.each(function() {
+                this.each(function() {
                     if (this.nodeType === 1) {
                         className = this.className;
                         if (className) {
@@ -1186,12 +1225,9 @@
                 return this.each(function() {
                     if (this.nodeType === 1) {
                         className = this.className;
-                        if (className) {
-                            reg = RegExp("(^|\\s)" + str + "($|\\s)", "ig");
-                            if (reg.test(className)) {
-                                this.className = className = trim(className.replace(reg, " "));
-                                className == "" && (this.removeAttribute ? this.removeAttribute("class") : this.className = "");
-                            }
+                        if (className && (reg = RegExp("(^|\\s)" + str + "($|\\s)", "ig")).test(className)) {
+                            this.className = className = trim(className.replace(reg, " "));
+                            className == "" && (this.removeAttribute ? this.removeAttribute("class") : this.className = "");
                         }
                     }
                 });
@@ -1224,7 +1260,7 @@
         index: function(obj) {
             try {
                 if (obj) {
-                    return D.inArray(obj.nodeList[0], this.nodeList);
+                    return D.inArray(obj.nodeType || obj == window ? obj: obj.nodeList[0], this.nodeList);
                 }
                 return D.inArray(this.nodeList[0], this.nodeList[0].parentNode.getElementsByTagName("*"));
             } catch(e) {
@@ -1359,7 +1395,7 @@
                 }
             } else if ((D.isObject(obj) || D.isArray(obj)) && D.isFunction(fun)) {
                 for (i in obj) {
-                    obj.hasOwnProperty(i) && fun(i, obj[i]);
+                    obj.hasOwnProperty && obj.hasOwnProperty(i) && fun(i, obj[i]);
                 }
                 return true;
             }
@@ -1511,7 +1547,7 @@
         D.fn[item] = function(item, newItem) {
             return function(str) {
                 if (str == null) {
-                    return this.nodeList[0]["offset" + newItem];
+                    return this.nodeList[0] ? this.nodeList[0]["offset" + newItem] : null;
                 }
                 /^[0-9]+$/.test(str) && (str += "px");
                 return this.css(item, str);
