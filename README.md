@@ -2,7 +2,7 @@
 
 English version is [here](README_en.md).
 
-继优秀作品shearphoto截图插件，本人又再推出国产山寨JQUERY，为什么我要开发一个山寨JQUERY？老实说我从来没用过JQUERY，正因为我反感JQUERY。
+继优秀作品shearphoto截图插件，本人又再推出国产山寨[JQUERY](https://github.com/hczhcz/JQUERY)，为什么我要开发一个山寨JQUERY？老实说我从来没用过JQUERY，正因为我反感JQUERY。
 为什么我反感，因为我完全有开发JQUERY的能力，JQUERY的底层我都了如指掌。
 我开发插件一直都是用原生JS，大家可以看下我前面的作品shearphoto就是用原生JS写的。  虽说我反感JQUERY，但是JQUERY却在前端界占有大量的用户份额，之后我有个想法，不如重新开发一个属于自己思想，自己架构的JQUERY。有了想法就要实现我山寨JQUERY之路
 
