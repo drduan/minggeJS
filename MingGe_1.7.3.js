@@ -1,15 +1,16 @@
-/*  MingGEjs类库1.7.2
+/*  MingGEjs类库1.7.3
  *  
  *  你会用JQUERY，那你也会用这个框架，语法都是一样的！
  *
- *  MingGejs选择器的执行速度，是JQUERY的十倍以上,绝对排行世界尖端,不喜匆喷，本屌要占有JQUERY用户份额关你X事
+ *  MingGe的运行绝对比JQUERY快，因为够精简，MingGejs是你的最佳选择，请多多支持，
  *
  *  作者：明哥先生 --QQ399195513 QQ群461550716 官网www.shearphoto.com
  */
 (function(window, varName, undefined) {
-    var MingGEjs = "1.7.2",
-    IfGetClassName = document.getElementsByClassName ? true: false,
-    IfQuery = document.querySelectorAll ? true: false,
+    var MingGEjs = "1.7.3",
+    DOC = document,
+    IfGetClassName = DOC.getElementsByClassName ? true: false,
+    IfQuery = DOC.querySelectorAll ? true: false,
     MySlice = Array.prototype.slice,
     rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
     toString = Object.prototype.toString,
@@ -54,18 +55,34 @@
         return returnArray;
     },
     filterSpecial = function(str) {
-        var Reg;
         D.each(["r", "t", "n", "f", "v"],
         function(key, val) {
             val = "\\" + val;
-            Reg = new RegExp(val, "g");
-            str = str.replace(Reg, val);
+            str = str.replace(new RegExp(val, "g"), val);
         });
         return str.replace(/[\x01-\x12]/g, "");
     },
+    stripslashes = function(str) {
+        return str.replace(/[\"\'\\\/]/g,
+        function(str) {
+            return "\\" + str;
+        });
+    },
     system = {
         transform: false,
-        bindEvent: false,
+        bindCallback: function(callback, eveName, isOne) {
+            var this_ = this;
+            return function(eve) {
+                setTimeout(function() {
+                    if (typeof isOne == "boolean" && isOne === true) {
+                        D(this_).unbind(eveName, callback);
+                    }
+                },
+                1);
+                eve || (eve = window.event);
+                callback.call(this_, eve);
+            };
+        },
         getFilter: function(elem) {
             var ori;
             if (ori = system.original("filter", system.oStyleValue(elem))) {
@@ -78,7 +95,7 @@
             if (/^(div|ul|p|h1|h2|h3|h4|h5|h6|dd|dt|dl|ol|table|nav|form)$/i.test(tag)) {
                 return "block";
             }
-            if (/^(span|ul|b|a|em|strong|a|img)$/i.test(tag)) {
+            if (/^(span|ul|b|a|em|strong|img)$/i.test(tag)) {
                 return "inline";
             }
             if (/^li$/i.test(tag)) {
@@ -93,8 +110,8 @@
             if (tag == "TR") {
                 return "table-row";
             }
-            var create = document.createElement(tag),
-            bodys = document.body,
+            var create = DOC.createElement(tag),
+            bodys = DOC.body,
             returns;
             create.style.visibility = "hidden";
             bodys.appendChild(create);
@@ -116,10 +133,14 @@
             timeout = arg.timeout,
             erro = arg.error,
             data = arg.data,
-            match, script, timer, matchFun = function() {
+            cacheFun, match, script, timer, matchFun = function() {
                 if (window[match]) {
-                    tally > 30 && matchTimer ? (clearInterval(matchTimer), matchTimer = null) : tally++;
-                    return;
+                    if (window[match].MingGeJSONCallBack) {
+                        timeout || (tally > 30 && matchTimer ? (clearInterval(matchTimer), matchTimer = null) : tally++);
+                        return;
+                    } else {
+                        cacheFun = window[match];
+                    }
                 }
                 matchTimer && (clearInterval(matchTimer), matchTimer = null);
                 window[match] = function(data) {
@@ -129,12 +150,17 @@
                     }
                     out();
                 };
+                window[match].MingGeJSONCallBack = 1;
                 script = D.createScript(url);
             },
             matchTimer,
             tally = 0,
             out = function() {
                 script && script[0].removeChild(script[1]);
+                if (cacheFun) {
+                    window[match] = cacheFun;
+                    return;
+                }
                 try {
                     delete window[match];
                 } catch(e) {
@@ -160,6 +186,59 @@
             },
             timeout));
             matchTimer = setInterval(matchFun, 200);
+        },
+        addElemEve: function(elem, EveName, callback) {
+            elem === window && (elem = D);
+            var MingGeBind = elem.MingGeBind,
+            isObject = D.isObject(MingGeBind);
+            if (isObject && D.isArray(MingGeBind[EveName])) {
+                MingGeBind[EveName].push(callback);
+            } else {
+                isObject || (elem.MingGeBind = MingGeBind = {});
+                MingGeBind[EveName] = [callback];
+            }
+        },
+        eachDel: function(arr, elem, callback, eveName) {
+            D.each(arr,
+            function(k, v) {
+                if (callback) {
+                    v.callback == callback && (system.delEvent(elem, eveName, v), arr[k] = null);
+                } else {
+                    system.delEvent(elem, eveName, v);
+                    arr[k] = null;
+                }
+            });
+        },
+        DelElemEve: function(elem, eveName, callback) {
+            var E, MingGeBind = elem === window ? (E = D).MingGeBind: (E = elem).MingGeBind;
+            if (MingGeBind) {
+                if (eveName) {
+                    MingGeBind[eveName] && this.eachDel(MingGeBind[eveName], elem, callback, eveName);
+                } else {
+                    D.each(MingGeBind,
+                    function(key, val) {
+                        system.eachDel(val, elem, callback, key);
+                    });
+                }
+                D.each(MingGeBind,
+                function(key, val) {
+                    D.each(val,
+                    function(k, v) {
+                        if (!v) {
+                            val.splice(k, 1);
+                            val.length < 1 && delete val[k];
+                        }
+                    });
+                    if (D.isEmptyObject(val)) {
+                        delete MingGeBind[key];
+                        try {
+                            D.isEmptyObject(MingGeBind) && delete E.MingGeBind;
+                        } catch(e) {
+                            E.MingGeBind = null;
+                        }
+                    }
+                });
+            }
         },
         htmlVal: function(hv, str) {
             try {
@@ -286,69 +365,81 @@
             MingGeTemp,
             i,
             attr = {};
+            name = D.trim(name);
             if (D.isTxt(attribute)) {
                 attr.html = D.trim(attribute);
             } else if (D.isObject(attribute)) {
                 attr = attribute;
                 attr.value && (attr.html = attr.value, delete attr.value);
             }
-            name = D.trim(name);
             cmd = system.cmdFun(cmd);
             fun = function() {
-                div = document.createElement("div"),
-                node = document.createElement(name),
-                MingGeTemp = "MingGeTemp" + Math.random().toString().match(/[^\.]+$/)[0],
-                i;
-                seachIndex = seachIndex || system.seachIndex(["value", "innerHTML"], node);
-                div.appendChild(node);
-                for (i in attr) {
-                    if (i != "id" && D.isTxt(attr[i])) {
-                        i == "html" || node.setAttribute(i, attr[i]);
-                    }
-                }
-                node.id = MingGeTemp;
-                this.insertAdjacentHTML(cmd, div.innerHTML);
-                node = document.getElementById(MingGeTemp);
-                attr.id ? node.id = attr.id: node.removeAttribute ? node.removeAttribute("id") : node.id = "";
                 try {
+                    div = DOC.createElement("div"),
+                    node = DOC.createElement(name),
+                    MingGeTemp = "MingGeTemp" + Math.random().toString().match(/[^\.]+$/)[0],
+                    i;
+                    seachIndex = seachIndex || system.seachIndex(["value", "innerHTML"], node);
+                    div.appendChild(node);
+                    for (i in attr) {
+                        if (i != "id" && D.isTxt(attr[i])) {
+                            i == "html" || node.setAttribute(i, attr[i]);
+                        }
+                    }
+                    node.id = MingGeTemp;
+                    this.insertAdjacentHTML(cmd, div.innerHTML);
+                    node = DOC.getElementById(MingGeTemp);
+                    attr.id ? node.id = attr.id: node.removeAttribute ? node.removeAttribute("id") : node.id = "";
                     attr.html && seachIndex && (node[seachIndex] = attr.html);
                 } catch(e) {}
-                newD.nodeList.push(node);
+                node && newD.nodeList.push(node);
             };
             this.each(fun);
-            newD.SelectorTxt = document.body;
+            newD.SelectorTxt = DOC.body;
             newD.SelectorStr = "000";
             return newD;
         },
-        addEvent: function(obj, evetype, fun) {
-            var addevent = {
-                add: function() {
-                    D.isFunction(fun) && obj.addEventListener(evetype, fun, false);
-                },
-                att: function() {
-                    D.isFunction(fun) && obj.attachEvent("on" + evetype, fun);
-                },
-                no: function() {
-                    D.isFunction(fun) && (obj["on" + evetype] = fun);
-                }
-            };
-            this.bindEvent = this.bindEvent || obj.addEventListener && "add" || obj.attachEvent && "att" || "no";
-            addevent[this.bindEvent] && addevent[this.bindEvent]();
+        delEvent: null,
+        addEvent: null,
+        initEvent: function() { (this.addEvent == null || this.addEvent == null) && this.seachEvent();
         },
-        delEvent: function(obj, evetype, fun) {
-            var delevent = {
-                add: function() {
-                    D.isFunction(fun) && obj.removeEventListener(evetype, fun, false);
+        seachEvent: function() {
+            var A, addevent = {
+                add: [function() {
+                    A = arguments;
+                    A[0].addEventListener(A[1], A[2], false);
                 },
-                att: function() {
-                    D.isFunction(fun) && obj.detachEvent("on" + evetype, fun);
+                function() {
+                    var A = arguments;
+                    A[0].removeEventListener(A[1], A[2], false);
+                }],
+                att: [function() {
+                    A = arguments;
+                    A[0].attachEvent("on" + A[1], A[2]);
                 },
-                no: function() {
-                    D.isFunction(fun) && (obj["on" + evetype] = null);
-                }
-            };
-            this.bindEvent = this.bindEvent || obj.addEventListener && "add" || obj.attachEvent && "att" || "no";
-            delevent[this.bindEvent] && delevent[this.bindEvent]();
+                function() {
+                    var A = arguments;
+                    A[0].detachEvent("on" + A[1], A[2]);
+                }],
+                no: [function() {
+                    A = arguments;
+                    A[0]["on" + A[1]] = A[2];
+                },
+                function() {
+                    A = arguments;
+                    A[0]["on" + A[1]] = null;
+                }]
+            },
+            add;
+            if (DOC.addEventListener) {
+                add = addevent["add"];
+            } else if (DOC.attachEvent) {
+                add = addevent["att"];
+            } else {
+                add = addevent["no"];
+            }
+            this.addEvent = add[0];
+            this.delEvent = add[1];
         },
         timeCompute: function(saveTime, timing, callblack) {
             var timeSubtract;
@@ -435,6 +526,7 @@
             },
             removeUploadEve: function() {},
             ajax: function(arg) {
+                arg.timeout = /^\d+/.test(arg.timeout) ? parseFloat(arg.timeout) : 2e4;
                 arg = D.extend({
                     type: "get",
                     timeout: 2e4,
@@ -560,7 +652,7 @@
                 }
             },
             _type_: function(arr) {
-                if (D.isNumber(arr.nodeType)) return "[object document]";
+                if (D.isNumber(arr.nodeType)) return "[object DOC]";
                 return toString.call(arr);
             },
             _addjson_: function(types, txt, txt2, TrueFalse) {
@@ -573,10 +665,7 @@
             _addstring_: function(parameter) {
                 var of = typeof parameter,
                 types;
-                if (of === "string") return '"' + parameter.replace(/[\"\'\\\/]/g,
-                function(str) {
-                    return "\\" + str;
-                }) + '"';
+                if (of === "string") return '"' + stripslashes(parameter) + '"';
                 if (of === "number") return parameter;
                 types = this._type_(parameter);
                 if (types === "[object Object]" || types === "[object Array]") {
@@ -596,9 +685,9 @@
                     if (D.isUndefined(pro[a])) {
                         var ArrA = this._addstring_(arr[a]);
                         if (typeof ArrA !== "boolean") {
-                            this._addjson_(types, '"' + a + '":' + ArrA + ",", ArrA + ",");
+                            this._addjson_(types, '"' + stripslashes(a) + '":' + ArrA + ",", ArrA + ",");
                         } else {
-                            this._addjson_(types, '"' + a + '":', "");
+                            this._addjson_(types, '"' + stripslashes(a) + '":', "");
                             this._read_(arr[a], false);
                         }
                     }
@@ -634,21 +723,21 @@
             return [name, val];
         },
         ready: function(a) {
-            system.bindEvent = system.bindEvent || document.addEventListener && "add" || document.attachEvent && "att" || "no";
+            system.initEvent();
             function b() {
                 try {
                     var c = function() {
-                        "complete" === document.readyState && (system.addEvent(document, "readystatechange", c), a());
+                        "complete" === DOC.readyState && (system.addEvent(DOC, "readystatechange", c), a());
                     },
                     d = window.frameElement;
                 } catch(e) {
-                    return system.addEvent(document, "readystatechange", c),
+                    return system.addEvent(DOC, "readystatechange", c),
                     void 0;
                 }
-                if (null != d) return system.addEvent(document, "readystatechange", c),
+                if (null != d) return system.addEvent(DOC, "readystatechange", c),
                 void 0;
                 try {
-                    document.documentElement.doScroll("left");
+                    DOC.documentElement.doScroll("left");
                 } catch(c) {
                     return setTimeout(b, 13),
                     void 0;
@@ -656,11 +745,11 @@
                 a();
             }
             var c;
-            D.isFunction(a) && (system.bindEvent == "add" ? (c = function() {
-                document.removeEventListener("DOMContentLoaded", c, !1),
+            D.isFunction(a) && (DOC.addEventListener ? (c = function() {
+                DOC.removeEventListener("DOMContentLoaded", c, !1),
                 a();
             },
-            document.addEventListener("DOMContentLoaded", c, !1)) : b());
+            DOC.addEventListener("DOMContentLoaded", c, !1)) : b());
         }
     },
     listNodeToArray = function(listNode) {
@@ -682,7 +771,7 @@
         }
     },
     circulateNode = function(parent, R) {
-        if (R[0] || R[1][3].Id && document === parent) {
+        if (R[0] || R[1][3].Id && DOC === parent) {
             var elemName = R[1][2];
             var nodeList = parent[R[1][0]](elemName === "MingGeAllelem2015" ? "*": elemName);
             if (nodeList) {
@@ -761,7 +850,7 @@
         try {
             var merge, MingGeId, remove = false;
             if (findTrue) {
-                if (getObj.SelectorTxt === document || getObj.SelectorTxt === window) {
+                if (getObj.SelectorTxt === DOC || getObj.SelectorTxt === window) {
                     return newD;
                 }
                 if (getObj.SelectorTxt && str != "") {
@@ -793,12 +882,12 @@
                         merge = mergeSelector(getObj.SelectorTxt, str, " ");
                     }
                 }
-                newD.nodeList = listNodeToArray(document.querySelectorAll(merge));
+                newD.nodeList = listNodeToArray(DOC.querySelectorAll(merge));
                 newD.SelectorTxt = merge;
             } else {
                 var match = /^#([\w-_]+)$/.exec(str),
                 getid;
-                newD.nodeList = match ? (getid = document.getElementById(match[1])) ? [getid] : [] : listNodeToArray(document.querySelectorAll(str));
+                newD.nodeList = match ? (getid = DOC.getElementById(match[1])) ? [getid] : [] : listNodeToArray(DOC.querySelectorAll(str));
                 newD.SelectorTxt = str;
             }
         } catch(e) {}
@@ -825,7 +914,7 @@
             }
             return newD;
         }
-        return findTrue ? newD: newD.init(str || 0, document);
+        return findTrue ? newD: newD.init(str || 0, DOC);
     },
     space = function(str, getObj, findTrue) {
         var match = str.match(/[^\s]+/g);
@@ -844,7 +933,7 @@
         var match = str.match(/[\.#]?([\w-]+)/g);
         if (match) for (var i = 0; i < match.length; i++) {
             if (num == 0) {
-                obj = i == 0 ? findTrue ? findTrue.find ? system.find.call(obj, match[0]) : system.filter.call(obj, match[0]) : new D().init(match[0], document) : system.filter.call(obj, match[i]);
+                obj = i == 0 ? findTrue ? findTrue.find ? system.find.call(obj, match[0]) : system.filter.call(obj, match[0]) : new D().init(match[0], DOC) : system.filter.call(obj, match[i]);
             } else {
                 obj = i == 0 ? system.find.call(obj, match[0]) : system.filter.call(obj, match[i]);
             }
@@ -856,7 +945,6 @@
             return CanonicalStructure(args);
         }
         this.nodeList = [];
-        this.animateList = [];
     };
     D.fn = D.prototype = {
         version: "\u4f60\u4f7f\u7528\u7684\u7248\u672c\u662fMingGejs" + MingGEjs,
@@ -866,7 +954,7 @@
                 system.ready(string);
                 return this;
             }
-            if (string === window || string === document || string.ownerDocument) {
+            if (string === window || string === DOC || string.ownerDocument) {
                 this.SelectorTxt = string;
                 this.nodeList = [string];
             } else if (R = optionColation(string)) {
@@ -1093,22 +1181,6 @@
             lock && system.animate.apply(newD, arg);
             return this;
         },
-        on: function(eveName, callback) {
-            var elem, i = 0,
-            type = typeof eveName;
-            if (type === "string" && D.isFunction(callback)) {
-                while (elem = this.nodeList[i++]) {
-                    elem["on" + eveName] = callback;
-                }
-            } else if (type === "object") {
-                while (elem = this.nodeList[i++]) {
-                    for (var key in eveName) {
-                        elem["on" + key] = eveName[key];
-                    }
-                }
-            }
-            return this;
-        },
         empty: function() {
             var seachIndex;
             return this.each(function(i) {
@@ -1130,55 +1202,52 @@
             this.nodeList = arr;
             return this;
         },
-        bind: function(eveName, callback) {
+        bind: function(eveName, callback, isOne) {
+            system.initEvent();
             var elem, i = 0,
-            type = typeof eveName;
-            if (type === "string" && D.isFunction(callback)) {
+            args;
+            if (D.isString(eveName) && D.isFunction(callback)) {
                 while (elem = this.nodeList[i++]) {
-                    system.addEvent(elem, eveName, callback);
+                    args = [elem, eveName, system.bindCallback.call(elem, callback, eveName, isOne)];
+                    args[2].callback = callback;
+                    system.addElemEve.apply(system, args);
+                    system.addEvent.apply(system, args);
                 }
-            } else if (type === "object") {
+
+            } else if (D.isObject(eveName)) {
                 while (elem = this.nodeList[i++]) {
                     for (var key in eveName) {
-                        system.addEvent(elem, key, eveName[key]);
+                        if (D.isString(key) && D.isFunction(eveName[key])) {
+                            args = [elem, key, system.bindCallback.call(elem, eveName[key], key, isOne)];
+                            args[2].callback = eveName[key];
+                            system.addElemEve.apply(system, args);
+                            system.addEvent.apply(system, args);
+                        }
                     }
                 }
             }
             return this;
         },
         unbind: function(eveName, callback) {
-            var elem, i = 0;
-            if (callback) {
-                while (elem = this.nodeList[i++]) {
-                    system.delEvent(elem, eveName, callback);
+            system.initEvent();
+            var elem, i = 0,
+            eveNameType = typeof eveName;
+            if (eveNameType == "function") {
+                callback = eveName;
+                eveName = undefined;
+            } else {
+                var callbackType = typeof callback;
+                if (! ((eveNameType == "string" || eveNameType == "undefined") && (callbackType == "function" || callbackType == "undefined"))) {
+                    return this;
                 }
-            } else while (elem = this.nodeList[i++]) {
-                elem["on" + eveName] = null;
+            }
+            while (elem = this.nodeList[i++]) {
+                system.DelElemEve(elem, eveName, callback);
             }
             return this;
         },
         one: function(eveName, callback) {
-            var type = typeof eveName;
-            if (type === "string" && D.isFunction(callback)) {
-                var newOne = function() {
-                    system.delEvent(this, eveName, newOne);
-                    callback.call(this);
-                };
-                return this.bind(eveName, newOne);
-            }
-            if (type === "object") {
-                var eveObj = {};
-                for (var key in eveName) {
-                    eveObj[key] = function(keys) {
-                        return function() {
-                            system.delEvent(this, keys, eveObj[keys]);
-                            eveName[keys].call(this);
-                        };
-                    } (key);
-                }
-                return this.bind(eveObj);
-            }
-            return this;
+            return this.bind(eveName, callback, true);
         },
         SelectorStr: false,
         SelectorTxt: false,
@@ -1197,7 +1266,7 @@
             while (obj = this.nodeList[i++]) { (par = obj.parentNode) && (par.tagName == "BODY" || newD.nodeList.push(par));
             }
             newD.nodeList = removing(newD.nodeList);
-            newD.SelectorTxt = document.body;
+            newD.SelectorTxt = DOC.body;
             newD.SelectorStr = "000";
             return re ? newD.filter(re) : newD;
         },
@@ -1292,7 +1361,7 @@
             return system.htmlVal.call(this, "innerHTML", str);
         },
         text: function(str) {
-            return system.htmlVal.call(this, system.isIndex("textContent", document.body) ? "textContent": "innerText", str);
+            return system.htmlVal.call(this, system.isIndex("textContent", DOC.body) ? "textContent": "innerText", str);
         },
         css: function(args, val) {
             var i = 0,
@@ -1326,7 +1395,7 @@
                         sty[arrayKey[0]] = arrayKey[1];
                     } catch(e) {}
                 }
-            } else if (type === "object") {
+            } else if (D.isObject(args)) {
                 while (elem = this.nodeList[i++]) {
                     sty = elem.style;
                     for (key in args) {
@@ -1366,17 +1435,7 @@
         }
         return false;
     };
-    system.ajax.prototype = system.ajaxPrototype; !
-    function(args) {
-        var elem, i = 0;
-        while (elem = args[i++]) {
-            D.fn[elem] = function(elem) {
-                return function(callback) {
-                    return this.bind(elem, callback);
-                };
-            } (elem);
-        }
-    } (["blur", "focus", "focusin", "focusout", "resize", "scroll", "unload", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "error", "touchstart", "touchmove", "touchend"]);
+    system.ajax.prototype = system.ajaxPrototype;
     D.extend({
         parseJSON: function(string, T) {
             return system.JsonString.StringToJson(string, T);
@@ -1387,20 +1446,6 @@
         trim: function(str) {
             return trim(str);
         },
-        each: function(obj, fun) {
-            var elem, i = 0;
-            if (D.isFunction(obj)) {
-                while (elem = this[i++]) {
-                    obj.call(elem);
-                }
-            } else if ((D.isObject(obj) || D.isArray(obj)) && D.isFunction(fun)) {
-                for (i in obj) {
-                    obj.hasOwnProperty && obj.hasOwnProperty(i) && fun(i, obj[i]);
-                }
-                return true;
-            }
-            return false;
-        },
         setVar: function(name) {
             try {
                 delete window[varName];
@@ -1410,7 +1455,11 @@
             window[name] = D;
         },
         isObject: function(obj) {
-            return toString.call(obj) === "[object Object]";
+            try {
+                return toString.call(obj) == "[object Object]" && typeof obj.nodeType != "number" && obj != window;
+            } catch(e) {
+                return false;
+            }
         },
         update: function(getObj) {
             var elem, i = 0,
@@ -1437,10 +1486,10 @@
             return true;
         },
         createScript: function(srcTxt) {
-            var head = document.getElementsByTagName("head").item(0),
+            var head = DOC.getElementsByTagName("head").item(0),
             script;
             if (head) {
-                script = document.createElement("script");
+                script = DOC.createElement("script");
                 head.appendChild(script);
                 D.isString(srcTxt) && (script.src = srcTxt);
                 return [head, script];
@@ -1486,6 +1535,20 @@
         isString: function(str) {
             return typeof str == "string";
         },
+        each: function(obj, fun) {
+            var elem, i = 0;
+            if (D.isFunction(obj)) {
+                while (elem = this[i++]) {
+                    obj.call(elem);
+                }
+            } else if ((D.isObject(obj) || D.isArray(obj)) && D.isFunction(fun)) {
+                for (i in obj) {
+                    obj.hasOwnProperty && obj.hasOwnProperty(i) && fun(i, obj[i]);
+                }
+                return true;
+            }
+            return false;
+        },
         objToUrl: function(obj) {
             if (D.isObject(obj)) {
                 var str = "";
@@ -1521,13 +1584,13 @@
             return url;
         },
         isHtml5: function() {
-            return document.createElement("canvas").getContext ? true: false;
+            return DOC.createElement("canvas").getContext ? true: false;
         },
         html5Attribute: function(attribute) {
             try {
                 var attributeLow = attribute ? attribute.toLowerCase() : "transform";
                 attribute = attributeLow.replace(/^\w/, attribute.charAt(0).toUpperCase());
-                var bodyStyle = document.body.style,
+                var bodyStyle = DOC.body.style,
                 arr = [attributeLow, "Ms" + attribute, "Moz" + attribute, "Webkit" + attribute, "O" + attribute],
                 save = false;
                 for (var i = 0; i < arr.length; i++) {
@@ -1554,5 +1617,25 @@
             };
         } (item, item.replace(/^\w/, item.charAt(0).toUpperCase()));
     });
+    D.fn.on = D.fn.bind;
+    D.fn.off = D.fn.unbind; !
+    function(args) {
+        var elem, i = 0;
+        while (elem = args[i++]) {
+            D.fn[elem] = function(elem) {
+                return function(callback) {
+                    if (D.isUndefined(callback)) {
+                        D.each.call(this.nodeList,
+                        function() {
+                            try {
+                                this[elem]();
+                            } catch(e) {}
+                        });
+                    }
+                    return this.bind(elem, callback);
+                };
+            } (elem);
+        }
+    } (["blur", "focus", "focusin", "focusout", "resize", "scroll", "unload", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "error", "touchstart", "touchmove", "touchend"]);
     window[varName] = D;
 })(window, "$");
