@@ -13,4 +13,4 @@ MingGeJs是什么？它是我一个星期完成的作品，它是一个JS类库�
 
 JQUERY百分之50以上的用户份额。MingGeJs已在GIT开源，欢迎各路前端高手对MingGeJs类库进行评测！  
 
-我是mingge    请支持国产minggeJS类库，因为我们都是中国人。    
+我是mingge    请支持国产minggeJS类库，因为我们都是中国人。     
