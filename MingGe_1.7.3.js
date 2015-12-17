@@ -447,7 +447,7 @@
                 timeSubtract = new Date().getTime() - saveTime;
                 if (timeSubtract > timing || timeSubtract < 0) {
                     callblack();
-                }
+                } 
             };
         },
         ajax: function() {
