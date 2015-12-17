@@ -13,5 +13,5 @@ I have not a Bachelor degree even never enter a high school. I have no any idea 
 I am MingGe. I initiative, let's give a support to Chinese-made minggeJS library as Chineses.
 
 ## minggeJS Release v1.7
-
+  
 **TODO**
