@@ -1,6 +1,5 @@
 # minggeJS
-<<<<<<< HEAD
-
+<<<<<<<HEAD
 
  English version is [here](README_en.md).
 
