@@ -51,5 +51,5 @@ minggeJS具有以下优点
 
 
 #minggeJS周边插件
-*[mingify - 明哥体生成器](https://github/cht8687/mingify)
+*[mingify - 明哥体生成器](https://github.com/cht8687/mingify)
 
