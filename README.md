@@ -84,7 +84,7 @@ $(XXX).one("click",function())        只执行一次后解绑事件
 
 on方法和bind，一样，我只是$.on=$.bind;掩耳法，
 
-off方法和unbid一样，我只是$.off=$.unbind;掩耳法，
+off方法和unbind一样，我只是$.off=$.unbind;掩耳法，
  
 那么说吧，我没写on委托事件方法，因为我没有重新定义event方法，如果不重新定义过event,事件委托写了也白写，这个只能以后再加了，我时间很有限。
 
