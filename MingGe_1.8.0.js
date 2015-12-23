@@ -1,14 +1,6 @@
 /*  MingGEjs类库1.8.0
  *  
-<<<<<<< HEAD:MingGe_1.8.0.js
-<<<<<<< HEAD:MingGe_1.8.0.js
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
-=======
- *  你会用JQUERY，那你也会用这个框架，语法都是一样！
->>>>>>> origin/master:MingGe_1.7.3.js
-=======
- *  你会用JQUERY，那你也会用这个框架，语法都是一样！
->>>>>>> origin/master:MingGe_1.7.3.js
  *
  *  MingGe的运行绝对比JQUERY快，因为够精简，MingGejs是你的最佳选择，请多多支持，
  *
@@ -519,7 +511,7 @@
                 timeSubtract = new Date().getTime() - saveTime;
                 if (timeSubtract > timing || timeSubtract < 0) {
                     callblack();
-                } 
+                }
             };
         },
         ajax: function() {
@@ -1793,19 +1785,7 @@
                 };
             } (eveName);
         }
-<<<<<<< HEAD:MingGe_1.8.0.js
-<<<<<<< HEAD:MingGe_1.8.0.js
         args = i = null;
     })(["blur", "focus", "focusin", "focusout", "resize", "scroll", "unload", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "error", "touchstart", "touchmove", "touchend", "touchcancel"]);
     window[varName] = D;
 })(window, "$");
-=======
-    } (["blur", "focus", "focusin", "focusout", "resize", "scroll", "unload", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "error", "touchstart", "touchmove", "touchend"]);
-    window[varName] = D; 
-})(window, "$");
->>>>>>> origin/master:MingGe_1.7.3.js
-=======
-    } (["blur", "focus", "focusin", "focusout", "resize", "scroll", "unload", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "error", "touchstart", "touchmove", "touchend"]);
-    window[varName] = D; 
-})(window, "$");
->>>>>>> origin/master:MingGe_1.7.3.js
