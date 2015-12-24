@@ -1,98 +1,104 @@
+<img src="http://ooo.0o0.ooo/2015/12/23/567b82dd86aab.png" align="right"/>
 # minggeJS
-<<<<<<< HEAD
 
- English version is [here](README_en.md).
+English version is [here](README_en.md).
+
 #  MingGeJS1.8.0 寄语：
 
-            从1.6一直到1.8.0，基本每天都在修BUG，修BUG！升级，升级！ 
-            每次当我认为完美时，总是有意无意地触犯了一些低级错误！例如 我把apply居然写成aply，然后又有人喷：你连apply都不会吗？
-            我说是手误，你说我装逼！面对这种人恶意攻击身心好疲劳！ 我深深体会到，要把一个类库做得近乎完美，一定要付出很多努力！
-            而有的人则说这样的类库，我能做十个八个。我只是知道JQUERY作者，为了JQUERY同样地付出很多努力，在开发的前几年，作者几乎每天都是在修              BUG。
+从1.6一直到1.8.0，基本每天都在修BUG，修BUG！升级，升级！
+每次当我认为完美时，总是有意无意地触犯了一些低级错误！例如 我把apply居然写成aply，然后又有人喷：你连apply都不会吗？
+我说是手误，你说我装逼！面对这种人恶意攻击身心好疲劳！ 我深深体会到，要把一个类库做得近乎完美，一定要付出很多努力！
+而有的人则说这样的类库，我能做十个八个。我只是知道JQUERY作者，为了JQUERY同样地付出很多努力，在开发的前几年，作者几乎每天都是在修              BUG。
 
-            更有甚者，说我抄袭JQUERY的源代码！直接理直气壮地埋没我这半个多月的努力！
-           例如这句：
-            match = /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) ||                 !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
-           navigator.userAgent是已知的，上面是正则配对，
-           你认为我不抄袭JQUERY这句，我就写不出来了，这个正则很高技术含量？ /(webkit)[ \/]([\w.]+)/.exec(ua) 
-           选择器的正则我都敲到出来，你认为这种1+1=2的东西对我有难度?！
-           某些时候我为了节省时间，抄袭一两句（简单语句）！
-           但是总被别人借题发挥，污蔑我!
-           本人作为minggeJS原创作者，我问心无愧地对大家最强调一次，minggeJS 99.9%的代码都是原创敲写，0.1%是贪方便抄一两句
-           minggeJS代码量一共1800行，每天修BUG和升级很辛苦的，而且做这种类库， 没有任何收入！ 你不喜欢minggeJS，你可以不看不评论，你认为你能                力比我高的，你可以放在心头，你没必要出来跟我拼，我很希望大家尊重原创作者！
-               
-           
+更有甚者，说我抄袭JQUERY的源代码！直接理直气壮地埋没我这半个多月的努力！
+例如这句：
+
+```javascript
+match = /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) ||                 !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
+```
+
+navigator.userAgent是已知的，上面是正则配对，
+你认为我不抄袭JQUERY这句，我就写不出来了，这个正则很高技术含量？ /(webkit)[ \/]([\w.]+)/.exec(ua)
+选择器的正则我都敲到出来，你认为这种1+1=2的东西对我有难度?！
+某些时候我为了节省时间，抄袭一两句（简单语句）！
+但是总被别人借题发挥，污蔑我!
+本人作为minggeJS原创作者，我问心无愧地对大家最强调一次，minggeJS 99.9%的代码都是原创敲写，0.1%是贪方便抄一两句
+minggeJS代码量一共1800行，每天修BUG和升级很辛苦的，而且做这种类库， 没有任何收入！ 你不喜欢minggeJS，你可以不看不评论，你认为你能                力比我高的，你可以放在心头，你没必要出来跟我拼，我很希望大家尊重原创作者！
+
+
 
 MingGeJS1.8.0升级细节
 ：
-          MingGeJS1.8.0根据GITHUB贡献者的反馈，作了大幅度调整及修复!
-          1：重新调整及修复绑定事件机制：
-                  示例(以click事件为例，所有事件都齐全的，别以为只有click哦)：
+MingGeJS1.8.0根据GITHUB贡献者的反馈，作了大幅度调整及修复!
+1：重新调整及修复绑定事件机制：
+示例(以click事件为例，所有事件都齐全的，别以为只有click哦)：
 
-                  $(xxx).bind("click",function); 绑定点击事件！
-                  $(xxx).bind({"click":function});OBJECT形式传入事件！
-                  $(xxx).unbind("click",function)解绑该事件与对应函数的绑定
-                  $(xxx).unbind("click"）; 解绑点击事件的所有绑定
-                  $(xxx).unbind(function)）;解绑该函数的所有事件
-                  $(xxx).one(xxxxxxxx) 与bind用法相同，不同的是，只运行一次就解开绑定
-                  $(xxx).click(function)    $(xxx).bind("click",function);的简写形式
-                  $(xxx).click（）让事件冒泡！
+```
+$(xxx).bind("click",function); 绑定点击事件！
+$(xxx).bind({"click":function});OBJECT形式传入事件！
+$(xxx).unbind("click",function)解绑该事件与对应函数的绑定
+$(xxx).unbind("click"）; 解绑点击事件的所有绑定
+$(xxx).unbind(function)）;解绑该函数的所有事件
+$(xxx).one(xxxxxxxx) 与bind用法相同，不同的是，只运行一次就解开绑定
+$(xxx).click(function)    $(xxx).bind("click",function);的简写形式
+$(xxx).click（）让事件冒泡！
+```
 
-                   on方法与off一样可以用，但没事件委托功能，event只作了简单处理！event下次升级重新定义过才写委托功能吧 
+ on方法与off一样可以用，但没事件委托功能，event只作了简单处理！event下次升级重新定义过才写委托功能吧
 
-          2：新增mouseenter  mouseleave  事件，新增clientHeight      scrollWidth     scrollHeight      scrollLeft    scrollTop
-             兼容IE678 及以尘世间所有浏览器！
+2：新增mouseenter  mouseleave  事件，新增clientHeight      scrollWidth     scrollHeight      scrollLeft    scrollTop
+   兼容IE678 及以尘世间所有浏览器！
 
-          3：$.toJSON修复，对16位字符作了严格处理！该函数连续修了四次，都一直反馈BUG，这次应该完美了！
-              另外说一下stringify插件stringify（｛"a":document｝）在浏览器下直接报错    minggeJS的toJSON则能完美通过 
-              请测试      alert($.toJSON({"  \u0000a%s'\n我好122\n\u00ad\u0000 \u0000  \d\f\t\b\g\q ":"a%s'\n\n你222好\d\f\t\b\g\q\u0000\u00ad",b:{a:{b:"b"}}}));
-        
-
-         4:   JSONP 先前的机制有严重问题，已全部重写 请测试 $.getJSON("http://xxxx?callback=?",function(v){alert(v)});});
-
-
-         5： 还有addClass removclass..以及大部份内部方法....等等，也作了调整及优化！
+3：$.toJSON修复，对16位字符作了严格处理！该函数连续修了四次，都一直反馈BUG，这次应该完美了！
+    另外说一下stringify插件stringify（｛"a":document｝）在浏览器下直接报错    minggeJS的toJSON则能完美通过
+    请测试      alert($.toJSON({"  \u0000a%s'\n我好122\n\u00ad\u0000 \u0000  \d\f\t\b\g\q ":"a%s'\n\n你222好\d\f\t\b\g\q\u0000\u00ad",b:{a:{b:"b"}}}));
 
 
-        
- 
-         结语：minggeJS并不单单山寨JQUERY，更多的是融入我自己思想。minggeJS的CSS3动画做得不错的，比ZEPTO动画要好是肯定的，
-　　　　　　　　例如串联动画，zepto是没有的，所以minggeJS非常合适合来做手机端，做各种复杂的ＣＳＳ３动画，
-                另外minggeJS支持模块及插件形式分离开发，大致用法基本和JQUERY一致，有部份函数用法则有所稍略
-                请大家看DEMO.html演试！（DEMO.html已大幅度更新）
+4:   JSONP 先前的机制有严重问题，已全部重写 请测试 $.getJSON("http://xxxx?callback=?",function(v){alert(v)});});
 
-                我是mingge,请支持国产MingGeJs
+5： 还有addClass removclass..以及大部份内部方法....等等，也作了调整及优化！
+
+结语：minggeJS并不单单山寨JQUERY，更多的是融入我自己思想。minggeJS的CSS3动画做得不错的，比ZEPTO动画要好是肯定的，
+例如串联动画，zepto是没有的，所以minggeJS非常合适合来做手机端，做各种复杂的ＣＳＳ３动画，
+另外minggeJS支持模块及插件形式分离开发，大致用法基本和JQUERY一致，有部份函数用法则有所稍略
+请大家看DEMO.html演试！（DEMO.html已大幅度更新）
+
+我是mingge,请支持国产MingGeJs
 
 
 # 又迎来1.7.3版更新  
-   
-<<<<<<< 1.7.3版更新：  
-  
+
+1.7.3版更新：  
+
 有只叫"鲁小夫"的贱渣，他是知乎网的，你绝对是个贱渣+败类
 他拿我的事件方法出来喷， 那告诉你写事件方法当时，我只是简单马虎写了几句，前后时间用了一小时左右，结果被喷得一文不值。
 好吧，最多的借口都是借口，那么今天特意把事件方法全部重写了
+
+```
 $(XXX).bind("click",function())        绑定$(XXX).bind("click",function()) 绑定
- 
+
 $(XXX).bind()                          全部解开绑定
 
 $(XXX).bind("click")                   只解开click绑定
 
-$(XXX).bind(function)                  解开所有该函数（只接受静态函数） 
+$(XXX).bind(function)                  解开所有该函数（只接受静态函数）
 
 $(XXX).bind({click:function(){}})      接受OBJECT对象批量传入批量事件
- 
+
 $(XXX).one("click",function())        只执行一次后解绑事件
+```
 
 on方法和bind，一样，我只是$.on=$.bind;掩耳法，
 
 off方法和unbid一样，我只是$.off=$.unbind;掩耳法，
- 
+
 那么说吧，我没写on委托事件方法，因为我没有重新定义event方法，如果不重新定义过event,事件委托写了也白写，这个只能以后再加了，我时间很有限。
 
 event 我只作了简单处理: event || window.event 。如果用户需要事件委托，那就要麻烦你在事件callback内自己写逻辑了！其实也很简单吧
 -------------------------------------------------------------------------------------------------------------------------
 
 
-然后说说，JSONP，同时触发JSONP时，引起公共变量被占用的问题。已修复， 
+然后说说，JSONP，同时触发JSONP时，引起公共变量被占用的问题。已修复，
 当公共变量被占用时，线程会等待公用变量消失，如果超时就关闭所有线程
 如果用户不设置超时，那么程序默认只等待连接30次！这个方案，应该是无可挑剔了
 $.getJSON 或$.ajax 进行测试吧      示例     $.getJSON("http://xxxx?callback=?",function(v){alert(v)});})
@@ -105,12 +111,12 @@ $.getJSON 或$.ajax 进行测试吧      示例     $.getJSON("http://xxxx?callb
 
      alert($.toJSON({"  a%s'\n我好122\n   \d\f\t\b\g\q ":"a%s'\n\n你222好\d\f\t\b\g\q"}))	;
 --------------------------------------------------------------------------------------------------
-        
-    现在的代码差不多1700行了，压缩文件快接近30K了，可能有些函数方法考虑不周，逻辑错误，函数漏洞，我写程序某些时候比较粗心大意，某些时候马虎了事，敬请各位多加提点，让我尽快修复。
-          诸如apply我写成aply
-        "on"+evename 我写成 on+"evename" 等等,这些纯粹是我手误，好吧！解释就是掩饰，技术差就是差不找借口了！
-   感谢各位对MingGeJS项目的关注，那大家只关注MingGeJS就好，不要关注作者了，我没什么值得你关注的！ 我更不想被关注！进来把我当笑话看的，你可以滚了！
-        以后对带骨的话，一律删除处理。---------------FROM mingge   版本号1.7.3
+
+现在的代码差不多1700行了，压缩文件快接近30K了，可能有些函数方法考虑不周，逻辑错误，函数漏洞，我写程序某些时候比较粗心大意，某些时候马虎了事，敬请各位多加提点，让我尽快修复。
+诸如apply我写成aply
+"on"+evename 我写成 on+"evename" 等等,这些纯粹是我手误，好吧！解释就是掩饰，技术差就是差不找借口了！
+感谢各位对MingGeJS项目的关注，那大家只关注MingGeJS就好，不要关注作者了，我没什么值得你关注的！ 我更不想被关注！进来把我当笑话看的，你可以滚了！
+以后对带骨的话，一律删除处理。---------------FROM mingge   版本号1.7.3
 ------------
 继优秀作品shearphoto截图插件，本人又再推出国产山寨JQUERY，为什么我要开发一个山寨JQUERY？老实说我从来没用过JQUERY，正因为我反感JQUERY。
 为什么我反感，因为我完全有开发JQUERY的能力，JQUERY的底层我都了如指掌。
@@ -119,7 +125,6 @@ $.getJSON 或$.ajax 进行测试吧      示例     $.getJSON("http://xxxx?callb
 继优秀作品shearphoto截图插件，本人又再推出国产山寨jQuery，为什么我要开发一个山寨jQuery？老实说我从来没用过jQuery，正因为我反感jQuery。
 为什么我反感，因为我完全有开发jQuery的能力，jQuery的底层我都了如指掌。
 我开发插件一直都是用原生JS，大家可以看下我前面的作品shearphoto就是用原生JS写的。  虽说我反感jQuery，但是jQuery却在前端界占有大量的用户份额，之后我有个想法，不如重新开发一个属于自己思想，自己架构的jQuery。有了想法就要实现我山寨jQuery之路
->>>>>>> pr/60
 
 我给了他一个霸气的名字：MingGeJs，  
 
@@ -145,7 +150,8 @@ minggeJS新增了JSONP，attr()等许多还没及时写上的API,以及优化部
 
 下面我介绍一下minggeJS几大优点。
 
-minggeJS具有以下优点
+minggeJS具有以下优点:
+
 1：选择器执行速度胜出jQuery，
    以十万个DIV节点测试，分别用minggeJS与jQuery选择器取出指定节点测试：
  jQuery结果 ：     IE7以上：花时1800毫秒   IE7 花时   8135毫秒     IE6   花时超过30-40秒之间，浏览器随机卡死。
