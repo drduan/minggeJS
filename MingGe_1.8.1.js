@@ -1,4 +1,4 @@
-/*  MingGEjs类库1.8.0
+/*  MingGEjs类库1.8.1
  *  
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
  *
@@ -7,7 +7,7 @@
  *  作者：明哥先生-QQ399195513 QQ群：461550716 官网：www.shearphoto.com
  */
 (function(window, varName, undefined) {
-    var MingGEjs = "1.8.0",
+    var MingGEjs = "1.8.1",
     DOC = document,
     addEvent, delEvent, DOCSCROLL_LT, saveGetMobile, ENCODE = encodeURIComponent,
     isGetClassName = !!DOC.getElementsByClassName,
@@ -506,9 +506,8 @@
             return newD;
         },
         timeCompute: function(saveTime, timing, callblack) {
-            var timeSubtract;
             return function() {
-                timeSubtract = new Date().getTime() - saveTime;
+                var timeSubtract = new Date().getTime() - saveTime;
                 if (timeSubtract > timing || timeSubtract < 0) {
                     callblack();
                 }
@@ -526,7 +525,7 @@
                 return this.simplify(url, "post", true, data, success, 2e4, false);
             },
             getJSON: function(url, data, success) {
-                return this.simplify(url, "get", true, data, success, 2e4, true, /[\?&]+.+\s*=\s*\?/i.test(url) ? "jsonp": "json");
+                return this.simplify(url, "get", true, data, success, 2e4, true, /[\?&]+.+\s*=\s*\?/.test(url) ? "jsonp": "json");
             },
             simplify: function(url, type, async, data, success, timeout, cache, json) {
                 if (D.isFunction(data)) {
@@ -548,43 +547,49 @@
                 });
                 return this;
             },
+            Del: function(xmlhttp, State, arg) {
+                try {
+                    xmlhttp.onreadystatechange = null;
+                } catch(e) {
+                    xmlhttp.onreadystatechange = function() {};
+                }
+                if (this.stop === true) return;
+                this.removeUploadEve();
+                this.timeout && (clearTimeout(this.timeout), this.timeout = false);
+                this.erromsg = State;
+                this.transit = true;
+                D.isFunction(arg.error) && arg.error(State);
+            },
             handle: function(xmlhttp, arg) {
                 if (4 == xmlhttp.readyState) {
                     if (this.stop === true) return;
                     this.transit = true;
                     this.removeUploadEve();
-                    if (arg.timeout && arg.async) {
-                        clearTimeout(this.timeout);
-                        this.timeout = false;
-                    }
+                    this.timeout && (clearTimeout(this.timeout), this.timeout = false);
                     if (200 == xmlhttp.status) {
-                        xmlhttp.onreadystatechange = null;
+                        try {
+                            xmlhttp.onreadystatechange = null;
+                        } catch(e) {
+                            xmlhttp.onreadystatechange = function() {};
+                        }
                         var responseText = this.serverdata = trim(xmlhttp.responseText);
                         if (D.isFunction(arg.success)) {
                             if (arg.dataType == "JSON") responseText = system.JsonString.StringToJson(responseText) || responseText;
                             arg.success(responseText, "success");
                         }
                     } else {
-                        this.erromsg = xmlhttp.status;
-                        D.isFunction(arg.error) && arg.error(xmlhttp.status);
+                        this.Del(xmlhttp, "\u72b6\u6001\uff1a" + xmlhttp.status, arg);
                     }
                 } else {
-                    if (0 == xmlhttp.readyState) {
-                        xmlhttp.onreadystatechange = null;
-                        if (this.stop === true) return;
-                        this.removeUploadEve();
-                        if (arg.timeout && arg.async) {
-                            clearTimeout(this.timeout);
-                            this.timeout = false;
-                        }
-                        this.erromsg = xmlhttp.readyState;
-                        this.transit = true;
-                        D.isFunction(arg.error) && arg.error(xmlhttp.readyState);
-                    }
+                    0 == xmlhttp.readyState && this.Del(xmlhttp, 0, arg);
                 }
             },
-            out: function(arg) {
-                xmlhttp.onreadystatechange = null;
+            out: function(arg, xmlhttp) {
+                try {
+                    xmlhttp.onreadystatechange = null;
+                } catch(e) {
+                    xmlhttp.onreadystatechange = function() {};
+                }
                 this.transit = true;
                 this.erromsg = 504;
                 this.stop = true;
@@ -644,15 +649,16 @@
                 var SendArg = arg.data == "" ? null: arg.data,
                 self = this;
                 D.isFunction(arg.complete) && arg.complete();
-                arg.timeout && arg.async && (this.timeout = setTimeout(function() {
-                    self.out(arg);
-                },
-                arg.timeout));
                 if (arg.async === true) {
                     xmlhttp.onreadystatechange = function() {
                         self.handle(xmlhttp, arg);
                     };
                 }
+                arg.timeout && arg.async && (this.timeout = setTimeout(function() {
+                    self.timeout = false;
+                    self.out(arg, xmlhttp);
+                },
+                arg.timeout));
                 try {
                     switch (arg.type) {
                     case "POST":
@@ -667,15 +673,7 @@
                     }
                     xmlhttp.send(SendArg);
                 } catch(e2) {
-                    xmlhttp.onreadystatechange = null;
-                    this.erromsg = 505;
-                    this.removeUploadEve();
-                    if (arg.timeout && arg.async) {
-                        clearTimeout(this.timeout);
-                        this.timeout = false;
-                    }
-                    this.transit = true;
-                    D.isFunction(arg.error) && arg.error(505, e2);
+                    this.Del(xmlhttp, e2, arg);
                     return;
                 }
                 arg.async === false && self.handle(xmlhttp, arg);
@@ -1032,10 +1030,9 @@
                 return this.bind("load", url);
             }
             var this_ = this,
-            seachIndex;
             successFun = function(HTML) {
                 this_.each(function() {
-                    seachIndex = system.seachIndex(["value", "innerHTML"], this);
+                    var seachIndex = system.seachIndex(["value", "innerHTML"], this);
                     seachIndex && (this[seachIndex] = HTML);
                 });
             };
@@ -1052,21 +1049,19 @@
         stop: function() {
             system.transition || (system.transition = D.html5Attribute("transition"));
             if (!system.transition) return this;
-            var style;
             return this.each(function() {
                 if (this.isMingGeAnimate) {
                     delete this.isMingGeAnimate;
                     this.mingGeAnimateList && delete this.mingGeAnimateList;
                     var timingFunction = system.transition + "TimingFunction";
-                    style = this.style;
+                    var style = this.style;
                     style[system.transition] = style[timingFunction] = null;
                 }
             });
         },
         fadeToggle: function(time, callback) {
-            var arr;
             return this.each(function() {
-                arr = system.oStyleValue(this);
+                var arr = system.oStyleValue(this);
                 if (system.original("display", arr) == "none") {
                     D(this).fadeIn(time, callback);
                 } else {
@@ -1082,7 +1077,7 @@
                     D.each.call(this.nodeList,
                     function() {
                         this_ = this;
-                        this_.setAttribute && D.each(name,
+                        this.setAttribute && D.each(name,
                         function(k, v) {
                             if (D.isString(k) && D.isTxt(v)) {
                                 this_.setAttribute(k, v);
@@ -1107,11 +1102,11 @@
             return this;
         },
         fadeOut: function(time, callback) {
-            var arr, newD = new D();
+            var newD = new D();
             system.transition || (system.transition = D.html5Attribute("transition"));
             this.each(function() {
-                arr = system.oStyleValue(this);
-                system.original("display", arr) == "none" || this.isMingGeAnimate || newD.nodeList.push(this);
+                var arr = system.oStyleValue(this);
+                this.nodeType == 1 && (system.original("display", arr) == "none" || this.isMingGeAnimate || newD.nodeList.push(this));
             });
             if (system.transition) {
                 newD.animate({
@@ -1132,24 +1127,35 @@
             return this;
         },
         hide: function() {
-            return this.css("display", "none");
-        },
-        show: function() {
-            this.css("display", null);
             D.each.call(this.nodeList,
             function() {
-                if (this.nodeType == 1 && system.original("display", system.oStyleValue(this)) == "none") {
-                    this.style.display = system.getDisplay(this.tagName);
+                if (this.nodeType == 1 && system.original("display", system.oStyleValue(this)) != "none") {
+                    this.style.display = "none";
+                }
+            });
+            return this;
+        },
+        show: function() {
+            D.each.call(this.nodeList,
+            function() {
+                var arr = system.oStyleValue(this);
+                if (this.nodeType == 1 && system.original("display", arr) == "none") {
+                    if (this.style.display == "none") {
+                        this.style.display = "";
+                        system.original("display", arr) == "none" && (this.style.display = system.getDisplay(this.tagName));
+                    } else {
+                        this.style.display = system.getDisplay(this.tagName);
+                    }
                 }
             });
             return this;
         },
         fadeIn: function(time, callback) {
             system.transition || (system.transition = D.html5Attribute("transition"));
-            var arr, newD = new D();
+            var newD = new D();
             this.each(function() {
-                arr = system.oStyleValue(this);
-                if (system.original("display", arr) == "none") {
+                var arr = system.oStyleValue(this);
+                if (this.nodeType == 1 && system.original("display", arr) == "none") {
                     if (this.isMingGeAnimate) return;
                     system.transition && D(this).css("opacity", 0);
                     newD.nodeList.push(this);
@@ -1222,6 +1228,7 @@
             arg = [params, speed, newCallback, model],
             lock;
             while (elem = this.nodeList[b++]) {
+                if (elem.nodeType != 1) continue;
                 if (elem.isMingGeAnimate) {
                     elem.mingGeAnimateList ? elem.mingGeAnimateList.push(arg) : elem.mingGeAnimateList = [arg];
                 } else {
@@ -1234,10 +1241,9 @@
             return this;
         },
         empty: function() {
-            var seachIndex;
             return this.each(function(i) {
                 if (this.nodeType == 1) {
-                    seachIndex = system.seachIndex(["value", "innerHTML"], this);
+                    var seachIndex = system.seachIndex(["value", "innerHTML"], this);
                     seachIndex && (this[seachIndex] = "");
                 }
             });
@@ -1253,6 +1259,7 @@
                 }
             });
             this.nodeList = arr;
+            arr = null;
             return this;
         },
         bind: function(eveName, callback, isOne) {
@@ -1319,10 +1326,9 @@
         addClass: function(str) {
             if (D.isString(str)) {
                 str = trim(str);
-                var className;
                 this.each(function() {
                     if (this.nodeType === 1) {
-                        className = this.className || "";
+                        var className = this.className || "";
                         className = removing(trim(className + " " + str).split(/\s+/)).join(" ");
                         className == "" || (this.className = className);
                     }
@@ -1330,21 +1336,28 @@
             }
             return this;
         },
+        hasClass: function(str) {
+
+            try {
+                return D.isString(str) && RegExp("(^|\\s)" + trim(str) + "($|\\s)").test(this.nodeList[0].className);
+            } catch(e) {
+                return false;
+            }
+        },
         removeClass: function(str) {
-            str = trim(str);
-            var className, reg;
             if (D.isString(str)) {
-                return this.each(function() {
+                str = "(" + trim(str).replace(RegExp("\\s+", "g"), "|") + ")";
+                this.each(function() {
                     if (this.nodeType === 1) {
-                        className = this.className;
-                        if (className && (reg = RegExp("(^|\\s)" + str + "($|\\s)", "ig")).test(className)) {
-                            this.className = className = trim(className.replace(reg, " "));
+                        var className = this.className;
+                        if (className) {
+                            this.className = className = trim(className.replace(/\s+/g, "  ").replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
                             className == "" && (this.removeAttribute ? this.removeAttribute("class") : this.className = "");
                         }
                     }
                 });
             } else if (D.isUndefined(str)) {
-                return this.each(function() {
+                this.each(function() {
                     if (this.nodeType === 1) {
                         if (this.className) {
                             this.removeAttribute ? this.removeAttribute("class") : this.className = "";
@@ -1352,6 +1365,7 @@
                     }
                 });
             }
+            str = "";
             return this;
         },
         children: function(elem) {
