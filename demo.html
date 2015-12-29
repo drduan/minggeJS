@@ -2,7 +2,7 @@
 <html lang="zh-cmn-Hans">
 <head>
 <meta charset="utf-8"/>
-<title>MingGeJs1.8.1,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
+<title>MingGeMingGeJs1.8.1,国产山寨MingGeJs，请支持国产</title>
 <style type="text/css">
 #some_element, #some_element2 {
 	background: #92b901;
@@ -62,7 +62,7 @@ $(function() {
 		  
     $("body div.main input").eq(0).bind({//事件绑定  one bind click  on 等事件都齐全了
         click:function() {
-            alert('$("body div.main input")绑定了点击事件，和JQUERY一样的，看DEMO的代码');
+            alert('$("body div.main input")绑定了点击事件，和MingGeJs一样的，看DEMO的代码');
         }
     });
 	
@@ -90,9 +90,9 @@ $(function() {
 		
 		 
         $.ajax({ //    $.ajax,$.post,$().load,$.get() $.getJSON的接口也齐全了
-            url:"MingGeJs介绍.txt",
+            url:"MingGeMingGeJs介绍.txt",
             data:{a:1,b:2}, //示范传参数
-            type:"get",  //不作介绍，和JQUERY的$.ajax接口一致
+            type:"get",  //不作介绍，和MingGeJs的$.ajax接口一致
             //dataType:"json", //可用JSONP
 			//jsonp:"callback",
 			//jsonpCallback:"callback",
@@ -131,9 +131,9 @@ $(function() {
 		 alert("删除了所有input按钮了,什么按钮也没了，刷新一下吧");     
     });
 	
-$("input").eq(10).click(function() { //利用minggeJS开发插件 模块扩展
-////minggeJS开发插件开始
-    $.fn.extend({ //minggeJS开发插件第一步
+$("input").eq(10).click(function() { //利用MingGeMingGeJs开发插件 模块扩展
+////MingGeMingGeJs开发插件开始
+    $.fn.extend({ //MingGeMingGeJs开发插件第一步
         abcdefg:function(options) {  //我们假设创建一个abcdefg方法
             var defaults = {  //参数默认值
                 padding:"20px",
@@ -149,7 +149,7 @@ $("input").eq(10).click(function() { //利用minggeJS开发插件 模块扩展
         $("input").abcdefg({//调用我创建的接口
         color:"red"
        });
-//minggeJS开发插件结束
+//MingGeMingGeJs开发插件结束
 	
 });
 
@@ -165,11 +165,11 @@ $("input").eq(11).click(function() {//读取手机端信息
   <br>
   <br>
   <br>
-  <h1> 强大的minggeJS，你会JQUERY你也会用minggeJS,语法是一样的！但是minggeJS比JQUERY还要强大，文件小，选择器的效率在JQUERY和ZEPTO之上，超强的CSS3动画
-    JQUERY有的功能，minggeJS都有基本上有，压缩后只有20K大，1.8.1版本 </h1>
+  <h1> 强大的MingGeMingGeJs，你会MingGeJs你也会用MingGeMingGeJs,语法是一样的！但是MingGeMingGeJs比MingGeJs还要强大，文件小，选择器的效率在MingGeJs和ZEPTO之上，超强的CSS3动画
+    MingGeJs有的功能，MingGeMingGeJs都有基本上有，压缩后只有20K大，1.8.1版本 </h1>
   <div>|我是父DIV|</div>
-  <div id="some_element">minggeJS动画</div>
-  <div id="some_element2">minggeJS动画</div>
+  <div id="some_element">MingGeMingGeJs动画</div>
+  <div id="some_element2">MingGeMingGeJs动画</div>
   <input  type="button" value="还有强大的mingge选择器，兼容IE678">
   <input  type="button" value="创建节点第一个DIV节点">
   <input  type="button" value="创建节点最后一个DIV节点">
@@ -186,6 +186,6 @@ $("input").eq(11).click(function() {//读取手机端信息
   <br>
   <br>
   <br>
-  minggeJS的接口就何止这些，请自己按着你所认识的JQUERY的函数。来测试下其他函数 </div>
+  MingGeMingGeJs的接口就何止这些，请自己按着你所认识的MingGeJs的函数。来测试下其他函数 </div>
 </body>
 </html>

@@ -1,10 +1,8 @@
-/*  MingGEjs类库1.8.1
+/*  MingGeminggeJS类库1.8.1
  *  
- *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
+ *  你会用MingGeJS，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和MingGeJS一样，要开发文档干嘛？
  *
- *  MingGe的运行绝对比JQUERY快，因为够精简，MingGejs是你的最佳选择，请多多支持，
- *
- *  作者：明哥先生-QQ399195513 QQ群：461550716 官网：www.shearphoto.com
+ *  MingGeminggeJS的运行绝对比MingGeJS快，因为够精简，MingGeminggeJS是你的最佳选择，请多多支持，
  */
 (function(window, varName, undefined) {
     var MingGEjs = "1.8.1",
