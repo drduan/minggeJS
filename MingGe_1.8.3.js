@@ -1,4 +1,4 @@
-/*  MingGeJs类库1.8.2
+/*  MingGeJs类库1.8.3
  *  
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
  *
@@ -7,18 +7,45 @@
  *  作者：明哥先生-QQ399195513 QQ群：461550716 官网：www.shearphoto.com
  */
 (function(window, varName, undefined) {
-    var MingGeJs = "1.8.2",
+    var MingGeJs = "1.8.3",
+    statech = "readystatechange",
+    statechange = "on" + statech,
+    strObject = "[object Object]",
+    strArray = "[object Array]",
+    getById = "getElementById",
+    getByTagName = "getElementsByTagName",
+    getByClassName = "getElementsByClassName",
+    querySelect = "querySelectorAll",
+    DOCE = "documentElement",
+    AnimateList = "mingGeAnimateList",
+    isAnimate = "isMingGeAnimate",
+    MGBD = "MingGeBind",
     DOC = document,
-    addEvent, delEvent, DOCSCROLL_LT, saveGetMobile, ENCODE = encodeURIComponent,
-    isGetClassName = !!DOC.getElementsByClassName,
-    isQuery = !!DOC.querySelectorAll,
+    ST = setTimeout,
+    ENCODE = encodeURIComponent,
+    virDiv = DOC.createElement("div"),
+    isGetClassName = !!DOC[getByClassName],
+    isQuery = !!DOC[querySelect],
+    emptyFunc = function() {},
     MySlice = Array.prototype.slice,
-    rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
     toString = Object.prototype.toString,
+    rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
+    addEvent,
+    delEvent,
+    DOCSCROLL_LT,
     showFast = {
         fast: 200,
         slow: 600,
         normal: 400
+    },
+    repObject = function(arg0, arg1) {
+        if (D.isObjArr(arg0) && D.isObjArr(arg1)) {
+            D.each(arg1,
+            function(i, str) {
+                arg0[i] = str;
+            });
+        }
+        return arg0;
     },
     ralpha = /alpha\([^)]*\)/,
     transformReg = /^\s*(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s*$/i,
@@ -36,7 +63,7 @@
             if (this[eveName]) {
                 this[eveName]();
             } else {
-                var MingGeBind = this.MingGeBind,
+                var MingGeBind = this[MGBD],
                 this_ = this;
                 MingGeBind && MingGeBind[eveName] && D.each(MingGeBind[eveName].concat(),
                 function(key, val) {
@@ -56,15 +83,15 @@
             return false;
         }
         if (match[1]) {
-            returnArray = ["getElementById", "id", match[1], {
+            returnArray = [getById, "id", match[1], {
                 Id: true
             }];
         } else if (match[2]) {
-            returnArray = ["getElementsByTagName", "tagName", match[2], {
+            returnArray = [getByTagName, "tagName", match[2], {
                 Tag: true
             }];
         } else {
-            returnArray = ["getElementsByClassName", "className", match[3], {
+            returnArray = [getByClassName, "className", match[3], {
                 Class: true
             }];
         }
@@ -74,11 +101,11 @@
         return str.replace(/[\t\r\n\f\v]/g,
         function(un) {
             return {
-                "\t": "\\t",
+                "	": "\\t",
                 "\r": "\\r",
                 "\n": "\\n",
                 "\f": "\\f",
-                "\v": "\\v"
+                "": "\\v"
             } [un];
         }).replace(/[\x00-\x1f\x7f-\x9f\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
         function(un) {
@@ -112,7 +139,6 @@
                 this.addElemEve(elem, eveName, bck);
             } catch(e) {}
         },
-        transform: false,
         bindCallback: function(callback, eveName, isOne, isMouse) {
             var this_ = this;
             return function(eve) {
@@ -163,19 +189,19 @@
             if (DOCSCROLL_LT) {
                 DOCSCROLL_LT[name] = num;
             } else {
-                var DOCELEMENT = DOC.documentElement,
+                var DOCELEMENT = DOC[DOCE],
                 DOCBODY = DOC.body;
                 if (DOCELEMENT) {
                     DOCELEMENT[name] = num;
                     if (DOCELEMENT[name]) {
                         DOCSCROLL_LT = DOCELEMENT;
-                    } else {
+                    } else if (DOCBODY) {
                         DOCBODY[name] = num;
                         if (DOCBODY[name]) {
                             DOCSCROLL_LT = DOCBODY;
                         }
                     }
-                } else {
+                } else if (DOCBODY) {
                     DOCSCROLL_LT = DOCBODY;
                     DOCBODY[name] = num;
                 }
@@ -185,7 +211,7 @@
             if (DOCSCROLL_LT) {
                 return DOCSCROLL_LT[name];
             }
-            var DOCELEMENT = DOC.documentElement,
+            var DOCELEMENT = DOC[DOCE],
             DOCBODY = DOC.body;
             if (DOCELEMENT) {
                 var val = DOCELEMENT[name];
@@ -193,15 +219,18 @@
                     DOCSCROLL_LT = DOCELEMENT;
                     return val;
                 }
-                val = DOCBODY[name];
+                val = DOCBODY && DOCBODY[name];
                 if (val) {
                     DOCSCROLL_LT = DOCBODY;
                     return val;
                 }
                 return 0;
             }
-            DOCSCROLL_LT = DOCBODY;
-            return DOCBODY[name];
+            if (DOCBODY) {
+                DOCSCROLL_LT = DOCBODY;
+                return DOCBODY[name];
+            }
+            return 0;
         },
         setS: function(name, num) {
             if (D.isUndefined(num)) {
@@ -223,15 +252,15 @@
             return this;
         },
         winWH: function(WH) {
-            var bo = DOC.documentElement || DOC.body,
+            var bo = DOC[DOCE] || DOC.body || false,
             sWH = "scroll" + WH,
             cWH = "client" + WH;
-            return Math.max(bo[sWH], bo[cWH]);
+            return bo ? Math.max(bo[sWH], bo[cWH]) : 0;
         },
         getCS: function(name, is) {
             var node = this.nodeList[0];
-            if (node && (node == window || node == DOC)) {
-                return is ? protected.getScroll_LT(name) : (DOC.documentElement || DOC.body)[name];
+            if (node == window || node == DOC) {
+                return is ? protected.getScroll_LT(name) : (DOC[DOCE] || DOC.body || [])[name] || 0;
             }
             try {
                 return node[name];
@@ -268,11 +297,13 @@
             }
             var create = DOC.createElement(tag),
             bodys = DOC.body,
-            returns;
-            create.style.visibility = "hidden";
-            bodys.appendChild(create);
-            returns = protected.original("display", protected.oStyleValue(create));
-            bodys.removeChild(create);
+            returns = false;
+            if (bodys) {
+                create.style.visibility = "hidden";
+                bodys.appendChild(create);
+                returns = protected.original("display", protected.oStyleValue(create));
+                bodys.removeChild(create);
+            }
             return returns;
         },
         seachIndex: function(arr, elem) {
@@ -322,7 +353,7 @@
                     };
                     var script = D.createScript(url);
                     timeout || (timeout = 3e4);
-                    timer = setTimeout(function() {
+                    timer = ST(function() {
                         D.isFunction(erro) && erro(505);
                         out();
                     },
@@ -336,12 +367,12 @@
         },
         addElemEve: function(elem, EveName, callback) {
             elem === window && (elem = D);
-            var MingGeBind = elem.MingGeBind,
+            var MingGeBind = elem[MGBD],
             isObject = D.isObject(MingGeBind);
             if (isObject && D.isArray(MingGeBind[EveName])) {
                 MingGeBind[EveName].push(callback);
             } else {
-                isObject || (elem.MingGeBind = MingGeBind = {});
+                isObject || (elem[MGBD] = MingGeBind = {});
                 MingGeBind[EveName] = [callback];
             }
         },
@@ -358,7 +389,7 @@
             return newArr;
         },
         DelElemEve: function(elem, eveName, callback) {
-            var E, MingGeBind = elem === window ? (E = D).MingGeBind: (E = elem).MingGeBind,
+            var E, MingGeBind = elem === window ? (E = D)[MGBD] : (E = elem)[MGBD],
             isMouse;
             if (MingGeBind) {
                 if (eveName) {
@@ -374,9 +405,9 @@
                 }
                 if (D.isEmptyObject(MingGeBind)) {
                     try {
-                        delete E.MingGeBind;
+                        delete E[MGBD];
                     } catch(e) {
-                        E.MingGeBind = undefined;
+                        E[MGBD] = undefined;
                     }
                 }
             }
@@ -447,7 +478,7 @@
                 style;
                 while (a = this_.nodeList[b++]) {
                     try {
-                        if (a.isMingGeAnimate) {
+                        if (a[isAnimate]) {
                             style = a.style;
                             style[protected.transition] = style[timingFunction] = null;
                             callback.call(a);
@@ -458,7 +489,7 @@
             transitionArr[protected.transition] = speed + "ms";
             transitionArr[timingFunction] = model;
             this.css(transitionArr);
-            setTimeout(function() {
+            ST(function() {
                 this_.css(params);
             },
             5);
@@ -520,14 +551,14 @@
                     }
                     node.id = MingGeTemp;
                     this.insertAdjacentHTML(cmd, div.innerHTML);
-                    node = DOC.getElementById(MingGeTemp);
+                    node = DOC[getById](MingGeTemp);
                     attr.id ? node.id = attr.id: node.removeAttribute ? node.removeAttribute("id") : node.id = "";
                     attr.html && seachIndex && (node[seachIndex] = attr.html);
                 } catch(e) {}
                 node && newD.nodeList.push(node);
             };
             this.each(fun);
-            newD.SelectorTxt = DOC.body;
+            newD.SelectorTxt = virDiv;
             newD.SelectorStr = "000";
             return newD;
         },
@@ -540,7 +571,7 @@
             };
         },
         ajax: function() {
-            this.serverdata = this.erromsg = this.timeout = this.stop = this.xmlhttp = false;
+            this.erromsg = this.timeout = this.stop = this.xmlhttp = false;
             this.transit = true;
         },
         ajaxPrototype: {
@@ -574,13 +605,9 @@
                 return this;
             },
             Del: function(xmlhttp, State, arg) {
-                try {
-                    xmlhttp.onreadystatechange = null;
-                } catch(e) {
-                    xmlhttp.onreadystatechange = function() {};
-                }
                 if (this.stop === true) return;
-                this.removeUploadEve();
+                this.delAjaxEve(xmlhttp);
+                this.delProgress(xmlhttp);
                 this.timeout && (clearTimeout(this.timeout), this.timeout = false);
                 this.erromsg = State;
                 this.transit = true;
@@ -590,15 +617,11 @@
                 if (4 == xmlhttp.readyState) {
                     if (this.stop === true) return;
                     this.transit = true;
-                    this.removeUploadEve();
                     this.timeout && (clearTimeout(this.timeout), this.timeout = false);
                     if (200 == xmlhttp.status) {
-                        try {
-                            xmlhttp.onreadystatechange = null;
-                        } catch(e) {
-                            xmlhttp.onreadystatechange = function() {};
-                        }
-                        var responseText = this.serverdata = trim(xmlhttp.responseText);
+                        this.delProgress(xmlhttp);
+                        this.delAjaxEve(xmlhttp);
+                        var responseText = trim(xmlhttp.responseText);
                         if (D.isFunction(arg.success)) {
                             if (arg.dataType == "JSON") responseText = protected.JsonString.StringToJson(responseText) || responseText;
                             arg.success(responseText, "success");
@@ -610,21 +633,34 @@
                     0 == xmlhttp.readyState && this.Del(xmlhttp, 0, arg);
                 }
             },
-            out: function(arg, xmlhttp) {
-                try {
-                    xmlhttp.onreadystatechange = null;
-                } catch(e) {
-                    xmlhttp.onreadystatechange = function() {};
+            delProgress: function(obj) {
+                var P = "progressFunc",
+                Func = obj[P];
+                if (Func) {
+                    delEvent(obj.upload, "progress", Func);
+                    if (!delete obj[P]) obj[P] = null;
                 }
+            },
+            delAjaxEve: function(obj) {
+                try {
+                    delete obj[statechange];
+                } catch(e) {
+                    try {
+                        obj[statechange] = null;
+                    } catch(e) {
+                        obj[statechange] = emptyFunc;
+                    }
+                }
+            },
+            out: function(arg, xmlhttp) {
+                this.delAjaxEve(xmlhttp);
+                this.delProgress(xmlhttp);
                 this.transit = true;
                 this.erromsg = 504;
                 this.stop = true;
-                this.removeUploadEve();
                 D.isFunction(arg.error) && arg.error(504);
             },
-            removeUploadEve: function() {},
             ajax: function(arg) {
-
                 if (!D.isString(arg.url)) {
                     return;
                 }
@@ -662,12 +698,10 @@
                 } else {
                     if (toString.call(arg.data) == "[object FormData]") {
                         if (D.isFunction(arg.progress)) {
-                            xmlhttp.upload.addEventListener("progress", arg.progress, false);
-                            this.removeUploadEve = function() {
-                                xmlhttp.upload.removeEventListener("progress", arg.progress, false);
-                            };
+                            xmlhttp.progressFunc = arg.progress;
+                            addEvent(xmlhttp.upload, "progress", arg.progress);
                         }
-                        ContentType = function() {};
+                        ContentType = emptyFunc;
                         arg.type = "POST";
                     } else {
                         arg.data = "";
@@ -677,11 +711,11 @@
                 self = this;
                 D.isFunction(arg.complete) && arg.complete();
                 if (arg.async === true) {
-                    xmlhttp.onreadystatechange = function() {
+                    xmlhttp[statechange] = function() {
                         self.handle(xmlhttp, arg);
                     };
                 }
-                arg.timeout && arg.async && (this.timeout = setTimeout(function() {
+                arg.timeout && arg.async && (this.timeout = ST(function() {
                     self.timeout = false;
                     self.out(arg, xmlhttp);
                 },
@@ -719,7 +753,6 @@
                     this._json_ = null;
                     return JsonJoin;
                 } catch(e) {
-
                     alert("Format does not match, conversion fails");
                     return;
                 }
@@ -731,10 +764,11 @@
                 try {
                     if (T == null && /^[\],:{}\s]*$/.test(arrtxt.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@").replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").replace(/(?:^|:|,)(?:\s*\[)+/g, ""))) {
                         return window.JSON && window.JSON.parse ? window.JSON.parse(arrtxt) : new Function("return (" + arrtxt + ")")();
-                    } else if (T) {
+                    }
+                    if (T) {
                         var array = new Function("return (" + arrtxt + ")")();
                         type = this._type_(array);
-                        if (type !== "[object Object]" && type !== "[object Array]") {
+                        if (type !== strObject && type !== strArray) {
                             return false;
                         }
                         return array;
@@ -763,14 +797,14 @@
                 if (parameter == null) return "null";
                 if (of === "boolean") return parameter.toString();
                 types = this._type_(parameter);
-                if (typeof parameter.nodeType != "number" && parameter != window && types === "[object Object]" || types === "[object Array]") {
+                if (D.isObjArr(parameter, types)) {
                     return false;
                 }
                 return '""';
             },
             _read_: function(arr, TrueFalse) {
                 var types = this._type_(arr);
-                if (TrueFalse && types !== "[object Object]" && types !== "[object Array]") {
+                if (TrueFalse && types !== strObject && types !== strArray) {
                     alert("Your incoming is not an array or JSON");
                     return this._json_ = null;
                 }
@@ -791,8 +825,6 @@
                 this._addjson_(types, "}" + TrueFalse, "]" + TrueFalse);
             }
         },
-        opacity: false,
-        transition: false,
         style: function(objstyle, name, val) {
             var arr, regexps, transform;
             val = D.isTxt(val) ? trim(val) : "";
@@ -821,19 +853,19 @@
             function b() {
                 try {
                     var c = function() {
-                        "complete" === DOC.readyState && (addEvent(DOC, "readystatechange", c), a());
+                        "complete" === DOC.readyState && (addEvent(DOC, statech, c), a());
                     },
                     d = window.frameElement;
                 } catch(e) {
-                    return addEvent(DOC, "readystatechange", c),
+                    return addEvent(DOC, statech, c),
                     void 0;
                 }
-                if (null != d) return addEvent(DOC, "readystatechange", c),
+                if (null != d) return addEvent(DOC, statech, c),
                 void 0;
                 try {
-                    DOC.documentElement.doScroll("left");
+                    DOC[DOCE].doScroll("left");
                 } catch(c) {
-                    return setTimeout(b, 13),
+                    return ST(b, 13),
                     void 0;
                 }
                 a();
@@ -867,7 +899,7 @@
             }
             return;
         }
-        var ListNode = parent.getElementsByTagName("*"),
+        var ListNode = parent[getByTagName]("*"),
         elem,
         i = 0,
         Reg = new RegExp("(^|\\s)" + R[1][2] + "(\\s|$)");
@@ -931,11 +963,11 @@
                 }
                 if (getObj.SelectorTxt && str != "") {
                     if (findTrue.filter) {
-                        if (getObj.SelectorTxt.ownerDocument) {
+                        if (D.isElem(getObj.SelectorTxt)) {
                             if (getObj.SelectorStr && getObj.SelectorStr !== "000") {
                                 MingGeId = "#" + (getObj.SelectorTxt.id || (remove = true, getObj.SelectorTxt.id = "tempMingGeId2015"));
                                 merge = mergeSelector(MingGeId, newD.SelectorStr = mergeSelector(getObj.SelectorStr, str, ""), " ");
-                                newD.nodeList = listNodeToArray(getObj.SelectorTxt.querySelectorAll(merge));
+                                newD.nodeList = listNodeToArray(getObj.SelectorTxt[querySelect](merge));
                                 newD.SelectorTxt = getObj.SelectorTxt;
                                 remove && getObj.SelectorTxt.removeAttribute("id");
                                 return newD;
@@ -947,10 +979,10 @@
                         if (getObj.SelectorStr === "000") {
                             return - 1;
                         }
-                        if (getObj.SelectorTxt.ownerDocument) {
+                        if (D.isElem(getObj.SelectorTxt)) {
                             MingGeId = "#" + (getObj.SelectorTxt.id || (remove = true, getObj.SelectorTxt.id = "tempMingGeId2015"));
                             merge = getObj.SelectorStr ? mergeSelector(MingGeId, newD.SelectorStr = mergeSelector(getObj.SelectorStr, str, " "), " ") : mergeSelector(MingGeId, newD.SelectorStr = str, " ");
-                            newD.nodeList = listNodeToArray(getObj.SelectorTxt.querySelectorAll(merge));
+                            newD.nodeList = listNodeToArray(getObj.SelectorTxt[querySelect](merge));
                             newD.SelectorTxt = getObj.SelectorTxt;
                             remove && getObj.SelectorTxt.removeAttribute("id");
                             return newD;
@@ -958,12 +990,12 @@
                         merge = mergeSelector(getObj.SelectorTxt, str, " ");
                     }
                 }
-                newD.nodeList = listNodeToArray(DOC.querySelectorAll(merge));
+                newD.nodeList = listNodeToArray(DOC[querySelect](merge));
                 newD.SelectorTxt = merge;
             } else {
                 var match = /^#([\w-_]+)$/.exec(str),
                 getid;
-                newD.nodeList = match ? (getid = DOC.getElementById(match[1])) ? [getid] : [] : listNodeToArray(DOC.querySelectorAll(str));
+                newD.nodeList = match ? (getid = DOC[getById](match[1])) ? [getid] : [] : listNodeToArray(DOC[querySelect](str));
                 newD.SelectorTxt = str;
             }
         } catch(e) {}
@@ -1042,7 +1074,7 @@
             str = trim(str);
             switch (str) {
             case ":animate":
-                return this.nodeList[0] ? this.nodeList[0].isMingGeAnimate ? true: false: false;
+                return this.nodeList[0] ? this.nodeList[0][isAnimate] ? true: false: false;
                 break;
             }
         },
@@ -1079,12 +1111,12 @@
             return protected.insertHTML.apply(this, arguments);
         },
         stop: function() {
-            protected.transition || (protected.transition = D.html5Attribute("transition"));
+            protected.transition == null && (protected.transition = D.html5Attribute("transition"));
             if (!protected.transition) return this;
             return this.each(function() {
-                if (this.isMingGeAnimate) {
-                    delete this.isMingGeAnimate;
-                    this.mingGeAnimateList && delete this.mingGeAnimateList;
+                if (this[isAnimate]) {
+                    delete this[isAnimate];
+                    this[AnimateList] && delete this[AnimateList];
                     var timingFunction = protected.transition + "TimingFunction";
                     var style = this.style;
                     style[protected.transition] = style[timingFunction] = null;
@@ -1135,10 +1167,10 @@
         },
         fadeOut: function(time, callback) {
             var newD = new D();
-            protected.transition || (protected.transition = D.html5Attribute("transition"));
+            protected.transition == null && (protected.transition = D.html5Attribute("transition"));
             this.each(function() {
                 var arr = protected.oStyleValue(this);
-                this.nodeType == 1 && (protected.original("display", arr) == "none" || this.isMingGeAnimate || newD.nodeList.push(this));
+                this.nodeType == 1 && (protected.original("display", arr) == "none" || this[isAnimate] || newD.nodeList.push(this));
             });
             if (protected.transition) {
                 newD.animate({
@@ -1167,6 +1199,38 @@
             });
             return this;
         },
+        getFormData: function(str, num) {
+            if (D.isString(str)) {
+                if (!D.isFunction(window.FormData)) return null;
+                num = parseInt(num);
+                var mydata = new FormData(),
+                isNum = D.isNumber(num),
+                nodeList = this.nodeList,
+                i = 0,
+                arr = [],
+                elem,
+                files,
+                text,
+                length;
+                for (; i < nodeList.length; i++) {
+                    elem = nodeList[i];
+                    if (files = elem.files) {
+                        length = files.length;
+                        if (isNum && num < length) {
+                            length = num;
+                        }
+                        for (var ii = 0; ii < length; ii++) {
+                            arr.push(text = str + "_" + i + "_" + ii);
+                            mydata.append(text, files[ii]);
+                        }
+                    }
+                }
+                return {
+                    data: mydata,
+                    name: arr
+                };
+            }
+        },
         show: function() {
             D.each.call(this.nodeList,
             function() {
@@ -1183,12 +1247,12 @@
             return this;
         },
         fadeIn: function(time, callback) {
-            protected.transition || (protected.transition = D.html5Attribute("transition"));
+            protected.transition == null && (protected.transition = D.html5Attribute("transition"));
             var newD = new D();
             this.each(function() {
                 var arr = protected.oStyleValue(this);
                 if (this.nodeType == 1 && protected.original("display", arr) == "none") {
-                    if (this.isMingGeAnimate) return;
+                    if (this[isAnimate]) return;
                     protected.transition && D(this).css("opacity", 0);
                     newD.nodeList.push(this);
                     if (this.style.display == "none") {
@@ -1200,7 +1264,7 @@
                 }
             });
             if (protected.transition) {
-                setTimeout(function() {
+                ST(function() {
                     newD.animate({
                         opacity: 1
                     },
@@ -1216,7 +1280,7 @@
             return this;
         },
         animate: function(params, speed, callback, model) {
-            protected.transition || (protected.transition = D.html5Attribute("transition"));
+            protected.transition == null && (protected.transition = D.html5Attribute("transition"));
             if (!protected.transition) {
                 this.css(params);
                 return this;
@@ -1238,10 +1302,10 @@
             if (!D.isFunction(callback)) {
                 var m = model;
                 model = callback;
-                callback = D.isFunction(m) ? m: function() {};
+                callback = D.isFunction(m) ? m: emptyFunc;
             }
             newCallback = function() {
-                var list = this.mingGeAnimateList;
+                var list = this[AnimateList];
                 if (D.isArray(list) && list.length > 0) {
                     var newD = new D(),
                     arg;
@@ -1250,8 +1314,8 @@
                     list.splice(0, 1);
                     protected.animate.apply(newD, arg);
                 } else {
-                    delete this.mingGeAnimateList;
-                    delete this.isMingGeAnimate;
+                    delete this[AnimateList];
+                    delete this[isAnimate];
                 }
                 callback.call(this);
             };
@@ -1261,10 +1325,10 @@
             lock;
             while (elem = this.nodeList[b++]) {
                 if (elem.nodeType != 1) continue;
-                if (elem.isMingGeAnimate) {
-                    elem.mingGeAnimateList ? elem.mingGeAnimateList.push(arg) : elem.mingGeAnimateList = [arg];
+                if (elem[isAnimate]) {
+                    elem[AnimateList] ? elem[AnimateList].push(arg) : elem[AnimateList] = [arg];
                 } else {
-                    elem.isMingGeAnimate = 1;
+                    elem[isAnimate] = 1;
                     newD.nodeList.push(elem);
                     lock || (lock = true);
                 }
@@ -1351,7 +1415,7 @@
             while (obj = this.nodeList[i++]) { (par = obj.parentNode) && (par.tagName == "BODY" || newD.nodeList.push(par));
             }
             newD.nodeList = removing(newD.nodeList);
-            newD.SelectorTxt = DOC.body;
+            newD.SelectorTxt = virDiv;
             newD.SelectorStr = "000";
             return re ? newD.filter(re) : newD;
         },
@@ -1383,6 +1447,15 @@
             } catch(e) {}
             return false;
         },
+        removeAttr: function(str) {
+            if (D.isString(str)) {
+                str = trim(str);
+                this.each(function() {
+                    this.removeAttribute && this.removeAttribute(str);
+                });
+            }
+            return this;
+        },
         removeClass: function(str) {
             if (D.isString(str)) {
                 str = "(" + trim(str).replace(RegExp("\\s+", "g"), "|") + ")";
@@ -1390,8 +1463,10 @@
                     if (this.nodeType === 1) {
                         var className = this.className;
                         if (className) {
-                            this.className = className = trim(className.replace(/\s+/g, "  ").replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
-                            className == "" && (this.removeAttribute ? this.removeAttribute("class") : this.className = "");
+                            try {
+                                this.className = className = trim(className.replace(/\s+/g, "  ").replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
+                                className == "" && (this.removeAttribute ? this.removeAttribute("class") : this.className = "");
+                            } catch(e) {}
                         }
                     }
                 });
@@ -1419,7 +1494,7 @@
             var fil = CanonicalStructure(str, this, {
                 filter: true
             });
-            this.SelectorTxt.ownerDocument && !this.SelectorStr && fil.nodeList[0] && (fil.SelectorTxt = fil.nodeList[0], fil.SelectorStr = false);
+            D.isElem(this.SelectorTxt) && !this.SelectorStr && fil.nodeList[0] && (fil.SelectorTxt = fil.nodeList[0], fil.SelectorStr = false);
             return fil;
         },
         index: function(obj) {
@@ -1427,7 +1502,7 @@
                 if (obj) {
                     return D.inArray(obj.nodeType || obj == window ? obj: obj.nodeList[0], this.nodeList);
                 }
-                return D.inArray(this.nodeList[0], this.nodeList[0].parentNode.getElementsByTagName("*"));
+                return D.inArray(this.nodeList[0], this.nodeList[0].parentNode[getByTagName]("*"));
             } catch(e) {
                 return - 1;
             }
@@ -1477,18 +1552,18 @@
             return protected.htmlVal.call(this, "innerHTML", str);
         },
         text: function(str) {
-            return protected.htmlVal.call(this, protected.isIndex("textContent", DOC.body) ? "textContent": "innerText", str);
+            return protected.htmlVal.call(this, protected.isIndex("textContent", virDiv) ? "textContent": "innerText", str);
         },
         css: function(args, val) {
             var i = 0,
             elem, key, arrayKey = {},
             sty, type = typeof args;
-            protected.opacity || (protected.opacity = D.html5Attribute("opacity") || "filter");
-            protected.transform || (protected.transform = D.html5Attribute("transform"));
+            protected.opacity == null && (protected.opacity = D.html5Attribute("opacity") || "filter");
+            protected.transform == null && (protected.transform = D.html5Attribute("transform"));
             if (type === "string") {
                 args = D.styleName(trim(args));
                 if (D.isUndefined(val)) {
-                    if (! ((elem = this.nodeList[0]) && elem.ownerDocument)) {
+                    if (! ((elem = this.nodeList[0]) && D.isElem(elem))) {
                         return null;
                     }
                     if (transformReg.test(args)) {
@@ -1531,28 +1606,44 @@
     D.fn.extend = D.extend = function() {
         var length = arguments.length,
         key;
-        if (length === 1 && toString.call(arguments[0]) === "[object Object]") {
+        if (length === 1 && toString.call(arguments[0]) === strObject) {
             for (key in arguments[0]) {
-                this[key] || (this[key] = arguments[0][key]);
+                if (! (key in this)) this[key] = arguments[0][key];
             }
             return true;
         }
         if (length > 1) {
-            var arg0 = arguments[0],
-            arg1 = arguments[1];
-            if (D.isObject(arg1) && D.isObject(arg0)) {
-                D.each(arg1,
-                function(i, str) {
-                    arg0[i] = str;
-                });
-                return arg0;
+            var args = arguments,
+            i = 1;
+            var args0 = D.copyObject(args[0]);
+            for (; i < length; i++) {
+                args0 = repObject(args0, args[i]);
             }
-            return arguments[1] || arguments[0];
+            return args0;
         }
         return false;
     };
     protected.ajax.prototype = protected.ajaxPrototype;
     D.extend({
+        copyObject: function(obj) {
+            if (D.isObject(obj)) {
+                var O = {},
+                key;
+                for (key in obj) {
+                    if (obj.hasOwnProperty(key)) O[key] = obj[key];
+                }
+                return O;
+            }
+            if (D.isArray(obj)) {
+                return obj.concat();
+            }
+            return obj;
+        },
+        isObjArr: function(obj, type) {
+            var types = type || toString.call(obj);
+            return D.isObject(obj, types) || types === strArray || false;
+        },
+        listNodeToArray: listNodeToArray,
         parseJSON: function(string, T) {
             return protected.JsonString.StringToJson(string, T);
         },
@@ -1567,28 +1658,17 @@
             }
             window[name] = D;
         },
-        isObject: function(obj) {
-            try {
-                return toString.call(obj) == "[object Object]" && typeof obj.nodeType != "number" && obj != window && !!obj;
-            } catch(e) {
-                return false;
-            }
+        isElem: function(obj) {
+            return !! (obj && obj.nodeType == 1 && obj[getByTagName]);
         },
-        update: function(getObj) {
-            var elem, i = 0,
-            array = [];
-            while (elem = getObj.nodeList[i++]) {
-                if (elem.ownerDocument) {
-                    elem.parentNode && array.push(elem);
-                } else array.push(elem);
-            }
-            getObj.nodeList = array;
+        isObject: function(obj, type) {
+            return typeof obj == "object" && (type || toString.call(obj)) == strObject && obj == strObject;
         },
-        isArray: function(obj) {
-            return toString.call(obj) === "[object Array]";
+        isArray: function(obj, type) {
+            return (type || toString.call(obj)) === strArray;
         },
-        isFunction: function(obj) {
-            return toString.call(obj) === "[object Function]";
+        isFunction: function(obj, type) {
+            return (type || toString.call(obj)) === "[object Function]";
         },
         isEmptyObject: function(obj) {
             for (var name in obj) {
@@ -1599,7 +1679,7 @@
             return true;
         },
         createScript: function(srcTxt) {
-            var head = DOC.getElementsByTagName("head").item(0),
+            var head = DOC[getByTagName]("head").item(0),
             script;
             if (head) {
                 script = DOC.createElement("script");
@@ -1657,13 +1737,31 @@
                 while (elem = this[i++]) {
                     obj.call(elem);
                 }
-            } else if ((D.isObject(obj) || D.isArray(obj)) && D.isFunction(fun)) {
+            } else if (D.isObjArr(obj) && D.isFunction(fun)) {
                 for (i in obj) {
                     obj.hasOwnProperty && obj.hasOwnProperty(i) && fun(i, obj[i]);
                 }
                 return true;
             }
             return false;
+        },
+        appendIframe: function(elem, False) {
+            var iframe = DOC.createElement("iframe"),
+            isCreate = false;
+            if (!False) {
+                if (elem == DOC || elem == window) elem = DOC.body;
+                if (D.isElem(elem)) {
+                    elem.appendChild(iframe);
+                    isCreate = true;
+                }
+            }
+            var ifrWin = iframe.contentWindow;
+            return {
+                elem: iframe,
+                WIN: ifrWin,
+                DOC: ifrWin.document,
+                is: isCreate
+            };
         },
         objToUrl: function(obj) {
             if (D.isObject(obj)) {
@@ -1677,7 +1775,6 @@
             return obj;
         },
         getMobile: function() {
-            if (saveGetMobile) return saveGetMobile;
             var ua = navigator.userAgent,
             android = ua.match(/(Android)\s+([\d.]+)/),
             ipad = ua.match(/(iPad).*OS\s([\d_]+)/),
@@ -1687,7 +1784,7 @@
             kindle = ua.match(/Kindle\/([\d.]+)/),
             silk = ua.match(/Silk\/([\d._]+)/),
             blackberry = ua.match(/(BlackBerry).*Version\/([\d.]+)/);
-            return saveGetMobile = {
+            return {
                 webkit: this.userAgent.browser == "webkit",
                 android: android && android[2],
                 ipad: ipad && ipad[2].replace(/_/g, "."),
@@ -1722,11 +1819,11 @@
         _protected: protected,
         html5Attribute: function(attribute) {
             try {
-                var attributeLow = D.isString(attribute) ? D.styleName(attribute) : "transform";
+                var save = false,
+                attributeLow = D.isString(attribute) ? D.styleName(attribute) : "transform";
                 attribute = attributeLow.replace(/^\w/, attribute.charAt(0).toUpperCase());
-                var bodyStyle = DOC.body.style,
-                arr = [attributeLow, "Ms" + attribute, "Moz" + attribute, "Webkit" + attribute, "O" + attribute],
-                save = false;
+                var bodyStyle = virDiv.style,
+                arr = [attributeLow, "Ms" + attribute, "Moz" + attribute, "Webkit" + attribute, "O" + attribute];
                 for (var i = 0; i < 5; i++) {
                     if (arr[i] in bodyStyle) {
                         save = arr[i];
@@ -1752,7 +1849,9 @@
                         if (newItem == "Height") {
                             return protected.winWH("Height");
                         }
-                        node = DOC.body;
+                        if (! (node = DOC.body)) {
+                            return null;
+                        }
                     }
                     return offset in node ? node[offset] : null;
                 }
