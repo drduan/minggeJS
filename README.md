@@ -1,5 +1,4 @@
 # minggeJS
-<<<<<<< HEAD
 
  English version is [here](README_en.md).
 #  MingGeJS1.8.0 寄语：
