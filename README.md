@@ -27,7 +27,7 @@ MingGeJS1.8.0升级细节
           MingGeJS1.8.0根据GITHUB贡献者的反馈，作了大幅度调整及修复!
           1：重新调整及修复绑定事件机制：
                   示例(以click事件为例，所有事件都齐全的，别以为只有click哦)：
-
+```
                   $(xxx).bind("click",function); 绑定点击事件！
                   $(xxx).bind({"click":function});OBJECT形式传入事件！
                   $(xxx).unbind("click",function)解绑该事件与对应函数的绑定
@@ -36,6 +36,7 @@ MingGeJS1.8.0升级细节
                   $(xxx).one(xxxxxxxx) 与bind用法相同，不同的是，只运行一次就解开绑定
                   $(xxx).click(function)    $(xxx).bind("click",function);的简写形式
                   $(xxx).click（）让事件冒泡！
+```
 
                    on方法与off一样可以用，但没事件委托功能，event只作了简单处理！event下次升级重新定义过才写委托功能吧 
 
