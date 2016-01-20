@@ -1,15 +1,15 @@
 # minggeJS
-<<<<<<< HEAD
+< HEAD
 
  English version is [here](README_en.md).
 #  MingGeJS1.8.0 寄语：
 
-            从1.6一直到1.8.0，基本每天都在修BUG，修BUG！升级，升级！ 
+   从1.6一直到1.8.0，基本每天都在修BUG，修BUG！升级，升级！ 
             每次当我认为完美时，总是有意无意地触犯了一些低级错误！例如 我把apply居然写成aply，然后又有人喷：你连apply都不会吗？
             我说是手误，你说我装逼！面对这种人恶意攻击身心好疲劳！ 我深深体会到，要把一个类库做得近乎完美，一定要付出很多努力！
             而有的人则说这样的类库，我能做十个八个。我只是知道JQUERY作者，为了JQUERY同样地付出很多努力，在开发的前几年，作者几乎每天都是在修              BUG。
 
-            更有甚者，说我抄袭JQUERY的源代码！直接理直气壮地埋没我这半个多月的努力！
+   更有甚者，说我抄袭JQUERY的源代码！直接理直气壮地埋没我这半个多月的努力！
            例如这句：
             match = /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) ||                 !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
            navigator.userAgent是已知的，上面是正则配对，
