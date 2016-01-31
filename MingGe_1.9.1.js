@@ -36,6 +36,42 @@
     beanExpr = /[^\,]+/g,
     spaceExpr = /[^\s]+/g,
     AZExpr = /^[\w\u00c0-\uFFFF\-]+/,
+    inputTag = /input|button|textarea|select|option/i,
+    trimExpr = /^(\s|\u00A0)+|(\s|\u00A0)+$/g,
+    filterSpecialExpr = /[\t\r\n\f\v]/g,
+    filterSpecialIIExpr = /[\x00-\x1f\x7f-\x9f\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+    filterSpecialIIIExpr = /\\([\}\]])/g,
+    stripslashesExpr = /[\]\}\"\\\/]/g,
+    attrMergeExpr = /((?:\[[^\[\]]+\])+)([\w\u00c0-\uFFFF\-]+)/g,
+    attrMergeIIExpr = /([\.#]?[\w\u00c0-\uFFFF\-]+)<<<(.+?)>>>/g,
+    wExpr = /^\w/,
+    beanEndExpr = /,+$/,
+    jsonpExpr = /([^\?&\\\/]+?)\s*=\s*\?+$/,
+    matchSetAttrExpr = /[\w\u00c0-\uFFFF\-]+\s*=/g,
+    equalEndExpr = /\=$/,
+    JsonToExpr = /,([\}\]])/g,
+    StringToExpr = /^[\],:{}\s]*$/,
+    StringToIIExpr = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,
+    StringToIIIExpr = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
+    StringToIIIIExpr = /(?:^|:|,)(?:\s*\[)+/g,
+    blankendExpr = /\s+/g,
+    uppercaseAZExpr = /([A-Z])/g,
+    convertuppercaseExpr = /-([a-z])/gi,
+    specialSignExpr = /&+$/,
+    hornSignExpr = /(<<<|>>>)/g,
+    EvenLabelExpr = /(\[.+?\]|[\.#]?([\w\u00c0-\uFFFF\-]+))/g,
+    createNodeExpr = /^([\w]+)$|\<([\w]+)(.*?)\>(?:(.*)<\/\s*[\w]+\s*\>)?/,
+    blockExpr = /^(div|ul|p|h1|h2|h3|h4|h5|h6|dd|dt|dl|ol|table|nav|form|hr)$/i,
+    inlineExpr = /^(span|ul|b|a|em|strong|img|label)$/i,
+    listItemExpr = /^li$/i,
+    inlineBlockExpr = /^(input|button|textarea)$/i,
+    opacitySignExpr = /opacity\s*=\s*([0-9]+)/,
+    animateExpr = /^(linear|ease|ease-in|ease-out|ease-in-out|cubic-bezier\s*\(.+\))$/,
+    getJSONExpr = /[\?&]+.+\s*=\s*\?/,
+    selectorExpr = /^#([\w\u00c0-\uFFFF\-]+)$/,
+    questionExpr = /\?/,
+    numEndExpr = /^[0-9]+$/,
+    ralpha = /alpha\([^)]*\)/,
     attrArray = {
         "class": "className",
         id: "id",
@@ -50,7 +86,6 @@
         readonly: 1,
         value: 1
     },
-    inputTag = /input|button|textarea|select|option/i,
     DOCSCROLL_LT,
     showFast = {
         fast: 200,
@@ -59,7 +94,7 @@
     },
     trim = function(str) {
         try {
-            return str.replace(/^(\s|\u00A0)+|(\s|\u00A0)+$/g, "");
+            return str.replace(trimExpr, "");
         } catch(e) {
             return str;
         }
@@ -73,15 +108,14 @@
         }
         return arg0;
     },
-    ralpha = /alpha\([^)]*\)/,
     transformReg = /^\s*(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s*$/i,
     uaMatch = function(ua) {
         ua = ua.toLowerCase();
-        var match = /(webkit)[ \/]([\w.]+)/.exec(ua) ||
-		/(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) ||
-		/(msie) ([\w.]+)/.exec(ua) ||
-		!/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) ||
-		[];
+        var match = /(webkit)[ \/]([\w.]+)/.exec(ua)||
+		 /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) ||
+		 /(msie) ([\w.]+)/.exec(ua) ||
+		 !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) ||
+		   [];
         return {
             browser: match[1] || "",
             version: match[2] || "0"
@@ -132,7 +166,7 @@
         return returnArray;
     },
     filterSpecial = function(str) {
-        return str.replace(/[\t\r\n\f\v]/g,
+        return str.replace(filterSpecialExpr,
         function(un) {
             return {
                 "\t": "\\t",
@@ -141,17 +175,16 @@
                 "\f": "\\f",
                 "\v": "\\v"
             } [un];
-        })
-		.replace(/[\x00-\x1f\x7f-\x9f\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        }).replace(filterSpecialIIExpr,
         function(un) {
             return "\\u" + ("000" + un.charCodeAt(0).toString(16)).slice( - 4);
-        }).replace(/\\([\}\]])/g,
+        }).replace(filterSpecialIIIExpr,
         function(all, b) {
             return b;
         });
     },
     stripslashes = function(str) {
-        return str.replace(/[\]\}\"\\\/]/g,
+        return str.replace(stripslashesExpr,
         function(str) {
             return "\\" + str;
         });
@@ -167,11 +200,11 @@
         return arr;
     },
     myMatch = function(str, isSpace) {
-        var is, txt, temp, expr, txtII;
+        var is;
         if (isSpace) {
-            txt = "s";
-            txtII = " ";
-            temp = "<<@>>";
+            var txt = "s",
+            txtII = " ",
+            temp = "<<@>>",
             expr = spaceExpr;
         } else {
             txt = txtII = ",";
@@ -195,25 +228,25 @@
         return match;
     },
     attrMerge = function(str) {
-        var is, str = str.replace(/((?:\[[^\[\]]+\])+)([\w\u00c0-\uFFFF\-]+)/g,
+        var is, str = str.replace(attrMergeExpr,
         function(all, b, c) {
             is = true;
             return "<<<" + c + ">>>" + b;
         });
         if (is) {
-            str = str.replace(/([\.#]?[\w\u00c0-\uFFFF\-]+)<<<(.+?)>>>/g,
+            str = str.replace(attrMergeIIExpr,
             function(all, b, c) {
-                if (/^\w/.test(b)) {
+                if (wExpr.test(b)) {
                     return b.toLowerCase() == c.toLowerCase() ? b: MGNotNode;
                 }
                 return c + b;
-            }).replace(/(<<<|>>>)/g, "");
+            }).replace(hornSignExpr, "");
             return attrMerge(str);
         }
         return str;
     },
     mergeFilter = function(strI, strII) {
-        if (/^\w/.test(strII)) {
+        if (wExpr.test(strII)) {
             var m = myMatch(strI, true);
             if (m) {
                 var end = m.length - 1,
@@ -246,7 +279,7 @@
                     merge += spanTrue ? contxt + matchTwo[ii] + ",": mergeFilter(contxt, matchTwo[ii]) + ",";
                 }
             }
-            return merge == "" ? MGNotNode: merge.replace(/,+$/, "");
+            return merge == "" ? MGNotNode: merge.replace(beanEndExpr, "");
         }
     },
     selectorId = function(getObj, newD, str, isFilter, space) {
@@ -285,7 +318,7 @@
                 newD.nodeList = listNodeToArray(DOC[querySelect](merge));
                 newD.queryOne = merge;
             } else {
-                var match = /^#([\w\u00c0-\uFFFF\-]+)$/.exec(str),
+                var match = selectorExpr.exec(str),
                 getid;
                 newD.nodeList = match ? (getid = DOC[getById](match[1])) ? [getid] : [] : listNodeToArray(DOC[querySelect](str));
                 newD.queryOne = str;
@@ -334,11 +367,11 @@
         return getObj;
     },
     EvenLabel = function(str, num, obj, findTrue) {
-        var match = str.match(/(\[.+?\]|[\.#]?([\w\u00c0-\uFFFF\-]+))/g);
+        var match = str.match(EvenLabelExpr);
         if (match) for (var i = 0; i < match.length; i++) {
             if (num == 0) {
                 obj = i == 0 ? findTrue ?
-				findTrue.find ? protected.find.call(obj, match[0]) : protected.filter.call(obj, match[0]) :
+				findTrue.find ?protected.find.call(obj, match[0]) : protected.filter.call(obj, match[0]) :
 				new D().init(match[0], DOC) : protected.filter.call(obj, match[i]);
             } else {
                 obj = i == 0 ? protected.find.call(obj, match[0]) : protected.filter.call(obj, match[i]);
@@ -519,8 +552,7 @@
                                 return;
                             }
                         }
-                        if (isRun = Math.abs(touches.pageX - this.XY[0]) < 30 ||
-						            Math.abs(touches.pageY - this.XY[1]) < 30) {
+                        if (isRun = Math.abs(touches.pageX - this.XY[0]) < 30 || Math.abs(touches.pageY - this.XY[1]) < 30) {
                             target = touches.target;
                         }
                         this.XY = [];
@@ -625,22 +657,22 @@
         getFilter: function(elem) {
             var ori;
             if (ori = protected.original(elem, "filter")) {
-                ori = /opacity\s*=\s*([0-9]+)/.exec(ori);
+                ori = opacitySignExpr.exec(ori);
                 ori = ori ? parseInt(ori[1]) * .01 : 1;
             } else ori = 1;
             return ori;
         },
         getDisplay: function(tag) {
-            if (/^(div|ul|p|h1|h2|h3|h4|h5|h6|dd|dt|dl|ol|table|nav|form|hr)$/i.test(tag)) {
+            if (blockExpr.test(tag)) {
                 return "block";
             }
-            if (/^(span|ul|b|a|em|strong|img|label)$/i.test(tag)) {
+            if (inlineExpr.test(tag)) {
                 return "inline";
             }
-            if (/^li$/i.test(tag)) {
+            if (listItemExpr.test(tag)) {
                 return "list-item";
             }
-            if (/^(input|button|textarea)$/i.test(tag)) {
+            if (inlineBlockExpr.test(tag)) {
                 return "inline-block";
             }
             if (tag == "TD") {
@@ -662,7 +694,6 @@
         },
         seachIndex: function(arr, elem) {
             return arr[0] in elem ? arr[0] : arr[1] in elem ? arr[1] : false;
-
         },
         isIndex: function(index, elem) {
             return index in elem;
@@ -682,7 +713,7 @@
             callName = D.isString(jsonpCallback) ? ENCODE(funName = jsonpCallback) : funName = protected.createKey("MingGe");
             try {
                 jsonp = isTxt ? ENCODE(jsonp) : "callback";
-                url = url.replace(/([^\?&\\\/]+?)\s*=\s*\?+$/,
+                url = url.replace(jsonpExpr,
                 function(a, b) {
                     isReg = true;
                     return (isTxt ? jsonp: b) + "=" + callName;
@@ -776,7 +807,7 @@
         },
         animate: function(params, speed, callback, model) {
             model = trim(model);
-            model = D.isString(model) && /^(linear|ease|ease-in|ease-out|ease-in-out|cubic-bezier\s*\(.+\))$/.test(model) ? model: "ease-out";
+            model = D.isString(model) && animateExpr.test(model) ? model: "ease-out";
             var timingFunction = protected.transition + "TimingFunction",
             transitionArr = {},
             this_ = this,
@@ -813,9 +844,9 @@
             div.innerHTML = "<div " + str + " ></div>";
             div = div.getElementsByTagName("div")[0];
             if (!div) return;
-            var match = str.match(/[\w\u00c0-\uFFFF\-]+\s*=/g);
+            var match = str.match(matchSetAttrExpr);
             for (var i = 0; i < match.length; i++) {
-                match[i] = match[i].replace(/\=$/, "");
+                match[i] = match[i].replace(equalEndExpr, "");
                 divAttr = protected.getAttr(div, match[i]);
                 divAttr === null || protected.setAttr(DOM, match[i], divAttr);
             }
@@ -850,7 +881,7 @@
         createNode: function(name, cmd) {
             var newD = new D();
             if (D.isString(name)) {
-                var Match = trim(name).match(/^([\w]+)$|\<([\w]+)(.*?)\>(?:(.*)<\/\s*[\w]+\s*\>)?/);
+                var Match = trim(name).match(createNodeExpr);
                 if (Match) {
                     if (Match[1]) {
                         var tag = Match[1],
@@ -913,7 +944,7 @@
                 return this.simplify(url, "post", true, data, success, 2e4, false);
             },
             getJSON: function(url, data, success) {
-                return this.simplify(url, "get", true, data, success, 2e4, true, /[\?&]+.+\s*=\s*\?/.test(url) ? "jsonp": "json");
+                return this.simplify(url, "get", true, data, success, 2e4, true, getJSONExpr.test(url) ? "jsonp": "json");
             },
             simplify: function(url, type, async, data, success, timeout, cache, json) {
                 if (D.isFunction(data)) {
@@ -1068,7 +1099,7 @@
                 try {
                     this._json_ = [];
                     this._read_(arr, true);
-                    var JsonJoin = filterSpecial(this._json_.join("").replace(/,([\}\]])/g,
+                    var JsonJoin = filterSpecial(this._json_.join("").replace(JsonToExpr,
                     function(a, b) {
                         return b;
                     }));
@@ -1084,9 +1115,7 @@
                     return;
                 }
                 try {
-                    if (T == null && /^[\],:{}\s]*$/.test(arrtxt.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@")
-					.replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]")
-					.replace(/(?:^|:|,)(?:\s*\[)+/g, ""))) {
+                    if (T == null && StringToExpr.test(arrtxt.replace(StringToIIExpr, "@").replace(StringToIIIExpr, "]").replace(StringToIIIIExpr, ""))) {
                         return window.JSON && window.JSON.parse ? window.JSON.parse(arrtxt) : new Function("return (" + arrtxt + ")")();
                     }
                     if (T) {
@@ -1559,8 +1588,7 @@
                 eveName = undefined;
             } else {
                 var callbackType = typeof callback;
-                if (! ((eveNameType == "string" || eveNameType == "undefined") &&
-				(callbackType == "function" || callbackType == "undefined"))) {
+                if (! ((eveNameType == "string" || eveNameType == "undefined") && (callbackType == "function" || callbackType == "undefined"))) {
                     return this;
                 }
             }
@@ -1626,7 +1654,10 @@
         removeAttr: function(str) {
             if (D.isString(str)) {
                 str = trim(str);
+                var caseStr = str.toLowerCase();
                 this.each(function() {
+                    var k = attrArray[caseStr];
+                    if (k) this[k] = "";
                     this.removeAttribute && this.removeAttribute(str);
                 });
             }
@@ -1634,15 +1665,13 @@
         },
         removeClass: function(str) {
             if (D.isString(str)) {
-                str = "(" + trim(str).replace(RegExp("\\s+", "g"), "|") + ")";
+                str = "(" + trim(str).replace(blankendExpr, "|") + ")";
                 this.each(function() {
                     if (this.nodeType === 1) {
                         var className = this.className;
                         if (className) {
                             try {
-                                this.className = className = trim(className.replace(/\s+/g, "  ")
-								.replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
-                                className == "" && (this.removeAttribute ? this.removeAttribute("class") : this.className = "");
+                                this.className = className = trim(className.replace(blankendExpr, "  ").replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
                             } catch(e) {
                                 console.log(e.message);
                             }
@@ -1653,16 +1682,15 @@
                 this.each(function() {
                     if (this.nodeType === 1) {
                         if (this.className) {
-                            this.removeAttribute ? this.removeAttribute("class") : this.className = "";
+                            this.className = "";
                         }
                     }
                 });
             }
-            str = "";
             return this;
         },
         children: function(str) {
-            return this.find(str || (isQuery ? "*" :"MingGeAllelem2015"));
+            return this.find(str || (isQuery ? "*": "MingGeAllelem2015"));
         },
         find: function(str) {
             return CanonicalStructure(str, this, {
@@ -1696,7 +1724,7 @@
         eq: function(index) {
             var M = new D();
             M = index == null ? this: (index = index < 0 ? this.nodeList.length + index: index,
-			this.nodeList[index] && (M.nodeList = [M.queryOne = this.nodeList[index]]), M);
+		    this.nodeList[index] && (M.nodeList = [M.queryOne = this.nodeList[index]]), M);
             return M;
         },
         size: function() {
@@ -1898,10 +1926,10 @@
         },
         styleName: function(name, is) {
             try {
-                return is ? name.replace(/([A-Z])/g,
+                return is ? name.replace(uppercaseAZExpr,
                 function(all, letter) {
                     return "-" + letter;
-                }) : name.replace(/-([a-z])/gi,
+                }) : name.replace(convertuppercaseExpr,
                 function(all, letter) {
                     return letter.toUpperCase();
                 });
@@ -2023,7 +2051,7 @@
             function(key, val) {
                 D.isTxt(val) && (str += ENCODE(key) + "=" + ENCODE(val) + "&");
             });
-            return str.replace(/&+$/, "");
+            return str.replace(specialSignExpr, "");
         },
         getMobile: function() {
             var ua = navigator.userAgent,
@@ -2060,7 +2088,7 @@
         },
         urlRevise: function(url, args) {
             if (args !== "" && D.isTxt(args)) {
-                url += /\?/.test(url) ? "&" + args: "?" + args;
+                url += questionExpr.test(url) ? "&" + args: "?" + args;
             }
             return url;
         },
@@ -2073,7 +2101,7 @@
             try {
                 var save = false,
                 attributeLow = D.isString(attribute) ? D.styleName(attribute) : "transform";
-                attribute = attributeLow.replace(/^\w/, attribute.charAt(0).toUpperCase());
+                attribute = attributeLow.replace(wExpr, attribute.charAt(0).toUpperCase());
                 var bodyStyle = virDiv.style,
                 arr = [attributeLow, "Ms" + attribute, "Moz" + attribute, "Webkit" + attribute, "O" + attribute];
                 for (var i = 0; i < 5; i++) {
@@ -2297,10 +2325,10 @@
                     }
                     return offset in node ? node[offset] : null;
                 }
-                /^[0-9]+$/.test(str) && (str += "px");
+                numEndExpr.test(str) && (str += "px");
                 return this.css(item, str);
             };
-        } (item, item.replace(/^\w/, item.charAt(0).toUpperCase()));
+        } (item, item.replace(wExpr, item.charAt(0).toUpperCase()));
     });
     D.fn.off = D.fn.unbind;
     var eventFunc = function(isDel) {
