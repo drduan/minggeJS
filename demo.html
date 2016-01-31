@@ -2,7 +2,7 @@
 <html lang="zh-cmn-Hans">
  <head>
  <meta charset="utf-8"/>
- <title>MingGeJs1.9.0,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
+ <title>MingGeJs1.9.1,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
  <style type="text/css">
 #some_element, #some_element2 {
 	background: #92b901;
@@ -30,11 +30,11 @@ input {
 	color: #F06;
 }
 </style>
- <script src="MingGe_Min_1.9.0.js"></script>
+ <script src="MingGe_1.9.1.js"></script>
  <script>
 //MingGe.setVar("D");//更换主变量名称。默认是$("XXXX") 或者最好在文件MingGe.JS尾部进行修改
 $(function() {
- function an(some) {
+  function an(some) {
         some.animate({ //linear|ease$|ease-in|ease-out|ease-in-out|cubic-bezier 可选择的动画模式       
             rotate: "20deg",
             "background-color": "#1ec7e6"
@@ -82,7 +82,7 @@ $(function() {
 
     $("input").eq(1).click(function() { //创建节点
         $("div").eq(1).createNode("<p>添加在参照物的内部的前面</p>","内前");
-		//也可使$("xxxx").append 和$("xxxx").insertBefore,不同的是createNode带命令 
+		//也可使用$("xxxx").append 和$("xxxx").insertBefore,不同的是createNode带命令 
         //如果你对 内前 内后，外前 外后中文反感的话，请你使用英文，//中文能简化很多这个接口的方便性，对于不会英文的人来说，例如作者就不会英文
         //  beforeBegin: 插入到标签开始前
         //  afterBegin:插入到标签开始标记之后
@@ -128,7 +128,7 @@ $(function() {
 
     $("input").eq(7).click(function() { //toJSON
         alert($.toJSON({
-            "  a%s'\n我好122\n   \v\d\f\t\b\g\q\u0000\u00ad ": "a%s'\v\"\n\n你222好\d\f\t\b\g\q\u0000\u00ad "
+            "  a%s'\n我好122\n   \d\f\t\b\g\q\u0000\u00ad ": "a%s'\v\"\n\n你222好\d\f\t\b\g\q\u0000\u00ad "
         }));
     });
 
@@ -181,7 +181,7 @@ $(function() {
    <br>
    <br>
    <h1> 强大的minggeJS，你会JQUERY你也会用minggeJS,语法是一样的！但是minggeJS比JQUERY还要强大，文件小，选择器的效率在JQUERY和ZEPTO之上，超强的CSS3动画
-     JQUERY有的功能，minggeJS都有基本上有，压缩后只有35K大，1.9.0版本 </h1>
+     JQUERY有的功能，minggeJS都有基本上有，压缩后只有35K大，1.9.1版本 </h1>
    <div>|我是参照物|</div>
    <div id="some_element">minggeJS动画</div>
    <div id="some_element2">minggeJS动画</div>

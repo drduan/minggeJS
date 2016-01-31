@@ -1,4 +1,4 @@
-/*  MingGeJs类库1.9.0(源代码)
+/*  MingGeJs类库1.9.1(源代码)
  *  
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
  *
@@ -7,9 +7,9 @@
  *  作者：明哥先生-QQ399195513 QQ群：461550716 官网：www.shearphoto.com
  */
 (function(window, varName, undefined) {
-    var MingGeJs = "1.9.0",
+    var MingGeJs = "1.9.1",
     statech = "readystatechange",
-    statechange = "on" + statech,
+    onStatech = "on" + statech,
     strObject = "[object Object]",
     strArray = "[object Array]",
     getById = "getElementById",
@@ -51,8 +51,6 @@
         value: 1
     },
     inputTag = /input|button|textarea|select|option/i,
-    addEvent,
-    delEvent,
     DOCSCROLL_LT,
     showFast = {
         fast: 200,
@@ -79,11 +77,11 @@
     transformReg = /^\s*(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s*$/i,
     uaMatch = function(ua) {
         ua = ua.toLowerCase();
-        var match = /(webkit)[ \/]([\w.]+)/.exec(ua)||
-		            /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) ||
-				    /(msie) ([\w.]+)/.exec(ua) ||
-				    !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) ||
-				     [];
+        var match = /(webkit)[ \/]([\w.]+)/.exec(ua) ||
+		/(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) ||
+		/(msie) ([\w.]+)/.exec(ua) ||
+		!/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) ||
+		[];
         return {
             browser: match[1] || "",
             version: match[2] || "0"
@@ -143,7 +141,8 @@
                 "\f": "\\f",
                 "\v": "\\v"
             } [un];
-        }).replace(/[\x00-\x1f\x7f-\x9f\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        })
+		.replace(/[\x00-\x1f\x7f-\x9f\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
         function(un) {
             return "\\u" + ("000" + un.charCodeAt(0).toString(16)).slice( - 4);
         }).replace(/\\([\}\]])/g,
@@ -152,7 +151,7 @@
         });
     },
     stripslashes = function(str) {
-        return str.replace(/[\]\}\"\'\\\/]/g,
+        return str.replace(/[\]\}\"\\\/]/g,
         function(str) {
             return "\\" + str;
         });
@@ -291,7 +290,9 @@
                 newD.nodeList = match ? (getid = DOC[getById](match[1])) ? [getid] : [] : listNodeToArray(DOC[querySelect](str));
                 newD.queryOne = str;
             }
-        } catch(e) {}
+        } catch(e) {
+            console.log(e.message);
+        }
         return newD;
     },
     CanonicalStructure = function(str, getObj, findTrue) {
@@ -336,13 +337,9 @@
         var match = str.match(/(\[.+?\]|[\.#]?([\w\u00c0-\uFFFF\-]+))/g);
         if (match) for (var i = 0; i < match.length; i++) {
             if (num == 0) {
-                obj = i == 0 ?
-				findTrue ?
-				findTrue.find ?
-				protected.find.call(obj, match[0]) :
-				protected.filter.call(obj, match[0]) :
-		        new D().init(match[0], DOC) :
-				protected.filter.call(obj, match[i]);
+                obj = i == 0 ? findTrue ?
+				findTrue.find ? protected.find.call(obj, match[0]) : protected.filter.call(obj, match[0]) :
+				new D().init(match[0], DOC) : protected.filter.call(obj, match[i]);
             } else {
                 obj = i == 0 ? protected.find.call(obj, match[0]) : protected.filter.call(obj, match[i]);
             }
@@ -369,6 +366,14 @@
                 return elem[keyII];
             }
             return elem.getAttribute && elem.getAttribute(key);
+        },
+        show: function(this_) {
+            if (this_.style.display == "none") {
+                this_.style.display = "";
+                protected.original(this_, "display") == "none" && (this_.style.display = protected.getDisplay(this_.tagName));
+            } else {
+                this_.style.display = protected.getDisplay(this_.tagName);
+            }
         },
         createKey: function(str) {
             D.isTxt(str) || (str = "");
@@ -455,7 +460,9 @@
                                 callback.call(elem, eve, this__);
                                 is = true;
                             }
-                        } catch(e) {}
+                        } catch(e) {
+                            console.log(e.message);
+                        }
                     }
                 }
             } else {
@@ -512,7 +519,8 @@
                                 return;
                             }
                         }
-                        if (isRun = Math.abs(touches.pageX - this.XY[0]) < 30 || Math.abs(touches.pageY - this.XY[1]) < 30) {
+                        if (isRun = Math.abs(touches.pageX - this.XY[0]) < 30 ||
+						            Math.abs(touches.pageY - this.XY[1]) < 30) {
                             target = touches.target;
                         }
                         this.XY = [];
@@ -589,7 +597,9 @@
                         } else {
                             this[name] = num;
                         }
-                    } catch(e) {}
+                    } catch(e) {
+                        console.log(e.message);
+                    }
                 });
             }
             return this;
@@ -608,12 +618,13 @@
             try {
                 return node[name];
             } catch(e) {
+                console.log(e.message);
                 return;
             }
         },
         getFilter: function(elem) {
             var ori;
-            if (ori = protected.original("filter", protected.oStyleValue(elem))) {
+            if (ori = protected.original(elem, "filter")) {
                 ori = /opacity\s*=\s*([0-9]+)/.exec(ori);
                 ori = ori ? parseInt(ori[1]) * .01 : 1;
             } else ori = 1;
@@ -644,13 +655,14 @@
             if (bodys) {
                 create.style.visibility = "hidden";
                 bodys.appendChild(create);
-                returns = protected.original("display", protected.oStyleValue(create));
+                returns = protected.original(create, "display");
                 bodys.removeChild(create);
             }
             return returns;
         },
         seachIndex: function(arr, elem) {
             return arr[0] in elem ? arr[0] : arr[1] in elem ? arr[1] : false;
+
         },
         isIndex: function(index, elem) {
             return index in elem;
@@ -686,7 +698,7 @@
                         D.delVar(window, funName);
                     };
                     window[funName] = function(data) {
-                        timer && (clearTimeout(timer), timer = null);
+                        timer && (clearTimeout(timer), timer = undefined);
                         D.isFunction(success) && success(protected.JsonString.StringToJson(data) || data, "success");
                         out();
                     };
@@ -727,15 +739,9 @@
             });
             return this;
         },
-        oStyleValue: function(elem) {
-            var oStyle = elem.currentStyle ? elem.currentStyle: window.getComputedStyle(elem, null);
-            if (oStyle.getPropertyValue) {
-                return [oStyle, "getPropertyValue"];
-            }
-            return [oStyle, "getAttribute"];
-        },
-        original: function(styleName, oStyleValue) {
-            return oStyleValue[0][oStyleValue[1]](D.styleName(styleName));
+        original: function(elem, styleName) {
+            var oStyle = elem.currentStyle || window.getComputedStyle(elem, null);
+            return oStyle.getPropertyValue ? oStyle.getPropertyValue(D.styleName(styleName, true)) : oStyle.getAttribute(styleName);
         },
         find: function(Z) {
             var elem, i = 0,
@@ -775,7 +781,7 @@
             transitionArr = {},
             this_ = this,
             timer, eventEnd = function() {
-                timer && (clearInterval(timer), timer = null);
+                timer && (clearInterval(timer), timer = undefined);
                 var a, b = 0,
                 style;
                 while (a = this_.nodeList[b++]) {
@@ -785,7 +791,9 @@
                             style[protected.transition] = style[timingFunction] = null;
                             callback.call(a);
                         }
-                    } catch(e) {}
+                    } catch(e) {
+                        console.log(e.message);
+                    }
                 }
             };
             transitionArr[protected.transition] = speed + "ms";
@@ -805,7 +813,7 @@
             div.innerHTML = "<div " + str + " ></div>";
             div = div.getElementsByTagName("div")[0];
             if (!div) return;
-            match = str.match(/[\w\u00c0-\uFFFF\-]+\s*=/g);
+            var match = str.match(/[\w\u00c0-\uFFFF\-]+\s*=/g);
             for (var i = 0; i < match.length; i++) {
                 match[i] = match[i].replace(/\=$/, "");
                 divAttr = protected.getAttr(div, match[i]);
@@ -833,7 +841,9 @@
             D.isTxt(str) && this.each(function() {
                 try {
                     this.insertAdjacentHTML(cmd, str);
-                } catch(e) {}
+                } catch(e) {
+                    console.log(e.message);
+                }
             });
             return this;
         },
@@ -963,8 +973,7 @@
                 }
             },
             delAjaxEve: function(obj) {
-
-                D.delVar(obj, statechange);
+                D.delVar(obj, onStatech);
             },
             out: function(arg, xmlhttp) {
                 this.delAjaxEve(xmlhttp);
@@ -988,13 +997,13 @@
                 var floadTimeOut = parseFloat(trim(arg.timeout));
                 arg.timeout = floadTimeOut == NaN ? 2e4: floadTimeOut;
                 if (D.isString(arg.dataType) && (arg.dataType = trim(arg.dataType.toUpperCase())) == "JSONP") {
-                    protected.jsonp(arg) || alert('Operation failed, please check "jsonpCallback" settings');
+                    protected.jsonp(arg) || console.log('Operation failed, please check "jsonpCallback" settings');
                     return;
                 }
                 if (arg.lock && !this.transit) {
                     return;
                 }
-                arg.async = arg.async===true;
+                arg.async = arg.async === true;
                 this.transit = false;
                 D.isString(arg.type) && (arg.type = arg.type.toUpperCase());
                 var xmlhttp;
@@ -1003,29 +1012,28 @@
                 } else {
                     xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
                 }
-                var ContentType = function() {
-                    xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                };
+                var isUrlencoded = true;
                 arg.data = D.objToUrl(arg.data);
                 if (D.isTxt(arg.data)) {
                     arg.data = trim(arg.data);
+                    arg.data === "" && (arg.data = null);
                 } else {
                     if (toString.call(arg.data) == "[object FormData]") {
                         if (D.isFunction(arg.progress)) {
                             xmlhttp.progressFunc = arg.progress;
                             addEvent(xmlhttp.upload, "progress", arg.progress);
                         }
-                        ContentType = emptyFunc;
+                        isUrlencoded = false;
                         arg.type = "POST";
                     } else {
-                        arg.data = "";
+                        arg.data = null;
                     }
                 }
-                var SendArg = arg.data == "" ? null: arg.data,
+                var SendArg = arg.data,
                 self = this;
                 D.isFunction(arg.complete) && arg.complete();
                 if (arg.async) {
-                    xmlhttp[statechange] = function() {
+                    xmlhttp[onStatech] = function() {
                         self.handle(xmlhttp, arg);
                     };
                 }
@@ -1038,11 +1046,12 @@
                     switch (arg.type) {
                     case "POST":
                         xmlhttp.open("POST", arg.url, arg.async);
-                        ContentType();
+                        isUrlencoded && xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                         break;
 
                     default:
                         xmlhttp.open("GET", D.urlRevise(arg.url, SendArg), arg.async);
+                        SendArg = null;
                         arg.cache === true || xmlhttp.setRequestHeader("If-Modified-Since", "0");
                         break;
                     }
@@ -1050,8 +1059,7 @@
                 } catch(e2) {
                     this.Del(xmlhttp, e2, arg);
                     return;
-                }
-                !arg.async && self.handle(xmlhttp, arg);
+                } ! arg.async && self.handle(xmlhttp, arg);
             }
         },
         JsonString: {
@@ -1067,8 +1075,8 @@
                     this._json_ = null;
                     return JsonJoin;
                 } catch(e) {
-                    alert("Format does not match, conversion fails");
-                    return;
+                    console.log("Format does not match, conversion fails");
+                    return false;
                 }
             },
             StringToJson: function(arrtxt, T) {
@@ -1076,69 +1084,52 @@
                     return;
                 }
                 try {
-                    if (T == null && /^[\],:{}\s]*$/.test(arrtxt.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@").
-					    replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]").
-						replace(/(?:^|:|,)(?:\s*\[)+/g, ""))) {
+                    if (T == null && /^[\],:{}\s]*$/.test(arrtxt.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@")
+					.replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]")
+					.replace(/(?:^|:|,)(?:\s*\[)+/g, ""))) {
                         return window.JSON && window.JSON.parse ? window.JSON.parse(arrtxt) : new Function("return (" + arrtxt + ")")();
                     }
                     if (T) {
                         var array = new Function("return (" + arrtxt + ")")();
-                        type = this._type_(array);
-                        if (type !== strObject && type !== strArray) {
-                            return false;
-                        }
-                        return array;
+                        if (D.isObjArr(array)) return array;
                     }
-                    return false;
                 } catch(e) {
-                    return false;
+                    console.log(e.message);
                 }
+                return false;
             },
-            _type_: function(arr) {
-                if (D.isNumber(arr.nodeType)) return "[object DOC]";
-                return toString.call(arr);
-            },
-            _addjson_: function(types, txt, txt2, TrueFalse) {
-                var run = {
-                    "[object Object]": txt,
-                    "[object Array]": txt2
-                };
-                this._json_.push(run[types]);
+            _addjson_: function(types, txt, txt2) {
+                this._json_.push(types == strObject ? txt: txt2);
             },
             _addstring_: function(parameter) {
-                var of = typeof parameter,
-                types;
+                var of = typeof parameter;
                 if (of === "string") return '"' + stripslashes(parameter) + '"';
                 if (of === "number" && parameter != NaN) return parameter;
                 if (parameter == null) return "null";
                 if (of === "boolean") return parameter.toString();
-                types = this._type_(parameter);
-                if (D.isObjArr(parameter, types)) {
-                    return false;
-                }
+                if (D.isObjArr(parameter)) return false;
                 return '""';
             },
-            _read_: function(arr, TrueFalse) {
-                var types = this._type_(arr);
-                if (TrueFalse && types !== strObject && types !== strArray) {
-                    alert("Your incoming is not an array or JSON");
+            _read_: function(arr, bool) {
+                var types = D.isObjArr(arr);
+                if (bool && !types) {
+                    console.log("Your incoming is not an array or JSON");
                     return this._json_ = null;
                 }
-                this._addjson_(types, "{", "[", TrueFalse);
-                var pro = arr.constructor.prototype;
+                this._addjson_(types, "{", "[");
                 for (var a in arr) {
-                    if (D.isUndefined(pro[a])) {
+                    if (arr.hasOwnProperty(a)) {
                         var ArrA = this._addstring_(arr[a]);
-                        if (typeof ArrA !== "boolean") {
-                            this._addjson_(types, '"' + stripslashes(a) + '":' + ArrA + ",", ArrA + ",");
-                        } else {
+                        if (ArrA === false) {
                             this._addjson_(types, '"' + stripslashes(a) + '":', "");
-                            this._read_(arr[a], false);
+                            this._read_(arr[a]);
+                        } else {
+                            this._addjson_(types, '"' + stripslashes(a) + '":' + ArrA + ",", ArrA + ",");
                         }
                     }
                 }
-                TrueFalse = TrueFalse ? "": ",";
-                this._addjson_(types, "}" + TrueFalse, "]" + TrueFalse);
+                bool = bool ? "": ",";
+                this._addjson_(types, "}" + bool, "]" + bool);
             }
         },
         style: function(objstyle, name, val) {
@@ -1259,7 +1250,7 @@
             str = trim(str);
             switch (str) {
             case ":animate":
-                return this.nodeList[0] ? !!$data.getAnimate(this.nodeList[0], [isAnimate]) : false;
+                return !! $data.getAnimate(this.nodeList[0], [isAnimate]);
 
             case ":XXX":
                 return;
@@ -1309,8 +1300,7 @@
         },
         fadeToggle: function(time, callback) {
             return this.each(function() {
-                var arr = protected.oStyleValue(this);
-                if (protected.original("display", arr) == "none") {
+                if (protected.original(this, "display") == "none") {
                     D(this).fadeIn(time, callback);
                 } else {
                     D(this).fadeOut(time, callback);
@@ -1355,8 +1345,7 @@
             var newD = new D();
             protected.transition == null && (protected.transition = D.html5Attribute("transition"));
             this.each(function() {
-                var arr = protected.oStyleValue(this);
-                this.nodeType == 1 && (protected.original("display", arr) == "none" || $data.getAnimate(this, [isAnimate]) || newD.nodeList.push(this));
+                this.nodeType == 1 && (protected.original(this, "display") == "none" || $data.getAnimate(this, [isAnimate]) || newD.nodeList.push(this));
             });
             if (protected.transition) {
                 newD.animate({
@@ -1379,7 +1368,7 @@
         hide: function() {
             D.each.call(this.nodeList,
             function() {
-                if (this.nodeType == 1 && protected.original("display", protected.oStyleValue(this)) != "none") {
+                if (this.nodeType == 1 && protected.original(this, "display") != "none") {
                     this.style.display = "none";
                 }
             });
@@ -1420,14 +1409,8 @@
         show: function() {
             D.each.call(this.nodeList,
             function() {
-                var arr = protected.oStyleValue(this);
-                if (this.nodeType == 1 && protected.original("display", arr) == "none") {
-                    if (this.style.display == "none") {
-                        this.style.display = "";
-                        protected.original("display", arr) == "none" && (this.style.display = protected.getDisplay(this.tagName));
-                    } else {
-                        this.style.display = protected.getDisplay(this.tagName);
-                    }
+                if (this.nodeType == 1 && protected.original(this, "display") == "none") {
+                    protected.show(this);
                 }
             });
             return this;
@@ -1436,17 +1419,11 @@
             protected.transition == null && (protected.transition = D.html5Attribute("transition"));
             var newD = new D();
             this.each(function() {
-                var arr = protected.oStyleValue(this);
-                if (this.nodeType == 1 && protected.original("display", arr) == "none") {
+                if (this.nodeType == 1 && protected.original(this, "display") == "none") {
                     if ($data.getAnimate(this, [isAnimate])) return;
                     protected.transition && D(this).css("opacity", 0);
                     newD.nodeList.push(this);
-                    if (this.style.display == "none") {
-                        this.style.display = "";
-                        protected.original("display", arr) == "none" && (this.style.display = protected.getDisplay(this.tagName));
-                    } else {
-                        this.style.display = protected.getDisplay(this.tagName);
-                    }
+                    protected.show(this);
                 }
             });
             if (protected.transition) {
@@ -1582,7 +1559,8 @@
                 eveName = undefined;
             } else {
                 var callbackType = typeof callback;
-                if (! ((eveNameType == "string" || eveNameType == "undefined") && (callbackType == "function" || callbackType == "undefined"))) {
+                if (! ((eveNameType == "string" || eveNameType == "undefined") &&
+				(callbackType == "function" || callbackType == "undefined"))) {
                     return this;
                 }
             }
@@ -1640,7 +1618,9 @@
                         }
                     }
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.log(e.message);
+            }
             return false;
         },
         removeAttr: function(str) {
@@ -1660,9 +1640,12 @@
                         var className = this.className;
                         if (className) {
                             try {
-                                this.className = className = trim(className.replace(/\s+/g, "  ").replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
+                                this.className = className = trim(className.replace(/\s+/g, "  ")
+								.replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
                                 className == "" && (this.removeAttribute ? this.removeAttribute("class") : this.className = "");
-                            } catch(e) {}
+                            } catch(e) {
+                                console.log(e.message);
+                            }
                         }
                     }
                 });
@@ -1678,8 +1661,8 @@
             str = "";
             return this;
         },
-        children: function(elem) {
-            return elem ? this.find(elem) : isQuery ? this.find("*") : this.find("MingGeAllelem2015");
+        children: function(str) {
+            return this.find(str || (isQuery ? "*" :"MingGeAllelem2015"));
         },
         find: function(str) {
             return CanonicalStructure(str, this, {
@@ -1712,7 +1695,8 @@
         },
         eq: function(index) {
             var M = new D();
-            M = index == null ? this: (index = index < 0 ? this.nodeList.length + index: index, this.nodeList[index] && (M.nodeList = [M.queryOne = this.nodeList[index]]), M);
+            M = index == null ? this: (index = index < 0 ? this.nodeList.length + index: index,
+			this.nodeList[index] && (M.nodeList = [M.queryOne = this.nodeList[index]]), M);
             return M;
         },
         size: function() {
@@ -1725,7 +1709,9 @@
                 for (; i < length; i++) {
                     try {
                         callback.call(this.nodeList[i], i, length);
-                    } catch(e) {}
+                    } catch(e) {
+                        console.log(e.message);
+                    }
                 }
             }
             return this;
@@ -1777,17 +1763,19 @@
                         }
                         return null;
                     }
-                    if (protected.opacity == "filter") {
+                    if ((args == "opacity" || args == "filter") && protected.opacity == "filter") {
                         return protected.getFilter(elem);
                     }
-                    return protected.original(args, protected.oStyleValue(elem));
+                    return protected.original(elem, args);
                 }
                 while (elem = this.nodeList[i++]) {
                     try {
                         sty = elem.style;
                         arrayKey = protected.style(sty, args, val);
                         sty[arrayKey[0]] = arrayKey[1];
-                    } catch(e) {}
+                    } catch(e) {
+                        console.log(e.message);
+                    }
                 }
             } else if (D.isObject(args)) {
                 while (elem = this.nodeList[i++]) {
@@ -1796,7 +1784,9 @@
                         try {
                             i == 1 && (arrayKey[key] = protected.style(sty, D.styleName(key), args[key]));
                             sty[arrayKey[key][0]] = arrayKey[key][1];
-                        } catch(e) {}
+                        } catch(e) {
+                            console.log(e.message);
+                        }
                     }
                 }
             }
@@ -1846,7 +1836,7 @@
         },
         isObjArr: function(obj, type) {
             var types = type || toString.call(obj);
-            return D.isObject(obj, types) || types === strArray || false;
+            return (D.isObject(obj, types) || types === strArray) && types;
         },
         listNodeToArray: listNodeToArray,
         trim: trim,
@@ -1875,7 +1865,6 @@
         isEmptyObject: function(obj) {
             for (var name in obj) {
                 if (obj.hasOwnProperty(name) && obj[name] != null) {
-
                     return false;
                 }
             }
@@ -1907,13 +1896,17 @@
             }
             return returns;
         },
-        styleName: function(name) {
+        styleName: function(name, is) {
             try {
-                return name.replace(/-([a-z])/gi,
+                return is ? name.replace(/([A-Z])/g,
+                function(all, letter) {
+                    return "-" + letter;
+                }) : name.replace(/-([a-z])/gi,
                 function(all, letter) {
                     return letter.toUpperCase();
                 });
             } catch(e) {
+                console.log(e.message);
                 return name;
             }
         },
@@ -1994,7 +1987,13 @@
                 }
             } else if (D.isObjArr(obj) && D.isFunction(fun)) {
                 for (i in obj) {
-                    obj.hasOwnProperty && obj.hasOwnProperty(i) && fun(i, obj[i]);
+                    if (obj.hasOwnProperty && obj.hasOwnProperty(i)) {
+                        try {
+                            fun(i, obj[i]);
+                        } catch(e) {
+                            console.log(e.message);
+                        }
+                    }
                 }
                 return true;
             }
@@ -2005,7 +2004,7 @@
             isCreate = false;
             if (!False) {
                 if (elem == DOC || elem == window) elem = DOC.body;
-                if (D.isElem(elem)) {
+                if (D.isNumber(elem.nodeType)) {
                     elem.appendChild(iframe);
                     isCreate = true;
                 }
@@ -2019,15 +2018,12 @@
             };
         },
         objToUrl: function(obj) {
-            if (D.isObject(obj)) {
-                var str = "";
-                D.each(obj,
-                function(key, val) {
-                    D.isTxt(val) && (str += ENCODE(key) + "=" + ENCODE(val) + "&");
-                });
-                return str.replace(/&+$/, "");
-            }
-            return obj;
+            var str = "";
+            D.each(obj,
+            function(key, val) {
+                D.isTxt(val) && (str += ENCODE(key) + "=" + ENCODE(val) + "&");
+            });
+            return str.replace(/&+$/, "");
         },
         getMobile: function() {
             var ua = navigator.userAgent,
@@ -2063,7 +2059,7 @@
             return - 1;
         },
         urlRevise: function(url, args) {
-            if (args != "" && D.isTxt(args)) {
+            if (args !== "" && D.isTxt(args)) {
                 url += /\?/.test(url) ? "&" + args: "?" + args;
             }
             return url;
@@ -2086,7 +2082,9 @@
                         break;
                     }
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.log(e.message);
+            }
             return save;
         }
     });
@@ -2201,8 +2199,7 @@
                             func = obj[name];
                         }
                         if (D.isFunction(func)) {
-                            xxxEvent(elem, trim(name), func);
-                            is = true;
+                            is = xxxEvent(elem, trim(name), func);
                         }
                     }
                 }
@@ -2305,51 +2302,45 @@
             };
         } (item, item.replace(/^\w/, item.charAt(0).toUpperCase()));
     });
-    D.fn.off = D.fn.unbind; (function() {
-        var A, eventArr = {
-            add: [function() {
-                A = arguments;
-                A[0].addEventListener(A[1], A[2], false);
-            },
-            function() {
-                A = arguments;
-                A[0].removeEventListener(A[1], A[2], false);
-            }],
-            att: [function() {
-                A = arguments;
-                A[0].attachEvent("on" + A[1], A[2]);
-            },
-            function() {
-                A = arguments;
-                A[0].detachEvent("on" + A[1], A[2]);
-            }],
-            on: [function() {
-                A = arguments;
-                A[0]["on" + A[1]] = A[2];
-            },
-            function() {
-                A = arguments;
-                A[0]["on" + A[1]] = null;
-            }]
-        },
-        add;
-        if (DOC.addEventListener) {
-            add = eventArr.add;
-            add[0].add = 1;
-        } else if (DOC.attachEvent) {
-            add = eventArr.att;
-            add[0].att = 1;
-        } else {
-            add = eventArr.on;
-            add[0].on = 1;
-        }
-        addEvent = D.addEvent = add[0];
-        delEvent = D.delEvent = add[1];
-        eventArr = A = add = null;
-    })();
+    D.fn.off = D.fn.unbind;
+    var eventFunc = function(isDel) {
+        return function(elem, event, callback) {
+            var onEve = "on" + event;
+            if (! (onEve in elem)) return false;
+            var eveArr = isDel ? ["removeEventListener", "detachEvent"] : ["addEventListener", "attachEvent"];
+            if (elem[eveArr[0]]) {
+                elem[eveArr[0]](event, callback, false);
+            } else if (elem[eveArr[1]]) {
+                elem[eveArr[1]](onEve, callback);
+            } else if (isDel) {
+                try {
+                    elem[onEve] = null;
+                } catch(e) {
+                    elem[onEve] = emptyFunc;
+                    console.log(e.message);
+                }
+            } else {
+                elem[onEve] = callback;
+            }
+            return true;
+        };
+    },
+    addEvent = D.addEvent = eventFunc(),
+    delEvent = D.delEvent = eventFunc(true);
+    eventFunc = undefined;
+    if (DOC.addEventListener) {
+        addEvent.add = 1;
+    } else if (DOC.attachEvent) {
+        addEvent.att = 1;
+    }
     Date.now || (Date.now = function() {
         return new Date().getTime();
-    }); (function(args) {
+    });
+    if (!window.console || !console.log) {
+        window.console = {
+            log: function() {}
+        };
+    } (function(args) {
         var eveName, i = 0;
         while (eveName = args[i++]) {
             D.fn[eveName] = function(eveName) {
@@ -2364,5 +2355,5 @@
         }
         args = i = undefined;
     })(["blur", "focus", "focusin", "focusout", "resize", "scroll", "unload", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "error", "touchstart", "touchmove", "touchend", "touchcancel", "tap", "doubleTap", "input", "propertychange"]);
-    window[varName] = D;
+window[varName] = D;
 })(window, "$");
