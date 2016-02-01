@@ -1,4 +1,4 @@
-/*  MingGeJs类库1.9.1(源代码)
+/*  MingGeJs类库1.9.1(第三版源代码)
  *  
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
  *
@@ -36,24 +36,17 @@
     beanExpr = /[^\,]+/g,
     spaceExpr = /[^\s]+/g,
     AZExpr = /^[\w\u00c0-\uFFFF\-]+/,
-    inputTag = /input|button|textarea|select|option/i,
     trimExpr = /^(\s|\u00A0)+|(\s|\u00A0)+$/g,
-    filterSpecialExpr = /[\t\r\n\f\v]/g,
-    filterSpecialIIExpr = /[\x00-\x1f\x7f-\x9f\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-    filterSpecialIIIExpr = /\\([\}\]])/g,
+    filterSpecialExpr = [/[\t\r\n\f\v]/g, /[\x00-\x1f\x7f-\x9f\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g, /\\([\}\]])/g],
     stripslashesExpr = /[\]\}\"\\\/]/g,
-    attrMergeExpr = /((?:\[[^\[\]]+\])+)([\w\u00c0-\uFFFF\-]+)/g,
-    attrMergeIIExpr = /([\.#]?[\w\u00c0-\uFFFF\-]+)<<<(.+?)>>>/g,
+    attrMergeExpr = [/((?:\[[^\[\]]+\])+)([\w\u00c0-\uFFFF\-]+)/g, /([\.#]?[\w\u00c0-\uFFFF\-]+)<<<(.+?)>>>/g],
     wExpr = /^\w/,
     beanEndExpr = /,+$/,
     jsonpExpr = /([^\?&\\\/]+?)\s*=\s*\?+$/,
     matchSetAttrExpr = /[\w\u00c0-\uFFFF\-]+\s*=/g,
     equalEndExpr = /\=$/,
     JsonToExpr = /,([\}\]])/g,
-    StringToExpr = /^[\],:{}\s]*$/,
-    StringToIIExpr = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,
-    StringToIIIExpr = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
-    StringToIIIIExpr = /(?:^|:|,)(?:\s*\[)+/g,
+    StringToExpr = [/^[\],:{}\s]*$/, /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, /(?:^|:|,)(?:\s*\[)+/g],
     blankendExpr = /\s+/g,
     uppercaseAZExpr = /([A-Z])/g,
     convertuppercaseExpr = /-([a-z])/gi,
@@ -64,7 +57,7 @@
     blockExpr = /^(div|ul|p|h1|h2|h3|h4|h5|h6|dd|dt|dl|ol|table|nav|form|hr)$/i,
     inlineExpr = /^(span|ul|b|a|em|strong|img|label)$/i,
     listItemExpr = /^li$/i,
-    inlineBlockExpr = /^(input|button|textarea)$/i,
+    inlineBlockExpr = /^(input|button|textarea|select|option)$/i,
     opacitySignExpr = /opacity\s*=\s*([0-9]+)/,
     animateExpr = /^(linear|ease|ease-in|ease-out|ease-in-out|cubic-bezier\s*\(.+\))$/,
     getJSONExpr = /[\?&]+.+\s*=\s*\?/,
@@ -72,20 +65,7 @@
     questionExpr = /\?/,
     numEndExpr = /^[0-9]+$/,
     ralpha = /alpha\([^)]*\)/,
-    attrArray = {
-        "class": "className",
-        id: "id",
-        value: "value",
-        checked: "checked",
-        disabled: "disabled",
-        readonly: "readonly"
-    },
-    assignInput = {
-        checked: 1,
-        disabled: 1,
-        readonly: 1,
-        value: 1
-    },
+    myMatchExpr = [/\[[^\[\]]*(\s)[^\[\]]*\]/g, /\s/g, /<<@>>/g, /\[[^\[\]]*(\,)[^\[\]]*\]/g, /\,/g, /<<\uff0c>>/g],
     DOCSCROLL_LT,
     showFast = {
         fast: 200,
@@ -111,11 +91,11 @@
     transformReg = /^\s*(matrix3d|translate3d|translateX|translateY|translateZ|scale3d|scaleX|scaleY|scaleZ|rotate3d|rotateX|rotateY|rotateZ|perspective|matrix|translate|translateX|translateY|scale|scaleX|scaleY|rotate|skew|skewX|skewY)\s*$/i,
     uaMatch = function(ua) {
         ua = ua.toLowerCase();
-        var match = /(webkit)[ \/]([\w.]+)/.exec(ua)||
-		 /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) ||
-		 /(msie) ([\w.]+)/.exec(ua) ||
-		 !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) ||
-		   [];
+        var match = /(webkit)[ \/]([\w.]+)/.exec(ua) ||
+		/(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) ||
+		/(msie) ([\w.]+)/.exec(ua) ||
+		!/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) ||
+		[];
         return {
             browser: match[1] || "",
             version: match[2] || "0"
@@ -166,7 +146,7 @@
         return returnArray;
     },
     filterSpecial = function(str) {
-        return str.replace(filterSpecialExpr,
+        return str.replace(filterSpecialExpr[0],
         function(un) {
             return {
                 "\t": "\\t",
@@ -175,10 +155,10 @@
                 "\f": "\\f",
                 "\v": "\\v"
             } [un];
-        }).replace(filterSpecialIIExpr,
+        }).replace(filterSpecialExpr[1],
         function(un) {
             return "\\u" + ("000" + un.charCodeAt(0).toString(16)).slice( - 4);
-        }).replace(filterSpecialIIIExpr,
+        }).replace(filterSpecialExpr[2],
         function(all, b) {
             return b;
         });
@@ -202,18 +182,20 @@
     myMatch = function(str, isSpace) {
         var is;
         if (isSpace) {
-            var txt = "s",
-            txtII = " ",
+            var txt = " ",
             temp = "<<@>>",
-            expr = spaceExpr;
+            expr = spaceExpr,
+            replExp = myMatchExpr[0],
+            ArepExp = myMatchExpr[1],
+            forExp = myMatchExpr[2];
         } else {
-            txt = txtII = ",";
-            temp = "<<\uff0c>>";
-            expr = beanExpr;
+            txt = ",",
+            temp = "<<\uff0c>>",
+            expr = beanExpr,
+            replExp = myMatchExpr[3],
+            ArepExp = myMatchExpr[4],
+            forExp = myMatchExpr[5];
         }
-        var replExp = new RegExp("\\[[^\\[\\]]*(\\" + txt + ")[^\\[\\]]*\\]", "g"),
-        ArepExp = new RegExp("\\" + txt, "g"),
-        forExp = new RegExp(temp, "g");
         str = str.replace(replExp,
         function(all, b) {
             is = true;
@@ -222,19 +204,19 @@
         var match = str.match(expr);
         if (match && is) {
             for (var i = 0; i < match.length; i++) {
-                match[i] = match[i].replace(forExp, txtII);
+                match[i] = match[i].replace(forExp, txt);
             }
         }
         return match;
     },
     attrMerge = function(str) {
-        var is, str = str.replace(attrMergeExpr,
+        var is, str = str.replace(attrMergeExpr[0],
         function(all, b, c) {
             is = true;
             return "<<<" + c + ">>>" + b;
         });
         if (is) {
-            str = str.replace(attrMergeIIExpr,
+            str = str.replace(attrMergeExpr[1],
             function(all, b, c) {
                 if (wExpr.test(b)) {
                     return b.toLowerCase() == c.toLowerCase() ? b: MGNotNode;
@@ -370,9 +352,13 @@
         var match = str.match(EvenLabelExpr);
         if (match) for (var i = 0; i < match.length; i++) {
             if (num == 0) {
-                obj = i == 0 ? findTrue ?
-				findTrue.find ?protected.find.call(obj, match[0]) : protected.filter.call(obj, match[0]) :
-				new D().init(match[0], DOC) : protected.filter.call(obj, match[i]);
+                obj = i == 0 ?
+				findTrue ?
+				findTrue.find ? 
+				protected.find.call(obj, match[0]) :
+				protected.filter.call(obj, match[0]) :
+				new D().init(match[0], DOC) :
+				protected.filter.call(obj, match[i]);
             } else {
                 obj = i == 0 ? protected.find.call(obj, match[0]) : protected.filter.call(obj, match[i]);
             }
@@ -380,22 +366,30 @@
         return obj;
     },
     protected = {
-        setAttr: function(elem, key, val) {
-            var keyII = attrArray[key.toLowerCase()],
-            tag;
-            if (keyII && !(assignInput[keyII] && !((tag = elem.tagName) && inputTag.test(tag)))) {
-                elem[keyII] = val;
-            } else {
-                elem.setAttribute && elem.setAttribute(key, val);
+        isElemProperty: function(elem, str) {
+            var strLow = str.toLowerCase();
+            if (strLow == "class") return "className";
+            if (strLow == "id") return "id";
+            if ({
+                value: 1,
+                checked: 1,
+                disabled: 1,
+                selected: 1,
+                readonly: 1
+            }.hasOwnProperty(strLow)) {
+                var tagName = elem.tagName;
+                if (tagName && strLow in DOC.createElement(tagName)) return strLow;
             }
         },
+        setAttr: function(elem, key, val) {
+            var keyII = protected.isElemProperty(elem, key);
+            if (keyII) elem[keyII] = val;
+            else elem.setAttribute && elem.setAttribute(key, val);
+        },
         getAttr: function(elem, key) {
-            var keyII = attrArray[key.toLowerCase()],
-            tag;
-            if (keyII && !(assignInput[keyII] && !((tag = elem.tagName) && inputTag.test(tag)))) {
-                if (elem[keyII] === "") {
-                    return null;
-                }
+            var keyII = protected.isElemProperty(elem, key);
+            if (keyII) {
+                if (elem[keyII] === "") return null;
                 return elem[keyII];
             }
             return elem.getAttribute && elem.getAttribute(key);
@@ -656,6 +650,7 @@
         },
         getFilter: function(elem) {
             var ori;
+
             if (ori = protected.original(elem, "filter")) {
                 ori = opacitySignExpr.exec(ori);
                 ori = ori ? parseInt(ori[1]) * .01 : 1;
@@ -1115,8 +1110,12 @@
                     return;
                 }
                 try {
-                    if (T == null && StringToExpr.test(arrtxt.replace(StringToIIExpr, "@").replace(StringToIIIExpr, "]").replace(StringToIIIIExpr, ""))) {
-                        return window.JSON && window.JSON.parse ? window.JSON.parse(arrtxt) : new Function("return (" + arrtxt + ")")();
+                    if (T == null && StringToExpr[0].test(arrtxt.replace(StringToExpr[1], "@").
+					replace(StringToExpr[2], "]").
+					replace(StringToExpr[3], ""))) {
+                        return window.JSON && window.JSON.parse ?
+						window.JSON.parse(arrtxt) :
+						new Function("return (" + arrtxt + ")")();
                     }
                     if (T) {
                         var array = new Function("return (" + arrtxt + ")")();
@@ -1301,14 +1300,14 @@
                 return this.bind("load", url);
             }
             if (D.isString(url)) {
-                var this_ = this,
-                successFun = function(HTML) {
+                var this_ = this;
+                D[arg == null ? "get": "post"](url, arg,
+                function(HTML) {
                     this_.each(function() {
                         var seachIndex = protected.seachIndex(["value", "innerHTML"], this);
                         seachIndex && (this[seachIndex] = HTML);
                     });
-                };
-                D[arg == null ? "get": "post"](url, arg, successFun);
+                });
             } else if (arguments.length == 0) {
                 bubbling.call(this, "load");
             }
@@ -1654,9 +1653,8 @@
         removeAttr: function(str) {
             if (D.isString(str)) {
                 str = trim(str);
-                var caseStr = str.toLowerCase();
                 this.each(function() {
-                    var k = attrArray[caseStr];
+                    var k = protected.isElemProperty(this, str);
                     if (k) this[k] = "";
                     this.removeAttribute && this.removeAttribute(str);
                 });
@@ -1671,7 +1669,8 @@
                         var className = this.className;
                         if (className) {
                             try {
-                                this.className = className = trim(className.replace(blankendExpr, "  ").replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
+                                this.className = className = trim(className.replace(blankendExpr, "  ").
+								replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
                             } catch(e) {
                                 console.log(e.message);
                             }
@@ -1723,8 +1722,9 @@
         },
         eq: function(index) {
             var M = new D();
-            M = index == null ? this: (index = index < 0 ? this.nodeList.length + index: index,
-		    this.nodeList[index] && (M.nodeList = [M.queryOne = this.nodeList[index]]), M);
+            M = index == null ? this: 
+			(index = index < 0 ? this.nodeList.length + index: index, 
+			this.nodeList[index] && (M.nodeList = [M.queryOne = this.nodeList[index]]), M);
             return M;
         },
         size: function() {
@@ -1786,8 +1786,12 @@
                     if (transformReg.test(args)) {
                         var transform = elem.style[protected.transform];
                         if (transform) {
-                            i = new RegExp("" + args + "\\s?\\((.*)\\)", "i").exec(transform);
-                            return i && i[1];
+                            try {
+                                i = new RegExp("" + args + "\\s?\\((.*)\\)", "i").exec(transform);
+                                return i && i[1];
+                            } catch(e) {
+                                console.log(e.message);
+                            }
                         }
                         return null;
                     }
@@ -1827,7 +1831,7 @@
     D.fn.extend = D.extend = D.bindFn.extend = function() {
         var length = arguments.length,
         key;
-        if (length === 1 && toString.call(arguments[0]) === strObject) {
+        if (length == 1 && toString.call(arguments[0]) == strObject) {
             for (key in arguments[0]) {
                 if (! (key in this)) this[key] = arguments[0][key];
             }
@@ -1847,7 +1851,7 @@
     protected.ajax.prototype = protected.ajaxPrototype;
     D.extend({
         data: function(obj) {
-            if (D.isUndefined) {
+            if (D.isUndefined(obj)) {
                 return $data;
             }
             return new CACHE(obj);
@@ -1861,6 +1865,7 @@
                 }
                 return O;
             }
+			return obj;
         },
         isObjArr: function(obj, type) {
             var types = type || toString.call(obj);
@@ -2315,6 +2320,7 @@
                     if (node == window || node == DOC) {
                         if (newItem == "Width") {
                             return protected.winWH("Width");
+
                         }
                         if (newItem == "Height") {
                             return protected.winWH("Height");
@@ -2383,5 +2389,5 @@
         }
         args = i = undefined;
     })(["blur", "focus", "focusin", "focusout", "resize", "scroll", "unload", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "error", "touchstart", "touchmove", "touchend", "touchcancel", "tap", "doubleTap", "input", "propertychange"]);
-window[varName] = D;
+    window[varName] = D;
 })(window, "$");
