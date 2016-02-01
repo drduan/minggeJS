@@ -1,26 +1,15 @@
 # minggeJS
-<HEAD
+>HEAD
 
  English version is [here](README_en.md).
-#  MingGeJS1.8.0 寄语：
+> #  MingGeJS1.8.0 寄语：
+*PS:MingGeJS1.9.1升级(第三个版本)：*
 
-   从1.6一直到1.8.0，基本每天都在修BUG，修BUG！升级，升级！ 
-            每次当我认为完美时，总是有意无意地触犯了一些低级错误！例如 我把apply居然写成aply，然后又有人喷：你连apply都不会吗？
-            我说是手误，你说我装逼！面对这种人恶意攻击身心好疲劳！ 我深深体会到，要把一个类库做得近乎完美，一定要付出很多努力！
-            而有的人则说这样的类库，我能做十个八个。我只是知道JQUERY作者，为了JQUERY同样地付出很多努力，在开发的前几年，作者几乎每天都是在修              BUG。
+&emsp;&emsp;这个版本没有新增功能，主要1.9.0有的地方写得不好，写得恶劣，作了一个急紧修复，我对MingGeJS太认真了，留下一点不足，我真的睡不着觉。
+每次看到代码内一些极为低级的错误，我都扇我自己，责备我自己，为什么同样的错误，我要连续的触犯，
+我有时候问自己，对自己是不是太严格了，但是我知道是必要的，minggeJS是给用户使用的，我不想留一丝遗憾!今天你不对自己严格，明天别人对你残忍
 
-   更有甚者，说我抄袭JQUERY的源代码！直接理直气壮地埋没我这半个多月的努力！
-           例如这句：
-            match = /(webkit)[ \/]([\w.]+)/.exec(ua) || /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) || /(msie) ([\w.]+)/.exec(ua) ||                 !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) || [];
-           navigator.userAgent是已知的，上面是正则配对，
-           你认为我不抄袭JQUERY这句，我就写不出来了，这个正则很高技术含量？ /(webkit)[ \/]([\w.]+)/.exec(ua) 
-           选择器的正则我都敲到出来，你认为这种1+1=2的东西对我有难度?！
-           某些时候我为了节省时间，抄袭一两句（简单语句）！
-           但是总被别人借题发挥，污蔑我!
-           本人作为minggeJS原创作者，我问心无愧地对大家最强调一次，minggeJS 99.9%的代码都是原创敲写，0.1%是贪方便抄一两句
-           minggeJS代码量一共1800行，每天修BUG和升级很辛苦的，而且做这种类库， 没有任何收入！ 你不喜欢minggeJS，你可以不看不评论，你认为你能                力比我高的，你可以放在心头，你没必要出来跟我拼，我很希望大家尊重原创作者！
-               
-           
+
 
 MingGeJS1.8.0升级细节
 ：
@@ -39,15 +28,15 @@ MingGeJS1.8.0升级细节
     $(xxx).click（）让事件冒泡！
 ```
 
-    on方法与off一样可以用，但没事件委托功能，event只作了简单处理！event下次升级重新定义过才写委托功能吧 
+    on方法与off一样可以用，但没事件委托功能，event只作了简单处理！event下次升级重新定义过才写委托功能吧
 
           2：新增mouseenter  mouseleave  事件，新增clientHeight      scrollWidth     scrollHeight      scrollLeft    scrollTop
              兼容IE678 及以尘世间所有浏览器！
 
           3：$.toJSON修复，对16位字符作了严格处理！该函数连续修了四次，都一直反馈BUG，这次应该完美了！
-              另外说一下stringify插件stringify（｛"a":document｝）在浏览器下直接报错    minggeJS的toJSON则能完美通过 
+              另外说一下stringify插件stringify（｛"a":document｝）在浏览器下直接报错    minggeJS的toJSON则能完美通过
               请测试      alert($.toJSON({"  \u0000a%s'\n我好122\n\u00ad\u0000 \u0000  \d\f\t\b\g\q ":"a%s'\n\n你222好\d\f\t\b\g\q\u0000\u00ad",b:{a:{b:"b"}}}));
-        
+
 
          4:   JSONP 先前的机制有严重问题，已全部重写 请测试 $.getJSON("http://xxxx?callback=?",function(v){alert(v)});});
 
@@ -55,8 +44,8 @@ MingGeJS1.8.0升级细节
          5： 还有addClass removclass..以及大部份内部方法....等等，也作了调整及优化！
 
 
-        
- 
+
+
          结语：minggeJS并不单单山寨JQUERY，更多的是融入我自己思想。minggeJS的CSS3动画做得不错的，比ZEPTO动画要好是肯定的，
 　　　　　　　　例如串联动画，zepto是没有的，所以minggeJS非常合适合来做手机端，做各种复杂的ＣＳＳ３动画，
                 另外minggeJS支持模块及插件形式分离开发，大致用法基本和JQUERY一致，有部份函数用法则有所稍略
@@ -68,9 +57,8 @@ MingGeJS1.8.0升级细节
 
 ------------
 继优秀作品shearphoto截图插件，本人又再推出国产山寨JQUERY，为什么我要开发一个山寨JQUERY？老实说我从来没用过JQUERY，正因为我反感JQUERY。
-为什么我反感，因为我完全有开发JQUERY的能力，JQUERY的底层我都了如指掌。
+为什么我反感，因为我完全有开发JQUERY的能力，JQUERY的底层我都了如指掌。  
 我开发插件一直都是用原生JS，大家可以看下我前面的作品shearphoto就是用原生JS写的。  虽说我反感JQUERY，但是JQUERY却在前端界占有大量的用户份额，之后我有个想法，不如重新开发一个属于自己思想，自己架构的JQUERY。有了想法就要实现我山寨JQUERY之路
-=======
 继优秀作品shearphoto截图插件，本人又再推出国产山寨jQuery，为什么我要开发一个山寨jQuery？老实说我从来没用过jQuery，正因为我反感jQuery。
 为什么我反感，因为我完全有开发jQuery的能力，jQuery的底层我都了如指掌。
 我开发插件一直都是用原生JS，大家可以看下我前面的作品shearphoto就是用原生JS写的。  虽说我反感jQuery，但是jQuery却在前端界占有大量的用户份额，之后我有个想法，不如重新开发一个属于自己思想，自己架构的jQuery。有了想法就要实现我山寨jQuery之路
