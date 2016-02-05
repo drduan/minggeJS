@@ -1,3 +1,7 @@
+![题图](img.jpg)
+
+[点这里看minggeJS演示](http://rawgit.com/drduan/minggeJS/master/demo.html)
+
 # minggeJS
 >HEAD
 
