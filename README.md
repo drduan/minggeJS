@@ -1,48 +1,24 @@
-# minggeJS
+# MingGeJS1.9.3.2016完美正式版
 >HEAD
 
  English version is [here](README_en.md).
+ 
+ 
+>PS:MingGeJS 1.9.3.完美正式版 升级
 
-*PS:MingGeJS1.9.1升级(第三个版本)：*
+1：新增取兄弟节点API接口 $(XXX).siblings(),$(XXX).prev(),$(XXX).prevAll(),$(XXX).next(),$(XXX).nextAll()。我不介绍了，和JQUERY的接口一样的。
 
-&emsp;&emsp;这个版本没有新增功能，主要1.9.0有的地方写得不好，写得恶劣，作了一个急紧修复，我对MingGeJS太认真了，留下一点不足，我真的睡不着觉。
-每次看到代码内一些极为低级的错误，我都扇我自己，责备我自己，为什么同样的错误，我要连续的触犯，
-我有时候问自己，对自己是不是太严格了，但是我知道是必要的，minggeJS是给用户使用的，我不想留一丝遗憾!今天你不对自己严格，明天别人对你残忍
-#  MingGeJS1.8.0 寄语：
+2：新增content 取文本节点， 不介绍了和JQUERY一样的。
 
-MingGeJS1.8.0升级细节
-：
-          MingGeJS1.8.0根据GITHUB贡献者的反馈，作了大幅度调整及修复!
-          1：重新调整及修复绑定事件机制：
-                  示例(以click事件为例，所有事件都齐全的，别以为只有click哦)：
-```
-    $(xxx).bind("click",function); 绑定点击事件！
-    $(xxx).bind({"click":function});OBJECT形式传入事件！
-    $(xxx).unbind("click",function)解绑该事件与对应函数的绑定
-    $(xxx).unbind("click"）; 解绑点击事件的所有绑定
-    $(xxx).unbind(function)）;解绑该函数的所有事件
-    $(xxx).one(xxxxxxxx) 与bind用法相同，不同的是，只运行一次就解开绑定
-    $(xxx).click(function)   
-    $(xxx).bind("click",function);的简写形式
-    $(xxx).click（）让事件冒泡！
-```
+3：修复选择器为 为“*”号时，取不出节点，例如$("*").filter("*"),已深度修复。
 
-    on方法与off一样可以用，但没事件委托功能，event只作了简单处理！event下次升级重新定义过才写委托功能吧
+4：修复children取出来的子节点有误。
 
-          2：新增mouseenter  mouseleave  事件，新增clientHeight      scrollWidth     scrollHeight      scrollLeft    scrollTop
-             兼容IE678 及以尘世间所有浏览器！
+5: 修正特殊情况下$(xxx)指向被错误劫持的问题！
 
-          3：$.toJSON修复，对16位字符作了严格处理！该函数连续修了四次，都一直反馈BUG，这次应该完美了！
-              另外说一下stringify插件stringify（｛"a":document｝）在浏览器下直接报错    minggeJS的toJSON则能完美通过
-              请测试      alert($.toJSON({"  \u0000a%s'\n我好122\n\u00ad\u0000 \u0000  \d\f\t\b\g\q ":"a%s'\n\n你222好\d\f\t\b\g\q\u0000\u00ad",b:{a:{b:"b"}}}));
+6: 以及部份API细节作了深度调整。
 
-
-         4:   JSONP 先前的机制有严重问题，已全部重写 请测试 $.getJSON("http://xxxx?callback=?",function(v){alert(v)});});
-
-
-         5： 还有addClass removclass..以及大部份内部方法....等等，也作了调整及优化！
-
-
+------------------------------------------------------------------------------------------------
 
 
          结语：minggeJS并不单单山寨JQUERY，更多的是融入我自己思想。minggeJS的CSS3动画做得不错的，比ZEPTO动画要好是肯定的，
