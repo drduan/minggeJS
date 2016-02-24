@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8" />
-		<title>MingGeJs1.9.3.2016完美正式版,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
+		<title>MingGeJs1.9.5.2016超级正式版,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
 		<style type="text/css">
 			#some_element,
 			#some_element2 {
@@ -35,7 +35,7 @@
 				color: #F06;
 			}
 		</style>
-		<script src="MingGe_Min_1.9.3.js"></script>
+		<script src="MingGe_Min_1.9.5.js"></script>
 		<script>
 			//MingGe.setVar("D");//更换主变量名称。默认是$("XXXX") 或者最好在文件MingGe.JS尾部进行修改
 			$(function() {
@@ -80,17 +80,14 @@
 					}
 				});
 				$("input").eq(1).click(function() { //创建节点
-					$("div").eq(1).createNode("<p>添加在参照物的内部的前面</p>", "内前");
-					//也可使用$("xxxx").append 和$("xxxx").insertBefore,不同的是createNode带命令 
-					//如果你对 内前 内后，外前 外后中文反感的话，请你使用英文，//中文能简化很多这个接口的方便性，对于不会英文的人来说，例如作者就不会英文
-					//  beforeBegin: 插入到标签开始前
-					//  afterBegin:插入到标签开始标记之后
-					//  beforeEnd:插入到标签结束标记前
-					//afterEnd:插入到标签结束标记后    
+					$("div").eq(1).prepend("<p>添加在参照物的内部的前面</p>");
+					//prepend appendTo prependTo before after createNode也可用，不同的是createNode带命令 
+					//也可使用$("xxxx").append 和$("xxxx").prepend,
+					//不同的是createNode带命令
 				});
 				$("input").eq(2).click(function() { //创建节点
-					//也可使$("xxxx").append 和$("xxxx").insertBefore,不同的是createNode带命令 
-					$("div").eq(1).createNode("<p>添加在参照物的内部的后面</p>", "内后");
+					//prepend appendTo prependTo before after createNode也可用，不同的是createNode带命令 
+					$("div").eq(1).append("<p>添加在参照物的内部的后面</p>");
 				});
 				$("input").eq(3).click(function() {
 					//AJAX读取远程文件
@@ -199,6 +196,11 @@
 					//手动冒泡$("input").eq(13).abcdef();也可以像普通方法让事件冒泡
 					alert("创建成功了，现在你再点击三次这个按钮就能看到引用abcdef事件了，整个创建独有事件就是这么简单，这个方法不含事件代理效果，需要事件代理效果请联系作者交接API");
 				});
+				$("input").eq(14).click(function() {
+					alert("我们现在测试一下克隆所有按钮和事件")
+					$("body").append($("input").clone(true)); //true代表克隆事件
+					alert("所有按钮克隆成功，包括事件和属性，子节点等（滚动条拉到最下面就看到了）")
+				});
 			});
 		</script>
 	</head>
@@ -210,7 +212,11 @@
 			<br>
 			<br>
 			<h1> 强大的minggeJS，你会JQUERY你也会用minggeJS,语法是一样的！但是minggeJS比JQUERY还要强大，文件小，选择器的效率在JQUERY和ZEPTO之上，超强的CSS3动画
-     JQUERY有的功能，minggeJS都有基本上有，压缩后只有35K大，1.9.3版本 </h1>
+     JQUERY有的功能，minggeJS都有基本上有，压缩后只有40K大，1.9.5超级正式版
+  可以说1.95是我一个思想更开放，更放纵的一个版本，能完全用“全面改革开放”来形容这次的更新，所有API，做到密不透风，非常严格！
+  目的就是，用户开心，我就开心，没有用户我就不开心。 MinggeJS经历过好几次的重大的更新，我一直好努力，好努力，我失去好多私人时间，
+  对于MingGeJS我越踩越深了！我无法自拨了，
+  我的好想在国内范围能取代JQ的位置，MinggeJS真的可以做到比JQ优秀，求大家给个机会我，给个机会MingGeJS</h1>
 			<div>|我是参照物|</div>
 			<div id="some_element">minggeJS动画</div>
 			<div id="some_element2">minggeJS动画</div>
@@ -228,6 +234,7 @@
 			<input type="button" value="读取手机端信息">
 			<input type="button" value="事件委托，事件代理" onEvent='1'>
 			<input type="button" value="创造一个独有事件">
+			<input type="button" value="测试一下事件克隆">
 			<br>
 			<br>
 			<br>
