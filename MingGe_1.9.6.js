@@ -1,5 +1,5 @@
 /* 
- *   MingGeJs类库1.9.5.2016超强正式版
+ *   MingGeJs类库1.9.6.2016超强正式版
  *  
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
  *
@@ -8,7 +8,7 @@
  *  作者：明哥先生-QQ399195513 QQ群：461550716 官网：www.shearphoto.com
  */
 (function(window, varName, undefined) {
-	var MingGeJs = "1.9.5",
+	var MingGeJs = "1.9.6",
 		statech = "readystatechange",
 		onStatech = "on" + statech,
 		strObject = "[object Object]",
@@ -402,53 +402,7 @@
 			var newD = protected.comMode(new D(), removing(array));
 			return D.isUndefined(selector) ? newD : newD.filter(selector);
 		},
-		createNode = function(html, cmd) {
-			try {
-				if (D.isTxt(html)) {
-					var fragment = protected.getFragment(html),
-						boole = true,
-						ie678 = protected.isIe == null ? D.isIe() : protected.isIe;
-					if (ie678 && ie678 < 9) protected.ieRunScript(html);
-				} else if (!(fragment = newDArray(html))) return this;
-			} catch (e) {
-				console.log(e.message);
-				return this;
-			}
-			var bodys = DOC.body,
-				cmd = protected.cmdFun(cmd),
-				tally = 0,
-				nodeList = this,
-				cloneFragment = protected.cloneFragment;
-			this.each(function() {
-				var this_ = D.isWINDOC(this) && bodys ? bodys : this;
-				if (!D.isDocNode(this_)) return;
-				var parent = this_.parentNode,
-					cFra = cloneFragment(fragment, boole, ++tally, nodeList);
-				if (cFra) {
-					var clone = cFra[0];
-					if (tally === 1) fragment = cFra[1];
-				}
-				if (clone && this_.insertBefore && this_.appendChild) {
-					switch (cmd) {
-						case "beforeBegin":
-							parent && parent.insertBefore(clone, this_);
-							break;
 
-						case "afterBegin":
-							this_.insertBefore(clone, this_.firstChild);
-							break;
-
-						case "afterEnd":
-							parent && parent.insertBefore(clone, this_.nextSibling);
-							break;
-
-						default:
-							this_.appendChild(clone);
-					}
-				}
-			});
-			return this;
-		},
 		protected = {
 			preventDefault: function(event) {
 				return function() {
@@ -1210,7 +1164,7 @@
 						async: true
 					}, arg);
 					var floadTimeOut = parseFloat(trim(arg.timeout));
-					arg.timeout = floadTimeOut == NaN ? 2e4 : floadTimeOut;
+					arg.timeout = isNaN(floadTimeOut) ? 2e4 : floadTimeOut;
 					if (D.isString(arg.dataType) && (arg.dataType = trim(arg.dataType.toUpperCase())) == "JSONP") {
 						protected.jsonp(arg) || console.log('Operation failed, please check "jsonpCallback" settings');
 						return;
@@ -1269,10 +1223,14 @@
 			},
 			JsonString: {
 				_json_: null,
-				JsonToString: function(arr) {
+				JsonToString: function(arrObj, T) {
 					try {
+						var winJOSN = window.JSON;
+						if (!T && winJOSN && (winJOSN = winJOSN.stringify)) {
+							return D.isObjArr(arrObj) ? winJOSN(arrObj) : false;
+						}
 						this._json_ = [];
-						this._read_(arr, true);
+						this._read_(arrObj, true);
 						var JsonJoin = filterSpecial(this._json_.join("").replace(JsonToExpr, fSArrFunc[2]));
 						this._json_ = null;
 						return JsonJoin;
@@ -1281,14 +1239,14 @@
 						return false;
 					}
 				},
-				StringToJson: function(arrtxt, T) {
-					if (!D.isString(arrtxt)) return;
+				StringToJson: function(str, T) {
+					if (!D.isString(str)) return;
 					try {
-						if (T == null && StringToExpr[0].test(arrtxt.replace(StringToExpr[1], "@").replace(StringToExpr[2], "]").replace(StringToExpr[3], ""))) {
-							return window.JSON && window.JSON.parse ? window.JSON.parse(arrtxt) : new Function("return (" + arrtxt + ")")();
+						if (T == null && StringToExpr[0].test(str.replace(StringToExpr[1], "@").replace(StringToExpr[2], "]").replace(StringToExpr[3], ""))) {
+							return window.JSON && window.JSON.parse ? window.JSON.parse(str) : new Function("return (" + str + ")")();
 						}
 						if (T) {
-							var array = new Function("return (" + arrtxt + ")")();
+							var array = new Function("return (" + str + ")")();
 							if (D.isObjArr(array)) return array;
 						}
 					} catch (e) {
@@ -1302,9 +1260,11 @@
 				_addstring_: function(parameter) {
 					var of = typeof parameter;
 					if (of === "string") return '"' + stripslashes(parameter) + '"';
-					if (of === "number" && parameter != NaN) return parameter;
-					if (parameter == null) return "null";
-					if (of === "boolean") return parameter.toString();
+					if ((of === "number" && !isNaN(parameter)) ||
+						parameter === null ||
+						of === "boolean") {
+						return String(parameter);
+					}
 					if (D.isObjArr(parameter)) return false;
 					return '""';
 				},
@@ -1479,26 +1439,72 @@
 			return nodeList && nodeList.getBoundingClientRect ? nodeList.getBoundingClientRect() : [];
 		},
 		append: function(selector) {
-			return createNode.call(this, selector, "beforeEnd");
+			return this.createNode(selector, "beforeEnd");
 		},
 		prepend: function(selector) {
-			return createNode.call(this, selector, "afterBegin");
+			return this.createNode(selector, "afterBegin");
 		},
 		appendTo: function(selector) {
-			createNode.call(D(selector), this, "beforeEnd");
+			D(selector).createNode(this, "beforeEnd");
 			return this;
 		},
 		prependTo: function(selector) {
-			createNode.call(D(selector), this, "afterBegin");
+			D(selector).createNode(this, "afterBegin");
 			return this;
 		},
 		before: function(selector) {
-			return createNode.call(this, selector, "beforeBegin");
+			return this.createNode(selector, "beforeBegin");
 		},
 		after: function(selector) {
-			return createNode.call(this, selector, "afterEnd");
+			return this.createNode(selector, "afterEnd");
 		},
-		createNode: createNode,
+		createNode: function(html, cmd) {
+			try {
+				if (D.isTxt(html)) {
+					var fragment = protected.getFragment(html),
+						boole = true,
+						ie678 = protected.isIe == null ? D.isIe() : protected.isIe;
+					if (ie678 && ie678 < 9) protected.ieRunScript(html);
+				} else if (!(fragment = newDArray(html))) return this;
+			} catch (e) {
+				console.log(e.message);
+				return this;
+			}
+			var bodys = DOC.body,
+				cmd = protected.cmdFun(cmd),
+				tally = 0,
+				nodeList = this,
+				cloneFragment = protected.cloneFragment;
+			this.each(function() {
+				var this_ = D.isWINDOC(this) && bodys ? bodys : this;
+				if (!D.isDocNode(this_)) return;
+				var parent = this_.parentNode,
+					cFra = cloneFragment(fragment, boole, ++tally, nodeList);
+				if (cFra) {
+					var clone = cFra[0];
+					if (tally === 1) fragment = cFra[1];
+				}
+				if (clone && this_.insertBefore && this_.appendChild) {
+					switch (cmd) {
+						case "beforeBegin":
+							parent && parent.insertBefore(clone, this_);
+							break;
+
+						case "afterBegin":
+							this_.insertBefore(clone, this_.firstChild);
+							break;
+
+						case "afterEnd":
+							parent && parent.insertBefore(clone, this_.nextSibling);
+							break;
+
+						default:
+							this_.appendChild(clone);
+					}
+				}
+			});
+			return this;
+		},
 		load: function(url, arg) {
 			if (D.isFunction(url)) return this.bind("load", url);
 			if (D.isString(url)) {
@@ -1544,7 +1550,7 @@
 						$data.cloneEvent(this, clone, 0, 1);
 						if (!is) {
 							$data.removeEvent(clone, null, {});
-							$(clone).find("*").unbind();
+							D(clone).find("*").unbind();
 						}
 					}
 					array.push(clone);
@@ -1688,7 +1694,7 @@
 			}
 			if (!D.isObject(params)) return this;
 			var typeSpeed = typeof speed;
-			if (typeSpeed !== "number" || speed == NaN) {
+			if (typeSpeed !== "number" || isNaN(speed)) {
 				if (typeSpeed === "string") {
 					speed = trim(speed);
 					showFast[speed] ? speed = showFast[speed] : (speed = parseFloat(speed), D.isNumber(speed) || (speed = 500));
@@ -1931,10 +1937,11 @@
 		},
 		index: function(obj) {
 			try {
-				if (obj) {
-					return D.inArray(obj.nodeType || D.isWindow(obj) ? obj : obj[0], this);
+				if (D.isUndefined(obj)) {
+					var t0 = this[0];
+					return D.inArray(t0, D(t0.parentNode).children());
 				}
-				return D.inArray(this[0], this[0].parentNode[getByTagName]("*"));
+				return D.inArray((obj instanceof D) ? obj[0] : obj, this);
 			} catch (e) {
 				return -1;
 			}
@@ -2138,8 +2145,8 @@
 		parseJSON: function(s, t) {
 			return protected.JsonString.StringToJson(s, t);
 		},
-		toJSON: function(s) {
-			return protected.JsonString.JsonToString(s);
+		toJSON: function(s, t) {
+			return protected.JsonString.JsonToString(s, t);
 		},
 		noConflict: function() {
 			D.delVar(window, varName);
@@ -2334,7 +2341,7 @@
 		},
 		isTxt: function(str) {
 			var of = typeof str;
-			return of == "string" || of == "number" && str !== NaN;
+			return of == "string" || of == "number" && !isNaN(str);
 		},
 		isNumber: function(number) {
 			return !(number === null || isNaN(number));
