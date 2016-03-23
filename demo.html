@@ -3,7 +3,7 @@
 
 	<head>
 		<meta charset="utf-8" />
-		<title>MingGeJs1.9.6.2016超级正式版,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
+		<title>MingGeJs1.9.6.2.2016超级正式版,国产山寨JQUERY，请支持国产，官网www.shearphoto.com</title>
 		<style type="text/css">
 			#some_element,
 			#some_element2 {
@@ -35,181 +35,181 @@
 				color: #F06;
 			}
 		</style>
-		<script src="MingGe_Min_1.9.6.js"></script>
+		<script src="MingGe_Min_1.9.6.2.js"></script>
 		<script>
 			/*
-			     var ￥=MingGe.noConflict() 方法让渡变量 $ 的 MingGe 控制权。
-	
-	                        该方法释放  MingGe 对 $ 变量的控制，￥则就为 $ 。
-	
-	                        该方法也可用于为  MingGe 变量规定新的自定义名称.
-	
-	                        对的，这个接口和JQ一样的，麻烦大家移步看JQ方档这个接口的详解
-	        */
-				$(function() {
-					function an(some) {
-						some.animate({ //linear|ease$|ease-in|ease-out|ease-in-out|cubic-bezier 可选择的动画模式       
-								rotate: "20deg",
-								"background-color": "#1ec7e6"
-							},
-							1500, "ease-in").animate({
-								left: "500px",
-								rotate: "0deg"
-							},
-							1e3, "ease").animate({
-								rotate: "-360deg",
-								left: 0,
-								"background-color": "#92b901"
-							},
-							1500, "ease-out",
-							function() {
-								alert("id:" + this.id + "对象，串联动画全部完成");
-							});
-					};
+						     var ￥=MingGe.noConflict() 方法让渡变量 $ 的 MingGe 控制权。
+				
+				                        该方法释放  MingGe 对 $ 变量的控制，￥则就为 $ 。
+				
+				                        该方法也可用于为  MingGe 变量规定新的自定义名称.
+				
+				                        对的，这个接口和JQ一样的，麻烦大家移步看JQ方档这个接口的详解
+				        */
+			$(function() {
+				function an(some) {
+					some.animate({ //linear|ease$|ease-in|ease-out|ease-in-out|cubic-bezier 可选择的动画模式       
+							rotate: "20deg",
+							"background-color": "#1ec7e6"
+						},
+						1500, "ease-in").animate({
+							left: "500px",
+							rotate: "0deg"
+						},
+						1e3, "ease").animate({
+							rotate: "-360deg",
+							left: 0,
+							"background-color": "#92b901"
+						},
+						1500, "ease-out",
+						function() {
+							alert("id:" + this.id + "对象，串联动画全部完成");
+						});
+				};
+				an($("#some_element,#some_element2"));
+				$("input").eq(6).click(function() { //再来一次动画
 					an($("#some_element,#some_element2"));
-					$("input").eq(6).click(function() { //再来一次动画
-						an($("#some_element,#some_element2"));
-					});
-					$("input").eq(4).click(function() { //淡入
-						$("#some_element,#some_element2").fadeIn(1000,
-							function() {
-								alert("id:" + this.id + "淡入成功");
-							});
-					});
-					$("input").eq(5).click(function() { //淡出
-						$("#some_element,#some_element2").fadeOut(1000,
-							function() {
-								alert("id:" + this.id + "淡出成功");
-							});
-					});
-					$("body div.main input").eq(0).bind({ //事件绑定  one bind click  on 等事件都齐全了
-						click: function() {
-							alert('$("body div.main input")绑定了点击事件，和JQUERY一样的，看DEMO的代码');
-						}
-					});
-					$("input").eq(1).click(function() { //创建节点
-						$("div").eq(1).prepend("<p>添加在参照物的内部的前面</p>");
-						//prepend appendTo prependTo before after createNode也可用，不同的是createNode带命令 
-						//也可使用$("xxxx").append 和$("xxxx").prepend,
-						//不同的是createNode带命令
-					});
-					$("input").eq(2).click(function() { //创建节点
-						//prepend appendTo prependTo before after createNode也可用，不同的是createNode带命令 
-						$("div").eq(1).append("<p>添加在参照物的内部的后面</p>");
-					});
-					$("input").eq(3).click(function() {
-						//AJAX读取远程文件
-						$.ajax({ //    $.ajax,$.post,$().load,$.get() $.getJSON的接口也齐全了
-							url: "MingGeJs介绍.txt",
-							data: {
-								a: 1,
-								b: 2
-							},
-							//示范传参数
-							type: "get",
-							//不作介绍，和JQUERY的$.ajax接口一致
-							//dataType:"json", //可用JSONP
-							//jsonp:"callback",
-							//jsonpCallback:"callback",
-							timeout: 2e4,
-							async: true,
-							lock: true,
-							//新加入的同线程AJAX锁定
-							complete: false,
-							progress: function() {},
-							success: function(serverdata) { //上传成功事件
-								alert(serverdata);
-							},
-							error: function(ErroMsg) {
-								alert(ErroMsg + "错误代码，请用http运行AJAX");
-							},
-							cache: false
+				});
+				$("input").eq(4).click(function() { //淡入
+					$("#some_element,#some_element2").fadeIn(1000,
+						function() {
+							alert("id:" + this.id + "淡入成功");
 						});
-					});
-					$("input").eq(7).click(function() { //toJSON
-						alert($.toJSON({
-							"  a%s'\n我好122\n   \d\f\t\b\g\q\u0000\u00ad ": "a%s'\v\"\n\n你222好\d\f\t\b\g\q\u0000\u00ad "
-						}));
-					});
-					$("input").eq(8).click(function() { //解绑了所有input标签事件
-						$("input").off();
-						alert("解绑了所有input标签事件，现在什么按钮都不能按了，杯具不，请重新刷新页面");
-					});
-					$("input").eq(9).click(function() { //删除了所有input按钮
-						$("input").remove();
-						alert("删除了所有input按钮了,什么按钮也没了，刷新一下吧");
-					});
-					$("input").eq(10).click(function() { //利用minggeJS开发插件 模块扩展
-						////minggeJS开发插件开始
-						$.fn.extend({ //minggeJS开发插件第一步
-							abcdefg: function(options) { //我们假设创建一个abcdefg方法
-								var defaults = { //参数默认值
-									padding: "20px",
-									color: "#000000"
-								};
-								var options = $.extend(defaults, options); //参数存在则替换，不存在则为默认值
-								this.each(function(i, l) { //历遍对象，当然你可以直接写成 this.css(options); 我只是顺便演试如何历遍
-									$(this).css(options); //这只是演试，认真就输
-								});
-								alert("具体请查看按钮10是怎么开发插件的");
-							}
+				});
+				$("input").eq(5).click(function() { //淡出
+					$("#some_element,#some_element2").fadeOut(1000,
+						function() {
+							alert("id:" + this.id + "淡出成功");
 						});
-						$("input").abcdefg({ //调用我创建的接口
-							color: "red"
-						});
-						//minggeJS开发插件结束
-					});
-					$("input").eq(11).click(function() { //读取手机端信息
-						alert($.toJSON($.getMobile())); //$.getMobile()接口出来是OBJECT对象，我用了 $.toJSON转出来方便大家观看
-					});
-					$(document).on("click", "input[onEvent='1']", function() { //事件代理
-						$(this).css({
-							color: "red"
-						});
-						alert('事件代理： $(document).on("事件名","选择器","函数")  请看DEMO 这个按钮的事件')
-					});
-					$("input").eq(13).click(function() { //创造一个独有事件
-						alert("假设我们创造一个abcdef事件，记得看代码是怎么创的哦");
-						/*开始创造*/
-						var count = 0; //创造事件用到
-						$.bindFn.extend({ //用到bindFn接口
-							abcdef: function(obj) { //创一个abcdef事件，这个事件假设是：单击三下就冒泡,obj是一个OBJECT对象,
-								return {
-									mousedown: function(event) {
-										if (++count > 2) {
-											count = 0;
-											event = $.eventCompatible(event, "mousedown"); //兼容性event
-											obj.callback.call(obj.elem || this, event); //执行回调
-											// 为什么这样写 obj.elem || this        ie下obj.elem有冒泡对象，非IE下没有值，所以这样写
-										};
-									}
-								} //你还可以传入更多事件做一个整合哦
-							}
-						});
-						$.fn.extend({ // 创建$(xxx).abcdef(function)的引用
-							abcdef: function(callback) { // 创建$(xxx).abcdef(function)的引用
-								if ($.isUndefined(callback)) {
-									$.bubbling.call(this, "abcdef"); //callback为空时就冒泡
-									return this;
-								}
-								return this.bind("abcdef", callback); //进行bind引用
-							}
-						});
-						/*开始结束*/
-						$("input").eq(13).unbind(); //删除这个原有的事
-						$("input").eq(13).abcdef(function(event) { //$(xxx)方式引用abcdef事件
-							this.value = "我已经事件冒泡了，我叫abcdef事件";
-						});
-						//移除事件$("input").eq(13).unbind("abcdef"); 也可以像普通方法一样移除事件
-						//手动冒泡$("input").eq(13).abcdef();也可以像普通方法让事件冒泡
-						alert("创建成功了，现在你再点击三次这个按钮就能看到引用abcdef事件了，整个创建独有事件就是这么简单，这个方法不含事件代理效果，需要事件代理效果请联系作者交接API");
-					});
-					$("input").eq(14).click(function() {
-						alert("我们现在测试一下克隆所有按钮和事件")
-						$("body").append($("input").clone(true)); //true代表克隆事件
-						alert("所有按钮克隆成功，包括事件和属性，子节点等（滚动条拉到最下面就看到了）")
+				});
+				$("body div.main input").eq(0).bind({ //事件绑定  one bind click  on 等事件都齐全了
+					click: function() {
+						alert('$("body div.main input")绑定了点击事件，和JQUERY一样的，看DEMO的代码');
+					}
+				});
+				$("input").eq(1).click(function() { //创建节点
+					$("div").eq(1).prepend("<p>添加在参照物的内部的前面</p>");
+					//prepend appendTo prependTo before after createNode也可用，不同的是createNode带命令 
+					//也可使用$("xxxx").append 和$("xxxx").prepend,
+					//不同的是createNode带命令
+				});
+				$("input").eq(2).click(function() { //创建节点
+					//prepend appendTo prependTo before after createNode也可用，不同的是createNode带命令 
+					$("div").eq(1).append("<p>添加在参照物的内部的后面</p>");
+				});
+				$("input").eq(3).click(function() {
+					//AJAX读取远程文件
+					$.ajax({ //    $.ajax,$.post,$().load,$.get() $.getJSON的接口也齐全了
+						url: "MingGeJs介绍.txt",
+						data: {
+							a: 1,
+							b: 2
+						},
+						//示范传参数
+						type: "get",
+						//不作介绍，和JQUERY的$.ajax接口一致
+						//dataType:"json", //可用JSONP
+						//jsonp:"callback",
+						//jsonpCallback:"callback",
+						timeout: 2e4,
+						async: true,
+						lock: true,
+						//新加入的同线程AJAX锁定
+						complete: false,
+						progress: function() {},
+						success: function(serverdata) { //上传成功事件
+							alert(serverdata);
+						},
+						error: function(ErroMsg) {
+							alert(ErroMsg + "错误代码，请用http运行AJAX");
+						},
+						cache: false
 					});
 				});
+				$("input").eq(7).click(function() { //toJSON
+					alert($.toJSON({
+						"  a%s'\n我好122\n   \d\f\t\b\g\q\u0000\u00ad ": "a%s'\v\"\n\n你222好\d\f\t\b\g\q\u0000\u00ad "
+					}));
+				});
+				$("input").eq(8).click(function() { //解绑了所有input标签事件
+					$("input").off();
+					alert("解绑了所有input标签事件，现在什么按钮都不能按了，杯具不，请重新刷新页面");
+				});
+				$("input").eq(9).click(function() { //删除了所有input按钮
+					$("input").remove();
+					alert("删除了所有input按钮了,什么按钮也没了，刷新一下吧");
+				});
+				$("input").eq(10).click(function() { //利用minggeJS开发插件 模块扩展
+					////minggeJS开发插件开始
+					$.fn.extend({ //minggeJS开发插件第一步
+						abcdefg: function(options) { //我们假设创建一个abcdefg方法
+							var defaults = { //参数默认值
+								padding: "20px",
+								color: "#000000"
+							};
+							var options = $.extend(defaults, options); //参数存在则替换，不存在则为默认值
+							this.each(function(i, l) { //历遍对象，当然你可以直接写成 this.css(options); 我只是顺便演试如何历遍
+								$(this).css(options); //这只是演试，认真就输
+							});
+							alert("具体请查看按钮10是怎么开发插件的");
+						}
+					});
+					$("input").abcdefg({ //调用我创建的接口
+						color: "red"
+					});
+					//minggeJS开发插件结束
+				});
+				$("input").eq(11).click(function() { //读取手机端信息
+					alert($.toJSON($.getMobile())); //$.getMobile()接口出来是OBJECT对象，我用了 $.toJSON转出来方便大家观看
+				});
+				$(document).on("click", "input[onEvent='1']", function() { //事件代理
+					$(this).css({
+						color: "red"
+					});
+					alert('事件代理： $(document).on("事件名","选择器","函数")  请看DEMO 这个按钮的事件')
+				});
+				$("input").eq(13).click(function() { //创造一个独有事件
+					alert("假设我们创造一个abcdef事件，记得看代码是怎么创的哦");
+					/*开始创造*/
+					var count = 0; //创造事件用到
+					$.bindFn.extend({ //用到bindFn接口
+						abcdef: function(obj) { //创一个abcdef事件，这个事件假设是：单击三下就冒泡,obj是一个OBJECT对象,
+							return {
+								mousedown: function(event) {
+									if (++count > 2) {
+										count = 0;
+										event = $.eventCompatible(event, "mousedown"); //兼容性event
+										obj.callback.call(obj.elem || this, event); //执行回调
+										// 为什么这样写 obj.elem || this        ie下obj.elem有冒泡对象，非IE下没有值，所以这样写
+									};
+								}
+							} //你还可以传入更多事件做一个整合哦
+						}
+					});
+					$.fn.extend({ // 创建$(xxx).abcdef(function)的引用
+						abcdef: function(callback) { // 创建$(xxx).abcdef(function)的引用
+							if ($.isUndefined(callback)) {
+								$.bubbling.call(this, "abcdef"); //callback为空时就冒泡
+								return this;
+							}
+							return this.bind("abcdef", callback); //进行bind引用
+						}
+					});
+					/*开始结束*/
+					$("input").eq(13).unbind(); //删除这个原有的事
+					$("input").eq(13).abcdef(function(event) { //$(xxx)方式引用abcdef事件
+						this.value = "我已经事件冒泡了，我叫abcdef事件";
+					});
+					//移除事件$("input").eq(13).unbind("abcdef"); 也可以像普通方法一样移除事件
+					//手动冒泡$("input").eq(13).abcdef();也可以像普通方法让事件冒泡
+					alert("创建成功了，现在你再点击三次这个按钮就能看到引用abcdef事件了，整个创建独有事件就是这么简单，这个方法不含事件代理效果，需要事件代理效果请联系作者交接API");
+				});
+				$("input").eq(14).click(function() {
+					alert("我们现在测试一下克隆所有按钮和事件")
+					$("body").append($("input").clone(true)); //true代表克隆事件
+					alert("所有按钮克隆成功，包括事件和属性，子节点等（滚动条拉到最下面就看到了）")
+				});
+			});
 		</script>
 	</head>
 
@@ -220,8 +220,8 @@
 			<br>
 			<br>
 			<h1>强大的minggeJS，你会JQUERY你也会用minggeJS,语法是一样的！但是minggeJS比JQUERY还要强大，文件小，选择器的效率在JQUERY和ZEPTO之上，超强的CSS3动画
-    JQUERY有的功能，minggeJS都有基本上有，压缩后只有40K大，1.9.6超级正式版
-  可以说1.9.6是我一个思想更开放，更放纵的一个版本，能完全用“全面改革开放”来形容这次的更新，所有API，做到密不透风，非常严格！
+    JQUERY有的功能，minggeJS都有基本上有，压缩后只有40K大，1.9.6.2超级正式版
+  可以说1.9.6.2是我一个思想更开放，更放纵的一个版本，能完全用“全面改革开放”来形容这次的更新，所有API，做到密不透风，非常严格！
   目的就是，用户开心，我就开心，没有用户我就不开心。 MinggeJS经历过好几次的重大的更新，我一直好努力，好努力，我失去好多私人时间，
   对于MingGeJS我越踩越深了！我无法自拨了，
   我的好想在国内范围能取代JQ的位置，MinggeJS真的可以做到比JQ优秀，求大家给个机会我，给个机会MingGeJS</h1>

@@ -1,5 +1,5 @@
 /* 
- *   MingGeJs类库1.9.6.2016超强正式版
+ *   MingGeJs类库1.9.6.2.2016超强正式版
  *  
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
  *
@@ -8,7 +8,7 @@
  *  作者：明哥先生-QQ399195513 QQ群：461550716 官网：www.shearphoto.com
  */
 (function(window, varName, undefined) {
-	var MingGeJs = "1.9.6",
+	var MingGeJs = "1.9.6.2",
 		statech = "readystatechange",
 		onStatech = "on" + statech,
 		strObject = "[object Object]",
@@ -901,7 +901,8 @@
 					erro = arg.error,
 					data = arg.data,
 					isReg, isTxt = D.isTxt(jsonp),
-					funName, callName = D.isString(jsonpCallback) ? ENCODE(funName = jsonpCallback) : funName = protected.createKey("MingGe_jsonp");
+					callName = D.isString(jsonpCallback) ?
+					ENCODE(jsonpCallback) : jsonpCallback = protected.createKey("MingGe_jsonp");
 				try {
 					jsonp = isTxt ? ENCODE(jsonp) : "callback";
 					url = url.replace(jsonpExpr, function(a, b) {
@@ -912,22 +913,22 @@
 						url = D.urlRevise(url, jsonp + "=" + callName);
 					}
 					url = D.urlRevise(url, D.objToUrl(data));
-					if (window[funName] == null) {
+					if (window[jsonpCallback] == null) {
 						D.isFunction(arg.complete) && arg.complete();
-						window[funName] = function(data) {
+						window[jsonpCallback] = function(data) {
 							D.isFunction(success) && success(protected.JsonString.StringToJson(data) || data, "success");
 						};
-						var script = D.createScript({
+						D.createScript({
 							url: url,
 							isDel: true,
 							success: function() {
-								D.delVar(window, funName);
+								D.delVar(window, jsonpCallback);
 							},
 							error: function() {
-								D.delVar(window, funName);
+								D.delVar(window, jsonpCallback);
 								D.isFunction(erro) && erro(505);
 							},
-							timeOut: 1e4
+							timeout: timeout
 						});
 						return true;
 					}
@@ -1163,8 +1164,7 @@
 						timeout: 2e4,
 						async: true
 					}, arg);
-					var floadTimeOut = parseFloat(trim(arg.timeout));
-					arg.timeout = isNaN(floadTimeOut) ? 2e4 : floadTimeOut;
+					arg.timeout = D.reviseTime(arg.timeout, 2e4);
 					if (D.isString(arg.dataType) && (arg.dataType = trim(arg.dataType.toUpperCase())) == "JSONP") {
 						protected.jsonp(arg) || console.log('Operation failed, please check "jsonpCallback" settings');
 						return;
@@ -1697,7 +1697,7 @@
 			if (typeSpeed !== "number" || isNaN(speed)) {
 				if (typeSpeed === "string") {
 					speed = trim(speed);
-					showFast[speed] ? speed = showFast[speed] : (speed = parseFloat(speed), D.isNumber(speed) || (speed = 500));
+					speed = showFast.hasOwnProperty(speed) ? showFast[speed] : D.reviseTime(speed, 500);
 				} else {
 					if (D.isFunction(speed)) {
 						callback = speed;
@@ -2100,7 +2100,7 @@
 		if (length > 1) {
 			var args = arguments,
 				i = 1,
-				args0 = D.copyObject(args[0]);
+				args0 = args[0];
 			for (; i < length; i++) {
 				args0 = repObject(args0, args[i]);
 			}
@@ -2208,29 +2208,24 @@
 				return false;
 			}
 		},
-		addCompleteEvent: function(elem, isDel, callback, erroCallback, timeOut) {
+		addCompleteEvent: function(elem, isDel, callback, erroCallback, timeout) {
 			if (isDel || callback || erroCallback) {
-				timeOut = timeOut && parseFloat(timeOut);
-				if (!timeOut) timeOut = 1e4;
+				timeout = D.reviseTime(timeout, 1e4);
 				var event = "onload" in elem ? ["load", "error"] : [statech],
-					STtime, loadFunc = function() {
-						var isSta = event[0] == statech;
-						if (isSta && !STtime) {
-							STtime = ST(errorFunc, timeOut);
-						}
-						var State = elem.readyState;
+					loadFunc = function() {
+						var isSta = event[0] == statech,
+							State = elem.readyState;
 						if (!isSta || isSta && (State == "complete" || State == "interactive")) {
-							STtime && clearTimeout(STtime);
+							errorFunc(true);
 							try {
 								D.isFunction(callback) && callback();
 							} catch (e) {
 								console.log(e.message);
 							}
-							errorFunc(true);
 						}
 					},
 					errorFunc = function(isHand) {
-						STtime && (STtime = undefined);
+						STtime && clearTimeout(STtime) && (STtime = undefined);
 						delEvent(elem, event[0], loadFunc);
 						event[1] && delEvent(elem, event[1], errorFunc);
 						try {
@@ -2239,7 +2234,8 @@
 							console.log(e.message);
 						}
 						isDel && elem.parentNode && elem.parentNode.removeChild(elem);
-					};
+					},
+					STtime = ST(errorFunc, timeout);
 				addEvent(elem, event[0], loadFunc);
 				event[1] && addEvent(elem, event[1], errorFunc);
 			}
@@ -2249,13 +2245,13 @@
 			if (head && D.isObject(arg) && D.isString(arg.url)) {
 				var srcTxt = arg.url,
 					isDel = arg.isDel,
-					timeOut = arg.timeOut,
+					timeout = arg.timeout,
 					callback = arg.success,
 					erroCallback = arg.error,
 					script = DOC.createElement("script");
 				script.src = srcTxt;
 				head.appendChild(script);
-				D.addCompleteEvent(script, isDel, callback, erroCallback, timeOut);
+				D.addCompleteEvent(script, isDel, callback, erroCallback, timeout);
 				return [head, script];
 			}
 		},
@@ -2348,6 +2344,12 @@
 		},
 		isUndefined: function(str) {
 			return typeof str == "undefined";
+		},
+		reviseTime: function(time, defNum) {
+			if (!isNaN(time = parseFloat(time)) && time > 0) {
+				return time;
+			}
+			return defNum || 0;
 		},
 		isString: function(str) {
 			return typeof str == "string";
@@ -2759,7 +2761,7 @@
 	});
 	if (!window.console || !console.log) {
 		window.console = {
-			log: function(e) {}
+			log: function() {}
 		};
 	}
 	(function(args) {
