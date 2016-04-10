@@ -1,5 +1,5 @@
 /* 
- *   MingGeJs类库1.9.6.2.2016超强正式版
+ *  MingGeJs类库1.9.6.3.2016超强正式版
  *  
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
  *
@@ -8,7 +8,7 @@
  *  作者：明哥先生-QQ399195513 QQ群：461550716 官网：www.shearphoto.com
  */
 (function(window, varName, undefined) {
-	var MingGeJs = "1.9.6.2",
+	var MingGeJs = "1.9.6.3",
 		statech = "readystatechange",
 		onStatech = "on" + statech,
 		strObject = "[object Object]",
@@ -1175,7 +1175,7 @@
 					D.isString(arg.type) && (arg.type = arg.type.toUpperCase());
 					var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"),
 						isUrlencoded = true;
-					arg.data = D.objToUrl(arg.data);
+					arg.data = D.objToUrl(arg.data) || arg.data;
 					if (D.isTxt(arg.data)) {
 						arg.data = trim(arg.data);
 						arg.data === "" && (arg.data = null);
@@ -1996,6 +1996,9 @@
 		scrollTop: function(num) {
 			return protected.setS.call(this, "scrollTop", num);
 		},
+		hover: function(inCallback, outCallback) {
+			return this.mouseenter(inCallback).mouseleave(outCallback);
+		},
 		val: function(str) {
 			return protected.htmlVal.call(this, "value", str);
 		},
@@ -2374,7 +2377,7 @@
 						console.log(e.message);
 					}
 				}
-			} else if (D.isFunction(fun)) {
+			} else if (D.isObject(obj) && D.isFunction(fun)) {
 				for (i in obj) {
 					if (obj.hasOwnProperty(i)) {
 						try {
