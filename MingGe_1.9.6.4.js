@@ -1,5 +1,5 @@
 /* 
- *  MingGeJs类库1.9.6.3.2016超强正式版
+ *  MingGeJs类库1.9.6.4.2016超强正式版
  *  
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
  *
@@ -8,7 +8,7 @@
  *  作者：明哥先生-QQ399195513 QQ群：461550716 官网：www.shearphoto.com
  */
 (function(window, varName, undefined) {
-	var MingGeJs = "1.9.6.3",
+	var MingGeJs = "1.9.6.4",
 		statech = "readystatechange",
 		onStatech = "on" + statech,
 		strObject = "[object Object]",
@@ -73,7 +73,6 @@
 		selectorExpr = /^#([\w\u00c0-\uFFFF\-]+)$/,
 		questionExpr = /\?/,
 		setInpTypeExpr = /^\<\s*input/i,
-		numEndExpr = /^[0-9]+$/,
 		ralpha = /alpha\([^)]*\)/,
 		myMatchExpr = [/\[[^\[\]]*(\s)[^\[\]]*\]/g,
 			/\s/g,
@@ -84,7 +83,8 @@
 		],
 		push = virArr.push,
 		slice = virArr.slice,
-		DOCSCROLL_LT, showFast = {
+		DOCSCROLL_LT,
+		showFast = {
 			fast: 200,
 			slow: 600,
 			normal: 400
@@ -402,7 +402,6 @@
 			var newD = protected.comMode(new D(), removing(array));
 			return D.isUndefined(selector) ? newD : newD.filter(selector);
 		},
-
 		protected = {
 			preventDefault: function(event) {
 				return function() {
@@ -475,32 +474,41 @@
 					}
 				}
 			},
-			ieRunScript: function isRunScript(html) {
-				var idkey = protected.createKey("Temp"),
-					sctiptName = "span id=" + idkey;
-				html = html.replace(/script/gi, sctiptName);
-				var overall = DOC.createElement("div");
-				overall.innerHTML = html;
-				var sctiptReg = new RegExp(sctiptName, "ig"),
-					sctipt = overall[getByTagName]("span"),
-					sctiptHtml, url, i = 0,
-					length = sctipt.length;
+			readScript: function(node) {
+				var tag = "SCRIPT",
+					i = 0,
+					arr = [],
+					length = node.length;
 				for (; i < length; i++) {
-					if (sctipt[i].id != idkey) {
-						continue;
+					if (node[i].tagName != tag) {
+						if (node[i][getByTagName]) {
+							arr = arr.concat(protected.readScript(node[i][getByTagName](tag)));
+						}
+					} else if (!D.isNodeCreateBody(node[i])) {
+						arr.push(node[i]);
 					}
-					url = sctipt[i].getAttribute("src");
+				}
+				return arr;
+			},
+			ieRunScript: function(node) {
+				var scriptHtml,
+					url,
+					i = 0,
+					length = node.length;
+				for (; i < length; i++) {
+					url = node[i].getAttribute("src");
 					try {
-						if (D.isString(url)) {
+						if (url && D.isString(url) && D.isNodeCreateBody(node[i])) {
 							D.createScript({
 								url: url,
 								isDel: true
 							});
-						} else if (sctiptHtml = sctipt[i].innerText) {
-							sctiptHtml = sctiptHtml.replace(sctiptReg, "script");
-							Function(sctiptHtml)();
+						} else if ((scriptHtml = node[i].innerHTML) && D.isNodeCreateBody(node[i])) {
+							Function(scriptHtml)();
 						}
-					} catch (e) {}
+					} catch (e) {
+						console.log(e.message);
+					}
 				}
 			},
 			inChild: function(node, nodei) {
@@ -556,18 +564,28 @@
 				return is && [fragment, newList];
 			},
 			getFragment: function(HTML) {
+				var ie678 = D.isIe();
+				if (ie678 = (ie678 && ie678 < 9)) {
+					HTML = "<span>0</span>" + HTML;
+				}
 				var overall = DOC.createElement("div");
 				overall.innerHTML = HTML;
-				var scriptElem = overall[getByTagName]("script"),
-					scriptElemi, script, tag = "script",
-					i = 0,
-					length = scriptElem.length;
-				for (; i < length; i++) {
-					scriptElemi = scriptElem[i];
-					script = DOC.createElement(tag);
-					protected.copyAttr(scriptElemi, script);
-					scriptElemi.parentNode.replaceChild(script, scriptElemi);
-					script.innerHTML = trim(scriptElemi.innerHTML);
+				if (ie678) {
+					overall.removeChild(overall[getByTagName]("span")[0]);
+				} else {
+					var tag = "script",
+						scriptElem = overall[getByTagName](tag),
+						scriptElemi,
+						script,
+						i = 0,
+						length = scriptElem.length;
+					for (; i < length; i++) {
+						scriptElemi = scriptElem[i];
+						script = DOC.createElement(tag);
+						protected.copyAttr(scriptElemi, script);
+						script.innerHTML = scriptElemi.innerHTML;
+						scriptElemi.parentNode.replaceChild(script, scriptElemi);
+					}
 				}
 				return listToArray(overall.childNodes);
 			},
@@ -675,7 +693,7 @@
 						isOne: true,
 						callback: callback
 					});
-					callback.call(this, event);
+					return callback.call(this, event);
 				};
 			},
 			runEventApp: function(this_, eveName, callback, isOne, agent, eve, targ, this__) {
@@ -689,7 +707,9 @@
 							elem = allElem[i];
 							try {
 								if (elem == targ || D.inArray(targ, elem[getByTagName](targ.tagName)) > -1) {
-									callback.call(elem, eve, this__);
+									if (callback.call(elem, eve, this__) === false) {
+										eve.preventDefault();
+									}
 									is = true;
 								}
 							} catch (e) {
@@ -698,7 +718,9 @@
 						}
 					}
 				} else {
-					callback.call(this_, eve, this__);
+					if (callback.call(this_, eve, this__) === false) {
+						eve.preventDefault();
+					}
 					is = true;
 				}
 				if (is && isOne) $data.removeEvent(this_, eveName, {
@@ -1420,673 +1442,687 @@
 			}
 			return this;
 		};
-	D.bindFn = {}, D.fn = D.prototype = {
-		version: "\u4f60\u4f7f\u7528\u7684\u7248\u672c\u662fMingGejs" + MingGeJs,
-		queryOne: false,
-		queryTwo: false,
-		is: function(selector) {
-			selector = trim(selector);
-			switch (selector) {
-				case ":animate":
-					return !!$data.getAnimate(this[0], [isAnimate]);
-
-				default:
-					return false;
-			}
-		},
-		offset: function() {
-			var nodeList = this[0];
-			return nodeList && nodeList.getBoundingClientRect ? nodeList.getBoundingClientRect() : [];
-		},
-		append: function(selector) {
-			return this.createNode(selector, "beforeEnd");
-		},
-		prepend: function(selector) {
-			return this.createNode(selector, "afterBegin");
-		},
-		appendTo: function(selector) {
-			D(selector).createNode(this, "beforeEnd");
-			return this;
-		},
-		prependTo: function(selector) {
-			D(selector).createNode(this, "afterBegin");
-			return this;
-		},
-		before: function(selector) {
-			return this.createNode(selector, "beforeBegin");
-		},
-		after: function(selector) {
-			return this.createNode(selector, "afterEnd");
-		},
-		createNode: function(html, cmd) {
-			try {
-				if (D.isTxt(html)) {
-					var fragment = protected.getFragment(html),
-						boole = true,
-						ie678 = protected.isIe == null ? D.isIe() : protected.isIe;
-					if (ie678 && ie678 < 9) protected.ieRunScript(html);
-				} else if (!(fragment = newDArray(html))) return this;
-			} catch (e) {
-				console.log(e.message);
+	D.bindFn = {},
+		D.fn = D.prototype = {
+			version: "\u4f60\u4f7f\u7528\u7684\u7248\u672c\u662fMingGejs" + MingGeJs,
+			queryOne: false,
+			queryTwo: false,
+			is: function(selector) {
+				selector = trim(selector);
+				//待扩展的接口
+				switch (selector) {
+					case ":animate":
+						return !!$data.getAnimate(this[0], [isAnimate]);
+					default:
+						return false;
+				}
+			},
+			offset: function() {
+				var nodeList = this[0];
+				return nodeList && nodeList.getBoundingClientRect ? nodeList.getBoundingClientRect() : [];
+			},
+			append: function(selector) {
+				return this.createNode(selector, "beforeEnd");
+			},
+			prepend: function(selector) {
+				return this.createNode(selector, "afterBegin");
+			},
+			appendTo: function(selector) {
+				D(selector).createNode(this, "beforeEnd");
 				return this;
-			}
-			var bodys = DOC.body,
-				cmd = protected.cmdFun(cmd),
-				tally = 0,
-				nodeList = this,
-				cloneFragment = protected.cloneFragment;
-			this.each(function() {
-				var this_ = D.isWINDOC(this) && bodys ? bodys : this;
-				if (!D.isDocNode(this_)) return;
-				var parent = this_.parentNode,
-					cFra = cloneFragment(fragment, boole, ++tally, nodeList);
-				if (cFra) {
-					var clone = cFra[0];
-					if (tally === 1) fragment = cFra[1];
-				}
-				if (clone && this_.insertBefore && this_.appendChild) {
-					switch (cmd) {
-						case "beforeBegin":
-							parent && parent.insertBefore(clone, this_);
-							break;
-
-						case "afterBegin":
-							this_.insertBefore(clone, this_.firstChild);
-							break;
-
-						case "afterEnd":
-							parent && parent.insertBefore(clone, this_.nextSibling);
-							break;
-
-						default:
-							this_.appendChild(clone);
+			},
+			prependTo: function(selector) {
+				D(selector).createNode(this, "afterBegin");
+				return this;
+			},
+			before: function(selector) {
+				return this.createNode(selector, "beforeBegin");
+			},
+			after: function(selector) {
+				return this.createNode(selector, "afterEnd");
+			},
+			createNode: function(html, cmd) {
+				try {
+					if (D.isTxt(html)) {
+						var fragment = protected.getFragment(html),
+							boole = true;
+					} else if (!(fragment = newDArray(html))) {
+						return this;
 					}
+				} catch (e) {
+					console.log(e.message);
+					return this;
 				}
-			});
-			return this;
-		},
-		load: function(url, arg) {
-			if (D.isFunction(url)) return this.bind("load", url);
-			if (D.isString(url)) {
-				var this_ = this;
-				D[arg == null ? "get" : "post"](url, arg, function(HTML) {
-					this_.each(function() {
-						var seachIndex = protected.seachIndex(["value", "innerHTML"], this);
-						seachIndex && (this[seachIndex] = HTML);
-					});
-				});
-			} else if (arguments.length == 0) {
-				bubbling.call(this, "load");
-			}
-			return this;
-		},
-		insertHTML: protected.insertHTML,
-		stop: function() {
-			if (!protected.transition) return this;
-			return this.each(function() {
-				if ($data.getAnimate(this, [isAnimate])) {
-					$data.delAnimate(this);
-					var timingFunction = protected.transition + "TimingFunction",
-						style = this.style;
-					style[protected.transition] = style[timingFunction] = null;
+				var bodys = DOC.body,
+					cmd = protected.cmdFun(cmd),
+					tally = 0,
+					nodeList = this,
+					cloneFragment = protected.cloneFragment,
+					ie678 = D.isIe();
+				if (ie678 && ie678 < 9) {
+					var runScriptArr = protected.readScript(fragment);
 				}
-			});
-		},
-		fadeToggle: function(time, callback) {
-			return this.each(function() {
-				if (protected.original(this, "display") == "none") {
-					D(this).fadeIn(time, callback);
-				} else {
-					D(this).fadeOut(time, callback);
-				}
-			});
-		},
-		clone: function(is) {
-			var array = [];
-			this.each(function() {
-				if (this.cloneNode) {
-					var clone = this.cloneNode(true);
-					if (is || !addEvent.add) {
-						$data.cloneEvent(this, clone, 0, 1);
-						if (!is) {
-							$data.removeEvent(clone, null, {});
-							D(clone).find("*").unbind();
+				this.each(function() {
+					var this_ = D.isWINDOC(this) && bodys ? bodys : this;
+					if (!D.isDocNode(this_)) return;
+					var parent = this_.parentNode,
+						cFra = cloneFragment(fragment, boole, ++tally, nodeList);
+					if (cFra) {
+						var clone = cFra[0];
+						if (tally === 1) {
+							fragment = cFra[1];
 						}
 					}
-					array.push(clone);
+					if (clone && this_.insertBefore && this_.appendChild) {
+						switch (cmd) {
+							case "beforeBegin":
+								parent && parent.insertBefore(clone, this_);
+								break;
+
+							case "afterBegin":
+								this_.insertBefore(clone, this_.firstChild);
+								break;
+
+							case "afterEnd":
+								parent && parent.insertBefore(clone, this_.nextSibling);
+								break;
+
+							default:
+								this_.appendChild(clone);
+						}
+					}
+				});
+				if (runScriptArr) {
+					protected.ieRunScript(runScriptArr);
 				}
-			});
-			return protected.comMode(new D(), array);
-		},
-		add: function(obj) {
-			var array;
-			if (D.isString(obj)) {
-				array = listToArray(D(obj));
-			} else if (!(array = newDArray(obj))) {
-				array = [];
-			}
-			return protected.comMode(new D(), this.slice().concat(array));
-		},
-		attr: function(name, val) {
-			var nodeList = this,
-				elem = this[0],
-				isUndefined = D.isUndefined(val),
-				proSetAttr = protected.setAttr;
-			if (elem) {
-				if (D.isObject(name)) {
-					this.each(function(a) {
-						var this_ = this;
-						D.each(name, function(k, v) {
-							if (D.isString(k) && (D.isTxt(v) || D.isBoolean(v))) {
-								var typeDOM = proSetAttr(this_, k, v);
-								if (typeDOM) this_ = nodeList[a] = typeDOM;
-							}
+				return this;
+			},
+			load: function(url, arg) {
+				if (D.isFunction(url)) return this.bind("load", url);
+				if (D.isString(url)) {
+					var this_ = this;
+					D[arg == null ? "get" : "post"](url, arg, function(HTML) {
+						this_.each(function() {
+							var seachIndex = protected.seachIndex(["value", "innerHTML"], this);
+							seachIndex && (this[seachIndex] = HTML);
 						});
 					});
-					return this;
-				}
-				if (isUndefined) {
-					if (D.isString(name)) {
-						return protected.getAttr(elem, name);
-					}
-					return null;
-				}
-				if (D.isString(name) && (D.isTxt(val) || D.isBoolean(val))) {
-					this.each(function(a) {
-						var typeDOM = proSetAttr(this, name, val);
-						if (typeDOM) nodeList[a] = typeDOM;
-					});
+				} else if (arguments.length == 0) {
+					bubbling.call(this, "load");
 				}
 				return this;
-			}
-			return isUndefined ? null : this;
-		},
-		fadeOut: function(time, callback) {
-			var newD = new D();
-			this.each(function() {
-				this.nodeType == 1 && (protected.original(this, "display") == "none" || $data.getAnimate(this, [isAnimate]) || newD.push(this));
-			});
-			if (protected.transition) {
-				newD.animate({
-					opacity: 0
-				}, time, function() {
-					D(this).css({
-						display: "none",
-						opacity: null
-					});
-					D.isFunction(callback) && callback.call(this);
-				}, "ease");
-			} else {
-				newD.css("display", "none");
-			}
-			return this;
-		},
-		hide: function() {
-			this.each(function() {
-				if (this.nodeType == 1 && protected.original(this, "display") != "none") {
-					this.style.display = "none";
-				}
-			});
-			return this;
-		},
-		getFormData: function(str, num) {
-			if (D.isString(str)) {
-				if (!D.isFunction(window.FormData)) return null;
-				num = parseInt(num);
-				var mydata = new FormData(),
-					isNum = D.isNumber(num),
-					i = 0,
-					arr = [],
-					elem, files, text, leng = this.length;
-				for (; i < leng; i++) {
-					elem = this[i];
-					if (files = elem.files) {
-						length = files.length;
-						if (isNum && num < length) {
-							length = num;
-						}
-						for (var ii = 0; ii < length; ii++) {
-							arr.push(text = str + "_" + i + "_" + ii);
-							mydata.append(text, files[ii]);
-						}
+			},
+			insertHTML: protected.insertHTML,
+			stop: function() {
+				if (!protected.transition) return this;
+				return this.each(function() {
+					if ($data.getAnimate(this, [isAnimate])) {
+						$data.delAnimate(this);
+						var timingFunction = protected.transition + "TimingFunction",
+							style = this.style;
+						style[protected.transition] = style[timingFunction] = null;
 					}
+				});
+			},
+			fadeToggle: function(time, callback) {
+				return this.each(function() {
+					if (protected.original(this, "display") == "none") {
+						D(this).fadeIn(time, callback);
+					} else {
+						D(this).fadeOut(time, callback);
+					}
+				});
+			},
+			clone: function(is) {
+				var array = [];
+				this.each(function() {
+					if (this.cloneNode) {
+						var clone = this.cloneNode(true);
+						if (is || !addEvent.add) {
+							$data.cloneEvent(this, clone, 0, 1);
+							if (!is) {
+								$data.removeEvent(clone, null, {});
+								D(clone).find("*").unbind();
+							}
+						}
+						array.push(clone);
+					}
+				});
+				return protected.comMode(new D(), array);
+			},
+			add: function(obj) {
+				if (D.isString(obj)) {
+					var array = listToArray(D(obj));
+				} else if (!(array = newDArray(obj))) {
+					array = [];
 				}
-				return {
-					data: mydata,
-					name: arr
-				};
-			}
-		},
-		show: function() {
-			this.each(function() {
-				if (this.nodeType == 1 && protected.original(this, "display") == "none") {
-					protected.show(this);
+				return protected.comMode(new D(), this.slice().concat(array));
+			},
+			attr: function(name, val) {
+				var nodeList = this,
+					elem = this[0],
+					isUndefined = D.isUndefined(val),
+					proSetAttr = protected.setAttr;
+				if (elem) {
+					if (D.isObject(name)) {
+						this.each(function(a) {
+							var this_ = this;
+							D.each(name, function(k, v) {
+								if (D.isString(k) && (D.isTxt(v) || D.isBoolean(v))) {
+									var typeDOM = proSetAttr(this_, k, v);
+									if (typeDOM) this_ = nodeList[a] = typeDOM;
+								}
+							});
+						});
+						return this;
+					}
+					if (isUndefined) {
+						if (D.isString(name)) {
+							return protected.getAttr(elem, name);
+						}
+						return null;
+					}
+					if (D.isString(name) && (D.isTxt(val) || D.isBoolean(val))) {
+						this.each(function(a) {
+							var typeDOM = proSetAttr(this, name, val);
+							if (typeDOM) nodeList[a] = typeDOM;
+						});
+					}
+					return this;
 				}
-			});
-			return this;
-		},
-		fadeIn: function(time, callback) {
-			var newD = new D();
-			this.each(function() {
-				if (this.nodeType == 1 && protected.original(this, "display") == "none") {
-					if ($data.getAnimate(this, [isAnimate])) return;
-					protected.transition && D(this).css("opacity", 0);
-					newD.push(this);
-					protected.show(this);
-				}
-			});
-			if (protected.transition) {
-				ST(function() {
+				return isUndefined ? null : this;
+			},
+			fadeOut: function(time, callback) {
+				var newD = new D();
+				this.each(function() {
+					this.nodeType == 1 && (protected.original(this, "display") == "none" || $data.getAnimate(this, [isAnimate]) || newD.push(this));
+				});
+				if (protected.transition) {
 					newD.animate({
-						opacity: 1
+						opacity: 0
 					}, time, function() {
-						D(this).css("opacity", null);
+						D(this).css({
+							display: "none",
+							opacity: null
+						});
 						D.isFunction(callback) && callback.call(this);
 					}, "ease");
-				}, 5);
-			}
-			return this;
-		},
-		animate: function(params, speed, callback, model) {
-			if (!protected.transition) {
-				this.css(params);
+				} else {
+					newD.css("display", "none");
+				}
 				return this;
-			}
-			if (!D.isObject(params)) return this;
-			var typeSpeed = typeof speed;
-			if (typeSpeed !== "number" || isNaN(speed)) {
-				if (typeSpeed === "string") {
-					speed = trim(speed);
-					speed = showFast.hasOwnProperty(speed) ? showFast[speed] : D.reviseTime(speed, 500);
-				} else {
-					if (D.isFunction(speed)) {
-						callback = speed;
+			},
+			hide: function() {
+				this.each(function() {
+					if (this.nodeType == 1 && protected.original(this, "display") != "none") {
+						this.style.display = "none";
 					}
-					speed = 500;
+				});
+				return this;
+			},
+			getFormData: function(str, num) {
+				if (D.isString(str)) {
+					if (!D.isFunction(window.FormData)) return null;
+					num = parseInt(num);
+					var mydata = new FormData(),
+						isNum = D.isNumber(num),
+						i = 0,
+						arr = [],
+						elem, files, text, leng = this.length;
+					for (; i < leng; i++) {
+						elem = this[i];
+						if (files = elem.files) {
+							length = files.length;
+							if (isNum && num < length) {
+								length = num;
+							}
+							for (var ii = 0; ii < length; ii++) {
+								arr.push(text = str + "_" + i + "_" + ii);
+								mydata.append(text, files[ii]);
+							}
+						}
+					}
+					return {
+						data: mydata,
+						name: arr
+					};
 				}
-			}
-			if (!D.isFunction(callback)) {
-				var m = model;
-				model = callback;
-				callback = D.isFunction(m) ? m : emptyFunc;
-			}
-			var newCallback = function() {
-				var list = $data.getAnimate(this, [AnimateList]);
-				if (D.isArray(list) && list.length > 0) {
-					var newD = new D(),
-						arg = list[0];
-					newD.push(this);
-					list.splice(0, 1);
-					protected.animate.apply(newD, arg);
-				} else {
-					$data.delAnimate(this);
+			},
+			show: function() {
+				this.each(function() {
+					if (this.nodeType == 1 && protected.original(this, "display") == "none") {
+						protected.show(this);
+					}
+				});
+				return this;
+			},
+			fadeIn: function(time, callback) {
+				var newD = new D();
+				this.each(function() {
+					if (this.nodeType == 1 && protected.original(this, "display") == "none") {
+						if ($data.getAnimate(this, [isAnimate])) return;
+						protected.transition && D(this).css("opacity", 0);
+						newD.push(this);
+						protected.show(this);
+					}
+				});
+				if (protected.transition) {
+					ST(function() {
+						newD.animate({
+							opacity: 1
+						}, time, function() {
+							D(this).css("opacity", null);
+							D.isFunction(callback) && callback.call(this);
+						}, "ease");
+					}, 5);
 				}
-				callback.call(this);
-			};
-			var elem, b = 0,
-				newD = new D(),
-				arg = [params, speed, newCallback, model],
-				lock, length = this.length;
-			for (; b < length; b++) {
-				elem = this[b];
-				if (elem && elem.nodeType != 1) continue;
-				var get = $data.getAnimate(elem);
-				if (get && get[isAnimate]) {
-					get[AnimateList] ? get[AnimateList].push(arg) : get[AnimateList] = [arg];
-				} else {
-					$data.setAnimate(elem, [isAnimate, 1]);
-					newD.push(elem);
-					lock || (lock = true);
-				}
-			}
-			lock && protected.animate.apply(newD, arg);
-			return this;
-		},
-		empty: function() {
-			return this.each(function(i) {
-				if (this.nodeType == 1) {
-					var seachIndex = protected.seachIndex(["value", "innerHTML"], this);
-					seachIndex && (this[seachIndex] = "");
-				}
-			});
-		},
-		remove: function() {
-			var arr = [];
-			this.each(function() {
-				try {
-					this.parentNode.removeChild(this);
-					D(this).unbind().stop();
-				} catch (e) {
-					arr.push(this);
-				}
-			});
-			D.upload(this, arr, 1);
-			return this;
-		},
-		on: function(eveName, agent, callback, isOne) {
-			if (D.isFunction(agent)) {
-				isOne = callback;
-				callback = agent;
-			}
-			return this.bind(eveName, callback, isOne, agent);
-		},
-		bind: function(eveName, callback, isOne, agent) {
-			isOne = isOne === true;
-			agent = D.isString(agent) ? [agent, this] : undefined;
-			if (D.isString(eveName) && D.isFunction(callback)) {
-				protected.bindHandle.call(this, eveName, callback, isOne, agent);
-			} else if (D.isObject(eveName)) {
-				for (var key in eveName) {
-					if (eveName.hasOwnProperty(key)) protected.bindHandle.call(this, key, eveName[key], isOne, agent);
-				}
-			}
-			return this;
-		},
-		unbind: function(eveName, callback) {
-			var eveNameType = typeof eveName;
-			if (eveNameType == "function") {
-				callback = eveName;
-				eveName = undefined;
-			} else {
-				var callbackType = typeof callback;
-				if (!((eveNameType == "string" || eveNameType == "undefined") && (callbackType == "function" || callbackType == "undefined"))) {
+				return this;
+			},
+			animate: function(params, speed, callback, model) {
+				if (!protected.transition) {
+					this.css(params);
 					return this;
 				}
-			}
-			eveName = trim(eveName);
-			var elem, i = 0,
-				length = this.length;
-			for (; i < length; i++) {
-				elem = this[i];
-				if (typeof elem != "object") continue;
-				$data.removeEvent(elem, eveName, {
-					callback: callback
-				});
-			}
-			return this;
-		},
-		one: function(eveName, callback) {
-			return this.bind(eveName, callback, true);
-		},
-		ready: function(callback) {
-			if (D.isFunction(callback)) {
-				protected.ready(callback);
-			}
-			return this;
-		},
-		children: function(selector) {
-			var elemCallback = protected.elemCallback;
-			return D.isUndefined(selector) ? this.contents(elemCallback) : this.contents(selector).filter(elemCallback);
-		},
-		contents: function(selector) {
-			var array = [];
-			this.each(function() {
-				array = array.concat(listToArray(this.childNodes));
-			});
-			var newD = protected.comMode(new D(), removing(array));
-			return D.isUndefined(selector) ? newD : newD.filter(selector);
-		},
-		toString: function() {
-			return "\u005b\u006f\u0062\u006a\u0065\u0063\u0074\u0020\u004d\u0069\u006e\u0067\u0047\u0065\u005d";
-		},
-		parent: function(selector) {
-			return commandNode.call(this, "parentNode", 0, selector);
-		},
-		siblings: function(selector) {
-			var prev = commandNode.call(this, "previousSibling", 1, selector),
-				next = commandNode.call(this, "nextSibling", 1, selector);
-			D.upload(prev, next.slice());
-			D.upload(prev, removing(prev), 1);
-			return prev;
-		},
-		prev: function(selector) {
-			return commandNode.call(this, "previousSibling", 0, selector);
-		},
-		prevAll: function(selector) {
-			return commandNode.call(this, "previousSibling", 1, selector);
-		},
-		next: function(selector) {
-			return commandNode.call(this, "nextSibling", 0, selector);
-		},
-		nextAll: function(selector) {
-			return commandNode.call(this, "nextSibling", 1, selector);
-		},
-		addClass: function(str) {
-			if (D.isString(str)) {
-				str = trim(str);
-				this.each(function() {
-					if (this.nodeType === 1) {
-						var className = this.className || "";
-						className = removing(trim(className + " " + str).split(/\s+/)).join(" ");
-						className == "" || (this.className = className);
+				if (!D.isObject(params)) return this;
+				var typeSpeed = typeof speed;
+				if (typeSpeed !== "number" || isNaN(speed)) {
+					if (typeSpeed === "string") {
+						speed = trim(speed);
+						speed = showFast.hasOwnProperty(speed) ? showFast[speed] : D.reviseTime(speed, 500);
+					} else {
+						if (D.isFunction(speed)) {
+							callback = speed;
+						}
+						speed = 500;
+					}
+				}
+				if (!D.isFunction(callback)) {
+					var m = model;
+					model = callback;
+					callback = D.isFunction(m) ? m : emptyFunc;
+				}
+				var newCallback = function() {
+					var list = $data.getAnimate(this, [AnimateList]);
+					if (D.isArray(list) && list.length > 0) {
+						var newD = new D(),
+							arg = list[0];
+						newD.push(this);
+						list.splice(0, 1);
+						protected.animate.apply(newD, arg);
+					} else {
+						$data.delAnimate(this);
+					}
+					callback.call(this);
+				};
+				var elem, b = 0,
+					newD = new D(),
+					arg = [params, speed, newCallback, model],
+					lock, length = this.length;
+				for (; b < length; b++) {
+					elem = this[b];
+					if (elem && elem.nodeType != 1) continue;
+					var get = $data.getAnimate(elem);
+					if (get && get[isAnimate]) {
+						get[AnimateList] ? get[AnimateList].push(arg) : get[AnimateList] = [arg];
+					} else {
+						$data.setAnimate(elem, [isAnimate, 1]);
+						newD.push(elem);
+						lock || (lock = true);
+					}
+				}
+				lock && protected.animate.apply(newD, arg);
+				return this;
+			},
+			empty: function() {
+				return this.each(function(i) {
+					if (this.nodeType == 1) {
+						var seachIndex = protected.seachIndex(["value", "innerHTML"], this);
+						seachIndex && (this[seachIndex] = "");
 					}
 				});
-			}
-			return this;
-		},
-		hasClass: function(str) {
-			try {
-				if (D.isString(str)) {
-					var className, i = 0,
-						length = this.length;
-					str = trim(str);
-					for (; i < length; i++) {
-						className = this[i].className;
-						if (className && D.selectIndexOf(className, str, 0, 1)) {
-							return true;
+			},
+			remove: function() {
+				var arr = [];
+				this.each(function() {
+					try {
+						this.parentNode.removeChild(this);
+						D(this).unbind().stop();
+					} catch (e) {
+						arr.push(this);
+					}
+				});
+				D.upload(this, arr, 1);
+				return this;
+			},
+			on: function(eveName, agent, callback, isOne) {
+				if (D.isFunction(agent)) {
+					isOne = callback;
+					callback = agent;
+				}
+				return this.bind(eveName, callback, isOne, agent);
+			},
+			bind: function(eveName, callback, isOne, agent) {
+				isOne = isOne === true;
+				agent = D.isString(agent) ? [agent, this] : undefined;
+				if (D.isString(eveName) && D.isFunction(callback)) {
+					protected.bindHandle.call(this, eveName, callback, isOne, agent);
+				} else if (D.isObject(eveName)) {
+					for (var key in eveName) {
+						if (eveName.hasOwnProperty(key) && D.isFunction(eveName[key])) {
+							protected.bindHandle.call(this, key, eveName[key], isOne, agent);
 						}
 					}
 				}
-			} catch (e) {
-				console.log(e.message);
-			}
-			return false;
-		},
-		removeAttr: function(str) {
-			if (D.isString(str)) {
-				str = trim(str);
-				this.each(function() {
-					var k = protected.isElemProperty(this, str);
-					if (k) this[k] = "";
-					this.removeAttribute && this.removeAttribute(str);
-				});
-			}
-			return this;
-		},
-		removeClass: function(str) {
-			if (D.isString(str)) {
-				str = "(" + trim(str).replace(blankendExpr, "|") + ")";
-				this.each(function() {
-					if (this.nodeType === 1) {
-						var className = this.className;
-						if (className) {
-							try {
-								this.className = className = trim(className.replace(blankendExpr, "  ").replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
-							} catch (e) {
-								console.log(e.message);
-							}
-						}
+				return this;
+			},
+			unbind: function(eveName, callback) {
+				var eveNameType = typeof eveName;
+				if (eveNameType == "function") {
+					callback = eveName;
+					eveName = undefined;
+				} else {
+					var callbackType = typeof callback;
+					if (!((eveNameType == "string" || eveNameType == "undefined") && (callbackType == "function" || callbackType == "undefined"))) {
+						return this;
 					}
-				});
-			} else if (D.isUndefined(str)) {
-				this.each(function() {
-					if (this.nodeType === 1) {
-						if (this.className) {
-							this.className = "";
-						}
-					}
-				});
-			}
-			return this;
-		},
-		find: function(str) {
-			return canonicalStructure(str, this, {
-				find: true
-			});
-		},
-		map: function(callback) {
-			if (D.isFunction(callback)) return protected.filterCallback(this, callback, true);
-			return new D();
-		},
-		filter: function(str) {
-			if (D.isFunction(str)) return protected.filterCallback(this, str);
-			var fil = canonicalStructure(str, this, {
-				filter: true
-			});
-			return fil;
-		},
-		index: function(obj) {
-			try {
-				if (D.isUndefined(obj)) {
-					var t0 = this[0];
-					return D.inArray(t0, D(t0.parentNode).children());
 				}
-				return D.inArray((obj instanceof D) ? obj[0] : obj, this);
-			} catch (e) {
-				return -1;
-			}
-		},
-		eq: function(index) {
-			var M = new D(),
-				node = this;
-			M = index == null ? this : (index = index < 0 ? node.length + index : index, node.hasOwnProperty(index) && M.push(M.queryOne = node[index]),
-				M);
-			return M;
-		},
-		first: function() {
-			return this.eq(0);
-		},
-		last: function() {
-			return this.eq(-1);
-		},
-		size: function() {
-			return this.length;
-		},
-		each: function(callback) {
-			if (D.isFunction(callback)) {
-				var length = this.length,
-					i = 0,
-					obj;
+				eveName = trim(eveName);
+				var elem, i = 0,
+					length = this.length;
 				for (; i < length; i++) {
-					try {
-						obj = this[i];
-						obj != null && callback.call(obj, i, length);
-					} catch (e) {
-						console.log(e.message);
-					}
+					elem = this[i];
+					if (typeof elem != "object") continue;
+					$data.removeEvent(elem, eveName, {
+						callback: callback
+					});
 				}
-			}
-			return this;
-		},
-		clientWidth: function() {
-			return protected.getCS.call(this, "clientWidth");
-		},
-		clientHeight: function() {
-			return protected.getCS.call(this, "clientHeight");
-		},
-		scrollWidth: function() {
-			return protected.getCS.call(this, "scrollWidth");
-		},
-		scrollHeight: function() {
-			return protected.getCS.call(this, "scrollHeight");
-		},
-		scrollLeft: function(num) {
-			return protected.setS.call(this, "scrollLeft", num);
-		},
-		scrollTop: function(num) {
-			return protected.setS.call(this, "scrollTop", num);
-		},
-		hover: function(inCallback, outCallback) {
-			return this.mouseenter(inCallback).mouseleave(outCallback);
-		},
-		val: function(str) {
-			return protected.htmlVal.call(this, "value", str);
-		},
-		html: function(str) {
-			return protected.htmlVal.call(this, "innerHTML", str);
-		},
-		text: function(str) {
-			return protected.htmlVal.call(this, protected.isIndex("textContent", virDiv) ? "textContent" : "innerText", str);
-		},
-		css: function(args, val) {
-			var i = 0,
-				elem, key, arrayKey = {},
-				sty, type = typeof args,
-				nodeList = this,
-				length = nodeList.length;
-			if (type === "string") {
-				args = D.styleName(trim(args));
-				if (D.isUndefined(val)) {
-					if (!((elem = nodeList[0]) && D.isElem(elem))) {
-						return null;
-					}
-					if (transformReg.test(args)) {
-						var transform = elem.style[protected.transform];
-						if (transform) {
-							try {
-								i = new RegExp("" + args + "\\s?\\((.*)\\)", "i").exec(transform);
-								return i && i[1];
-							} catch (e) {
-								console.log(e.message);
+				return this;
+			},
+			one: function(eveName, callback) {
+				return this.bind(eveName, callback, true);
+			},
+			ready: function(callback) {
+				if (D.isFunction(callback)) {
+					protected.ready(callback);
+				}
+				return this;
+			},
+			children: function(selector) {
+				var elemCallback = protected.elemCallback;
+				return D.isUndefined(selector) ? this.contents(elemCallback) : this.contents(selector).filter(elemCallback);
+			},
+			contents: function(selector) {
+				var array = [];
+				this.each(function() {
+					array = array.concat(listToArray(this.childNodes));
+				});
+				var newD = protected.comMode(new D(), removing(array));
+				return D.isUndefined(selector) ? newD : newD.filter(selector);
+			},
+			toString: function() {
+				return "\u005b\u006f\u0062\u006a\u0065\u0063\u0074\u0020\u004d\u0069\u006e\u0067\u0047\u0065\u005d";
+			},
+			parent: function(selector) {
+				return commandNode.call(this, "parentNode", 0, selector);
+			},
+			siblings: function(selector) {
+				var prev = commandNode.call(this, "previousSibling", 1, selector),
+					next = commandNode.call(this, "nextSibling", 1, selector);
+				D.upload(prev, next.slice());
+				D.upload(prev, removing(prev), 1);
+				return prev;
+			},
+			prev: function(selector) {
+				return commandNode.call(this, "previousSibling", 0, selector);
+			},
+			prevAll: function(selector) {
+				return commandNode.call(this, "previousSibling", 1, selector);
+			},
+			next: function(selector) {
+				return commandNode.call(this, "nextSibling", 0, selector);
+			},
+			nextAll: function(selector) {
+				return commandNode.call(this, "nextSibling", 1, selector);
+			},
+			addClass: function(str) {
+				if (D.isString(str)) {
+					str = trim(str);
+					this.each(function() {
+						if (this.nodeType === 1) {
+							var className = this.className || "";
+							className = removing(trim(className + " " + str).split(/\s+/)).join(" ");
+							className == "" || (this.className = className);
+						}
+					});
+				}
+				return this;
+			},
+			hasClass: function(str) {
+				try {
+					if (D.isString(str)) {
+						var className, i = 0,
+							length = this.length;
+						str = trim(str);
+						for (; i < length; i++) {
+							className = this[i].className;
+							if (className && D.selectIndexOf(className, str, 0, 1)) {
+								return true;
 							}
 						}
-						return null;
 					}
-					if ((args == "opacity" || args == "filter") && protected.opacity == "filter") {
-						return protected.getFilter(elem);
-					}
-					return protected.original(elem, args);
+				} catch (e) {
+					console.log(e.message);
 				}
-				for (i = 0; i < length; i++) {
-					elem = nodeList[i];
-					if (!D.isElem(elem)) continue;
-					try {
-						sty = elem.style;
-						arrayKey = protected.style(sty, args, val);
-						sty[arrayKey[0]] = arrayKey[1];
-					} catch (e) {
-						console.log(e.message);
-					}
+				return false;
+			},
+			removeAttr: function(str) {
+				if (D.isString(str)) {
+					str = trim(str);
+					this.each(function() {
+						var k = protected.isElemProperty(this, str);
+						if (k) this[k] = "";
+						this.removeAttribute && this.removeAttribute(str);
+					});
 				}
-			} else if (D.isObject(args)) {
-				for (i = 0; i < length; i++) {
-					elem = nodeList[i];
-					if (!D.isElem(elem)) continue;
-					sty = elem.style;
-					for (key in args) {
+				return this;
+			},
+			removeClass: function(str) {
+				if (D.isString(str)) {
+					str = "(" + trim(str).replace(blankendExpr, "|") + ")";
+					this.each(function() {
+						if (this.nodeType === 1) {
+							var className = this.className;
+							if (className) {
+								try {
+									this.className = className = trim(className.replace(blankendExpr, "  ").replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
+								} catch (e) {
+									console.log(e.message);
+								}
+							}
+						}
+					});
+				} else if (D.isUndefined(str)) {
+					this.each(function() {
+						if (this.nodeType === 1) {
+							if (this.className) {
+								this.className = "";
+							}
+						}
+					});
+				}
+				return this;
+			},
+			find: function(str) {
+				return canonicalStructure(str, this, {
+					find: true
+				});
+			},
+			map: function(callback) {
+				if (D.isFunction(callback)) return protected.filterCallback(this, callback, true);
+				return new D();
+			},
+			filter: function(str) {
+				if (D.isFunction(str)) return protected.filterCallback(this, str);
+				var fil = canonicalStructure(str, this, {
+					filter: true
+				});
+				return fil;
+			},
+			index: function(obj) {
+				try {
+					if (D.isUndefined(obj)) {
+						var t0 = this[0];
+						return D.inArray(t0, D(t0.parentNode).children());
+					}
+					return D.inArray((obj instanceof D) ? obj[0] : obj, this);
+				} catch (e) {
+					return -1;
+				}
+			},
+			eq: function(index) {
+				var M = new D(),
+					node = this;
+				M = index == null ? this : (index = index < 0 ? node.length + index : index, node.hasOwnProperty(index) && M.push(M.queryOne = node[index]),
+					M);
+				return M;
+			},
+			first: function() {
+				return this.eq(0);
+			},
+			last: function() {
+				return this.eq(-1);
+			},
+			size: function() {
+				return this.length;
+			},
+			each: function(callback) {
+				if (D.isFunction(callback)) {
+					var length = this.length,
+						i = 0,
+						obj;
+					for (; i < length; i++) {
 						try {
-							if (i == 0 && args.hasOwnProperty(key)) {
-								arrayKey[key] = protected.style(sty, D.styleName(key), args[key]);
-							}
-							if (arrayKey[key]) {
-								sty[arrayKey[key][0]] = arrayKey[key][1];
-							}
+							obj = this[i];
+							obj != null && callback.call(obj, i, length);
 						} catch (e) {
 							console.log(e.message);
 						}
 					}
 				}
-			}
-			return this;
-		},
-		get: function(index) {
-			var node = this;
-			return index == null ? node.slice() : (index = index < 0 ? node.length + index : index,
-				node.hasOwnProperty(index) && node[index]);
-		},
-		push: push,
-		slice: slice,
-		splice: virArr.splice,
-		pop: virArr.pop,
-		indexOf: virArr.indexOf,
-		shift: virArr.shift,
-		sort: virArr.sort,
-		unshift: virArr.unshift,
-		toLocaleString: virArr.toLocaleString,
-		join: virArr.join,
-		reverse: virArr.reverse,
-		length: 0
-	};
+				return this;
+			},
+			clientWidth: function() {
+				return protected.getCS.call(this, "clientWidth");
+			},
+			clientHeight: function() {
+				return protected.getCS.call(this, "clientHeight");
+			},
+			scrollWidth: function() {
+				return protected.getCS.call(this, "scrollWidth");
+			},
+			scrollHeight: function() {
+				return protected.getCS.call(this, "scrollHeight");
+			},
+			scrollLeft: function(num) {
+				return protected.setS.call(this, "scrollLeft", num);
+			},
+			scrollTop: function(num) {
+				return protected.setS.call(this, "scrollTop", num);
+			},
+			hover: function(inCallback, outCallback) {
+				return this.bind({
+					mouseenter: inCallback,
+					mouseleave: outCallback
+				});
+			},
+			val: function(str) {
+				return protected.htmlVal.call(this, "value", str);
+			},
+			html: function(str) {
+				return protected.htmlVal.call(this, "innerHTML", str);
+			},
+			text: function(str) {
+				return protected.htmlVal.call(this, protected.isIndex("textContent", virDiv) ? "textContent" : "innerText", str);
+			},
+			css: function(args, val) {
+				var i = 0,
+					elem, key, arrayKey = {},
+					sty, type = typeof args,
+					nodeList = this,
+					length = nodeList.length;
+				if (type === "string") {
+					args = D.styleName(trim(args));
+					if (D.isUndefined(val)) {
+						if (!((elem = nodeList[0]) && D.isElem(elem))) {
+							return null;
+						}
+						if (transformReg.test(args)) {
+							var transform = elem.style[protected.transform];
+							if (transform) {
+								try {
+									i = new RegExp("" + args + "\\s?\\((.*)\\)", "i").exec(transform);
+									return i && i[1];
+								} catch (e) {
+									console.log(e.message);
+								}
+							}
+							return null;
+						}
+						if ((args == "opacity" || args == "filter") && protected.opacity == "filter") {
+							return protected.getFilter(elem);
+						}
+						return protected.original(elem, args);
+					}
+					for (i = 0; i < length; i++) {
+						elem = nodeList[i];
+						if (!D.isElem(elem)) continue;
+						try {
+							sty = elem.style;
+							arrayKey = protected.style(sty, args, val);
+							sty[arrayKey[0]] = arrayKey[1];
+						} catch (e) {
+							console.log(e.message);
+						}
+					}
+				} else if (D.isObject(args)) {
+					for (i = 0; i < length; i++) {
+						elem = nodeList[i];
+						if (!D.isElem(elem)) continue;
+						sty = elem.style;
+						for (key in args) {
+							try {
+								if (i == 0 && args.hasOwnProperty(key)) {
+									arrayKey[key] = protected.style(sty, D.styleName(key), args[key]);
+								}
+								if (arrayKey[key]) {
+									sty[arrayKey[key][0]] = arrayKey[key][1];
+								}
+							} catch (e) {
+								console.log(e.message);
+							}
+						}
+					}
+				}
+				return this;
+			},
+			get: function(index) {
+				var node = this;
+				return index == null ? node.slice() : (index = index < 0 ? node.length + index : index,
+					node.hasOwnProperty(index) && node[index]);
+			},
+			push: push,
+			slice: slice,
+			splice: virArr.splice,
+			pop: virArr.pop,
+			indexOf: virArr.indexOf,
+			shift: virArr.shift,
+			sort: virArr.sort,
+			unshift: virArr.unshift,
+			toLocaleString: virArr.toLocaleString,
+			join: virArr.join,
+			reverse: virArr.reverse,
+			length: 0
+		};
 	D.fn.extend = D.extend = D.bindFn.extend = function() {
 		var length = arguments.length,
 			key;
@@ -2358,6 +2394,16 @@
 			return typeof str == "string";
 		},
 		removArray: removing,
+		isNodeCreateBody: function(node) {
+			while (node) {
+				if (node.tagName == "BODY") {
+					return true;
+				}
+				node = node.parentNode;
+			}
+			return false;
+
+		},
 		each: function(obj, fun) {
 			var i = 0,
 				isfun;
@@ -2391,7 +2437,6 @@
 			} else return false;
 			return true;
 		},
-
 		eventCompatible: function(event, eventName) {
 			event || (event = window.event);
 			if (addEvent.att == 1) {
@@ -2722,8 +2767,8 @@
 					}
 					return offset in node ? node[offset] : null;
 				}
-				numEndExpr.test(str) && (str += "px");
-				return this.css(item, str);
+				str = parseFloat(str);
+				return isNaN(str) ? this : this.css(item, str + "px");
 			};
 		}(item, item.replace(wExpr, item.charAt(0).toUpperCase()));
 	});
@@ -2766,6 +2811,15 @@
 		window.console = {
 			log: function() {}
 		};
+	}
+	if (D.isFunction(window.define) && define.amd) {
+		// AMD
+		define('MingGe_1.9.6.4', function() {
+			return MingGe;
+		});
+	} else if (typeof exports === 'object') {
+		// Node.js
+		module.exports = MingGe;
 	}
 	(function(args) {
 		var eveName, i = 0,
