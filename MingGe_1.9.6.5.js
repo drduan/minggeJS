@@ -1,5 +1,5 @@
 /* 
- *  MingGeJs类库1.9.6.4.2016超强正式版
+ *  MingGeJs类库1.9.6.5.2016超强正式版
  *  
  *  你会用JQUERY，那你也会用这个类库，因为语法都是一样的,那有开发文档吗？和JQUERY一样，要开发文档干嘛？
  *
@@ -8,7 +8,7 @@
  *  作者：明哥先生-QQ399195513 QQ群：461550716 官网：www.shearphoto.com
  */
 (function(window, varName, undefined) {
-	var MingGeJs = "1.9.6.4",
+	var MingGeJs = "MingGe_1.9.6.5",
 		statech = "readystatechange",
 		onStatech = "on" + statech,
 		strObject = "[object Object]",
@@ -185,7 +185,7 @@
 			var i = 0,
 				arr = [],
 				length = array.length;
-			if (array && (array.item || length)) {
+			if (array && (length || (array.item && !D.isWindow(array)))) {
 				for (; i < length; i++) {
 					D.inArray(array[i], arr) == -1 && arr.push(array[i]);
 				}
@@ -314,7 +314,8 @@
 				} else {
 					var match = selectorExpr.exec(selector),
 						getid;
-					D.upload(newD, match ? (getid = DOC[getById](match[1])) ? [getid] : [] : listToArray(DOC[querySelect](selector)));
+					D.upload(newD, match ?
+						(getid = DOC[getById](match[1])) ? [getid] : [] : listToArray(DOC[querySelect](selector)));
 					newD.queryOne = selector;
 				}
 			} catch (e) {
@@ -1407,11 +1408,8 @@
 			if (D.isArray(obj) || obj instanceof D) {
 				return obj.slice();
 			}
-			if (obj.item) {
-				if (obj.item && D.isArray(obj = listToArray(obj))) {
-					return obj;
-				}
-				return false;
+			if (obj.item && !D.isWindow(obj) && D.isArray(obj = listToArray(obj))) {
+				return obj;
 			}
 			return [obj];
 		},
@@ -1444,7 +1442,7 @@
 		};
 	D.bindFn = {},
 		D.fn = D.prototype = {
-			version: "\u4f60\u4f7f\u7528\u7684\u7248\u672c\u662fMingGejs" + MingGeJs,
+			version: "\u4f60\u4f7f\u7528\u7684\u7248\u672c\u662f" + MingGeJs,
 			queryOne: false,
 			queryTwo: false,
 			is: function(selector) {
@@ -2408,7 +2406,7 @@
 			var i = 0,
 				isfun;
 			if (obj == null) return false;
-			if (D.isArray(obj) || obj.item || (isfun = D.isFunction(obj))) {
+			if (D.isArray(obj) || (obj.item && !D.isWindow(obj)) || (isfun = D.isFunction(obj))) {
 				if (isfun) {
 					fun = obj;
 					obj = this;
@@ -2814,7 +2812,7 @@
 	}
 	if (D.isFunction(window.define) && define.amd) {
 		// AMD
-		define('MingGe_1.9.6.4', function() {
+		define(MingGeJs, function() {
 			return MingGe;
 		});
 	} else if (typeof exports === 'object') {
