@@ -1,5 +1,4 @@
 # MingGeJS1.9.4.2016完美正式版
->HEAD
 
  English version is [here](README_en.md).
  
@@ -94,7 +93,6 @@
 继优秀作品shearphoto截图插件，本人又再推出国产山寨jQuery，为什么我要开发一个山寨jQuery？老实说我从来没用过jQuery，正因为我反感jQuery。
 为什么我反感，因为我完全有开发jQuery的能力，jQuery的底层我都了如指掌。
 我开发插件一直都是用原生JS，大家可以看下我前面的作品shearphoto就是用原生JS写的。  虽说我反感jQuery，但是jQuery却在前端界占有大量的用户份额，之后我有个想法，不如重新开发一个属于自己思想，自己架构的jQuery。有了想法就要实现我山寨jQuery之路
->>>>>>> pr/60
 
 我给了他一个霸气的名字：MingGeJs，  
 
