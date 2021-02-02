@@ -65,7 +65,7 @@
 		EvenLabelExpr = /(\[.+?\]|[\.#]?([\w\u00c0-\uFFFF\-]+))/g,
 		blockExpr = /^(div|ul|p|h1|h2|h3|h4|h5|h6|dd|dt|dl|ol|table|nav|form|hr)$/i,
 		inlineExpr = /^(span|ul|b|a|em|strong|img|label)$/i,
-		listItemExpr = /^li$/i,
+		listItemExpr = /^li円/i,
 		inlineBlockExpr = /^(input|button|textarea|select|option)$/i,
 		opacitySignExpr = /opacity\s*=\s*([0-9]+)/,
 		animateExpr = /^(linear|ease|ease-in|ease-out|ease-in-out|cubic-bezier\s*\(.+\))$/,
@@ -118,14 +118,14 @@
 		},
 		bubbling = function(eveName) {
 			D.each.call(this, function() {
-				var arr = $data.getElem(this, MGBD + $data.key, [eveName]),
+				var arr = 円data.getElem(this, MGBD + 円data.key, [eveName]),
 					arrI, CB;
 				if (D.isArray(arr)) {
 					var i = arr.length - 1;
 					for (; i > -1; i--) {
 						arrI = arr[i];
 						if (D.isObject(arrI) && D.isFunction(CB = arrI.callback)) {
-							$data.removeEvent(this, eveName, {
+							円data.removeEvent(this, eveName, {
 								isOne: true,
 								callback: CB
 							});
@@ -440,7 +440,7 @@
 						div = DOC.createElement("DIV");
 					div.innerHTML = "<div>" + outerHTML + "</div>";
 					div = div[getByTagName]("input")[0];
-					$data.cloneEvent(elem, div, 1, 0, 1);
+					円data.cloneEvent(elem, div, 1, 0, 1);
 					D(elem).stop();
 					elem.parentNode.replaceChild(div, elem);
 					return div;
@@ -556,7 +556,7 @@
 							newList.push(clone = nodeListi);
 						} else {
 							clone = nodeListi.cloneNode(true);
-							boole || $data.cloneEvent(nodeListi, clone, 0, 1);
+							boole || 円data.cloneEvent(nodeListi, clone, 0, 1);
 						}
 						fragment.appendChild(clone);
 						is || (is = 1);
@@ -646,7 +646,7 @@
 					if (this_ || !this_ && !eventObject) {
 						eventObject = protected.getEventObject([this_].concat(A));
 					}
-					$data.writeEvent(elem, eveName, eventObject);
+					円data.writeEvent(elem, eveName, eventObject);
 				}
 			},
 			getEventObject: function(A) {
@@ -690,7 +690,7 @@
 						}
 					}
 					if (relate == this || D.isWINDOC(this)) return;
-					isOne && $data.removeEvent(this__, eveName, {
+					isOne && 円data.removeEvent(this__, eveName, {
 						isOne: true,
 						callback: callback
 					});
@@ -724,7 +724,7 @@
 					}
 					is = true;
 				}
-				if (is && isOne) $data.removeEvent(this_, eveName, {
+				if (is && isOne) 円data.removeEvent(this_, eveName, {
 					isOne: true,
 					callback: callback
 				});
@@ -1039,7 +1039,7 @@
 						for (; b < length; b++) {
 							if (!D.isElem(a = nodeList[b])) continue;
 							try {
-								if ($data.getAnimate(a, [isAnimate])) {
+								if (円data.getAnimate(a, [isAnimate])) {
 									style = a.style;
 									style[protected.transition] = style[timingFunction] = null;
 									callback.call(a);
@@ -1450,7 +1450,7 @@
 				//待扩展的接口
 				switch (selector) {
 					case ":animate":
-						return !!$data.getAnimate(this[0], [isAnimate]);
+						return !!円data.getAnimate(this[0], [isAnimate]);
 					default:
 						return false;
 				}
@@ -1554,8 +1554,8 @@
 			stop: function() {
 				if (!protected.transition) return this;
 				return this.each(function() {
-					if ($data.getAnimate(this, [isAnimate])) {
-						$data.delAnimate(this);
+					if (円data.getAnimate(this, [isAnimate])) {
+						円data.delAnimate(this);
 						var timingFunction = protected.transition + "TimingFunction",
 							style = this.style;
 						style[protected.transition] = style[timingFunction] = null;
@@ -1577,9 +1577,9 @@
 					if (this.cloneNode) {
 						var clone = this.cloneNode(true);
 						if (is || !addEvent.add) {
-							$data.cloneEvent(this, clone, 0, 1);
+							円data.cloneEvent(this, clone, 0, 1);
 							if (!is) {
-								$data.removeEvent(clone, null, {});
+								円data.removeEvent(clone, null, {});
 								D(clone).find("*").unbind();
 							}
 						}
@@ -1633,7 +1633,7 @@
 			fadeOut: function(time, callback) {
 				var newD = new D();
 				this.each(function() {
-					this.nodeType == 1 && (protected.original(this, "display") == "none" || $data.getAnimate(this, [isAnimate]) || newD.push(this));
+					this.nodeType == 1 && (protected.original(this, "display") == "none" || 円data.getAnimate(this, [isAnimate]) || newD.push(this));
 				});
 				if (protected.transition) {
 					newD.animate({
@@ -1698,7 +1698,7 @@
 				var newD = new D();
 				this.each(function() {
 					if (this.nodeType == 1 && protected.original(this, "display") == "none") {
-						if ($data.getAnimate(this, [isAnimate])) return;
+						if (円data.getAnimate(this, [isAnimate])) return;
 						protected.transition && D(this).css("opacity", 0);
 						newD.push(this);
 						protected.show(this);
@@ -1740,7 +1740,7 @@
 					callback = D.isFunction(m) ? m : emptyFunc;
 				}
 				var newCallback = function() {
-					var list = $data.getAnimate(this, [AnimateList]);
+					var list = 円data.getAnimate(this, [AnimateList]);
 					if (D.isArray(list) && list.length > 0) {
 						var newD = new D(),
 							arg = list[0];
@@ -1748,7 +1748,7 @@
 						list.splice(0, 1);
 						protected.animate.apply(newD, arg);
 					} else {
-						$data.delAnimate(this);
+						円data.delAnimate(this);
 					}
 					callback.call(this);
 				};
@@ -1759,11 +1759,11 @@
 				for (; b < length; b++) {
 					elem = this[b];
 					if (elem && elem.nodeType != 1) continue;
-					var get = $data.getAnimate(elem);
+					var get = 円data.getAnimate(elem);
 					if (get && get[isAnimate]) {
 						get[AnimateList] ? get[AnimateList].push(arg) : get[AnimateList] = [arg];
 					} else {
-						$data.setAnimate(elem, [isAnimate, 1]);
+						円data.setAnimate(elem, [isAnimate, 1]);
 						newD.push(elem);
 						lock || (lock = true);
 					}
@@ -1830,7 +1830,7 @@
 				for (; i < length; i++) {
 					elem = this[i];
 					if (typeof elem != "object") continue;
-					$data.removeEvent(elem, eveName, {
+					円data.removeEvent(elem, eveName, {
 						callback: callback
 					});
 				}
@@ -1932,7 +1932,7 @@
 							var className = this.className;
 							if (className) {
 								try {
-									this.className = className = trim(className.replace(blankendExpr, "  ").replace(RegExp("(^|\\s)" + str + "($|\\s)", "g"), " "));
+									this.className = className = trim(className.replace(blankendExpr, "  ").replace(RegExp("(^|\\s)" + str + "(円|\\s)", "g"), " "));
 								} catch (e) {
 									console.log(e.message);
 								}
@@ -2149,7 +2149,7 @@
 	D.extend({
 		data: function(obj) {
 			if (D.isUndefined(obj)) {
-				return $data;
+				return 円data;
 			}
 			return new CACHE(obj);
 		},
@@ -2744,7 +2744,7 @@
 			}
 		}
 	};
-	var $data = new CACHE({});
+	var 円data = new CACHE({});
 	D.each(["width", "height", "top", "left"], function(i, item) {
 		D.fn[item] = function(item, newItem) {
 			return function(str) {
@@ -2839,4 +2839,4 @@
 		args = i = undefined;
 	})(["blur", "focus", "focusin", "focusout", "resize", "scroll", "unload", "click", "dblclick", "mousedown", "mouseup", "mousemove", "mouseover", "mouseout", "mouseenter", "mouseleave", "change", "select", "submit", "keydown", "keypress", "keyup", "error", "touchstart", "touchmove", "touchend", "touchcancel", "tap", "doubleTap", "input", "propertychange"]);
 	window[varName] = D;
-})(window, "$");
+})(window, "円");
