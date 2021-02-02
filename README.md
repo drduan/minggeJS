@@ -15,30 +15,30 @@
   2：新增 prepend appendTo prependTo before after ，完全和JQ一一模一样，，而且带事件克隆效果，这些接口分别做了大量的工作，createNode接口，继续存在，保留参数传入
 
 
-  3：先前取 单个对象 需要  $("div").nodeList[0],一直惹起各方用户反感，纷纷说“JQ都不是这样的，作者技术不够吧”，因此我又做了大量工作，现在可以$("div")[0] 可以这样取了
+  3：先前取 单个对象 需要  円("div").nodeList[0],一直惹起各方用户反感，纷纷说“JQ都不是这样的，作者技术不够吧”，因此我又做了大量工作，现在可以円("div")[0] 可以这样取了
 
 
  4：选择器接口深度修复，细节不详，以及执行效率增强，可以告诉大家，比JQ最小快2倍，逻辑不比JQ少，ZEPTO更甩开他几条街。
 
 
-  5：新增克隆节点 ， $("div").clone(参数) 参数为TRUE时，连事件一起克隆，包括子节点。参数非TRUE时，只克隆节点，包括子节点，这个接口和JQ一模一样的，具体看JQ的方档；
+  5：新增克隆节点 ， 円("div").clone(参数) 参数为TRUE时，连事件一起克隆，包括子节点。参数非TRUE时，只克隆节点，包括子节点，这个接口和JQ一模一样的，具体看JQ的方档；
 
 
    6：新增add  map 接口，具体请看JQ方档，反正一模一样的；
 
 
-   7： filter 新增可以传入FUNCTION 示例  $("div").filter(function(){ return this.nodeType==1;  })，和JQ一模一样的；
+   7： filter 新增可以传入FUNCTION 示例  円("div").filter(function(){ return this.nodeType==1;  })，和JQ一模一样的；
 
 
-   8：新增依赖加载接口（非标准型）,$.createScript；
+   8：新增依赖加载接口（非标准型）,円.createScript；
 
 
-   9：新增可以这样创节点 $("<div>123</div>")，还有  $([1,2,3,4]) 这样传入   还有  $( document.getElementsByTagName("div")) 节点列表传入，DOM传入等，非常人性化；
+   9：新增可以这样创节点 円("<div>123</div>")，还有  円([1,2,3,4]) 这样传入   还有  円( document.getElementsByTagName("div")) 节点列表传入，DOM传入等，非常人性化；
 
 
-   10：新增 MingGe.noConflict() 方法让渡变量 $ 的 MingGe 控制权。
+   10：新增 MingGe.noConflict() 方法让渡变量 円 的 MingGe 控制权。
 
-该方法释放  MingGe 对 $ 变量的控制。
+该方法释放  MingGe 对 円 变量的控制。
 
  该方法也可用于为  MingGe 变量规定新的自定义名称.
 
@@ -63,15 +63,15 @@
 
 >PS:MingGeJS 1.9.3.完美正式版 升级
 
-1：新增取兄弟节点API接口 $(XXX).siblings(),$(XXX).prev(),$(XXX).prevAll(),$(XXX).next(),$(XXX).nextAll()。我不介绍了，和jQuery的接口一样的。
+1：新增取兄弟节点API接口 円(XXX).siblings(),円(XXX).prev(),円(XXX).prevAll(),円(XXX).next(),円(XXX).nextAll()。我不介绍了，和jQuery的接口一样的。
 
 2：新增content 取文本节点， 不介绍了和jQuery一样的。
 
-3：修复选择器为 为“*”号时，取不出节点，例如$("*").filter("*"),已深度修复。
+3：修复选择器为 为“*”号时，取不出节点，例如円("*").filter("*"),已深度修复。
 
 4：修复children取出来的子节点有误。
 
-5: 修正特殊情况下$(xxx)指向被错误劫持的问题！
+5: 修正特殊情况下円(xxx)指向被错误劫持的问题！
 
 6: 以及部份API细节作了深度调整。
 
